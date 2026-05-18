@@ -1,0 +1,12 @@
+{
+  "name": "remotion-video-presentation",
+  "version": "1.0.0",
+  "category": "Video / Presentation",
+  "description": "Turn articles or scripts into MP4 videos using Remotion. Produces a React-based Remotion project with frame-precise animation, embedded audio timeline, and direct MP4 rendering — no screen recording needed.",
+  "homepage": "https://github.com/MgGaWin/remotion-video-presentation",
+  "compat": [
+    "claude-code",
+    "claude-ai",
+    "cursor"
+  ]
+}
