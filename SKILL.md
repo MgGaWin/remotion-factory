@@ -1,5 +1,5 @@
 ---
-name: remotion-video-presentation
+name: remotion-factory
 description: |
   把一篇文章或口播稿，用 Remotion 做成可直接渲染 MP4 的视频。
   流程：原始文章 → 口播稿 + outline → 用户对齐 → Remotion 开发 → 音频嵌入 → 渲染 MP4。

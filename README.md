@@ -1,4 +1,4 @@
-# Remotion Video Presentation
+# Remotion Factory
 
 Turn articles or scripts into MP4 videos using [Remotion](https://remotion.dev).
 
