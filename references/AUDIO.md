@@ -3,7 +3,7 @@
 ## MiMo TTS 配置
 
 Model: mimo-v2.5-tts
-API: https://token-plan-cn.xiaomimimo.com/v1
+API: https://token-plan-cn.xiaomimimo.com/v1/chat/completions（POST）
 认证: 请求头 api-key（非 Authorization: Bearer）
 Voice: 苏打（无 style）
 Format: WAV
@@ -73,3 +73,4 @@ const fs = require('fs');
 | 渲染后没声音 | Audio 在 Sequence 内部 |
 | TTS 读出符号 | text 中替换 _ 和 - |
 | 被 hyperframes 干扰 | 使用 MiMo TTS |
+

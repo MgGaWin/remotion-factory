@@ -87,6 +87,31 @@ my-video/
 └── out/                     # 渲染输出的 MP4
 ```
 
+**audio-segments.json 格式**：
+
+`json
+[
+  {
+    "chapter": "ch1",
+    "scene": "Scene0Title",
+    "audio": "ch1-0.wav",
+    "text": "Hello，大家好，今天我们来聊 LangChain 中最核心的部分，模型，Models。"
+  },
+  {
+    "chapter": "ch1",
+    "scene": "Scene1Emergence",
+    "audio": "ch1-1.wav",
+    "text": "在正式写代码之前，我们先搞清楚几个基本概念。"
+  }
+]
+`
+
+字段说明：
+- chapter: 章节标识（ch1, ch2, ...）
+- scene: 场景组件名（必须与 src/scenes/ 下的文件名对应）
+- audio: 音频文件名（输出到 public/audio/）
+- text: 口播文本（TTS 友好：已替换 _ 和 - 为空格）
+
 **references/ 目录说明**：
 - 用于放置设计参考图（草图、截图、灵感图）
 - Claude 会读取这些图片作为视觉参考
@@ -290,7 +315,7 @@ script.md + outline.md 写完后必须停下来，一次对齐 5 件事：
 
 API 配置：
   Model: mimo-v2.5-tts
-  API: https://token-plan-cn.xiaomimimo.com/v1
+  API: https://token-plan-cn.xiaomimimo.com/v1/chat/completions（POST）
   认证: 请求头 api-key（非 Authorization: Bearer）
   Voice: 苏打
   Format: WAV
@@ -314,6 +339,8 @@ const fs = require('fs');
 });"
 
 帧数 = 秒数 x 30，向上取整。铁律：必须从 WAV header 计算。
+
+如果测量帧数与 ChapterX.tsx 中声明的常量相差超过 2 帧，必须重新测量并更新常量。
 
 ---
 
@@ -351,6 +378,8 @@ const fs = require('fs');
 脚手架：
   mkdir src/{styles,components,scenes} public/audio out scripts references
 
+字体加载：在 global.css 中用 @import 导入 Google Fonts（Lora, Poppins, JetBrains Mono），否则会静默回退到 Georgia/Arial/monospace。
+
 tokens.css 使用默认 Anthropic 暖调赤陶风格（见上方"设计风格"章节），用户可自定义。
 
 ### 3.2 第 1 章 — 主线程 + 强制验收
@@ -360,6 +389,7 @@ tokens.css 使用默认 Anthropic 暖调赤陶风格（见上方"设计风格"�
 
 Chapter1.tsx 模板：
 ```tsx
+import React from 'react';
 import { AbsoluteFill, Audio, Sequence, staticFile } from 'remotion';
 
 // 帧数从 Phase 2 测量结果获取
@@ -434,6 +464,12 @@ npx remotion render src/index.ts Chapter1 out/chapter1.mp4 --browser-executable=
 1. 帧驱动：useCurrentFrame() 是唯一时间源
 2. 确定性：同一帧数永远产生同一画面
 3. 所有 interpolate 必须有 extrapolateLeft/Right: 'clamp'
+
+### 动画导入
+
+`	sx
+import { useCurrentFrame, interpolate, Easing } from 'remotion';
+`
 
 ### 动画节奏：延迟对齐 + 快速动画
 
@@ -538,3 +574,4 @@ const bulletOp = (i) => interpolate(
 | 重新生成音频后错位 | 重新测量 WAV 帧数，更新常量 |
 | 动画和音频对不上 | Phase 2 先合成音频，再开发动画 |
 | 渲染太早 | 必须通过 Checkpoint Render 才能渲染 |
+

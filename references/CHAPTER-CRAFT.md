@@ -52,13 +52,13 @@ const bulletOp = (i) => interpolate(
 const exitOp = 1; // 不加退出动画
 
 ### 旋转（加载指示器）
-const rotation = interpolate(frame, [0, 300], [0, 1080], { extrapolateRight: 'clamp' });
+const rotation = interpolate(frame, [0, 300], [0, 1080], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 
 ### 数字递增
-const value = interpolate(frame, [startFrame, endFrame], [0, targetValue], { extrapolateRight: 'clamp' });
+const value = interpolate(frame, [startFrame, endFrame], [0, targetValue], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 
 ### 打字机效果
-const charCount = Math.floor(interpolate(frame, [startFrame, startFrame + text.length * 2], [0, text.length], { extrapolateRight: 'clamp' }));
+const charCount = Math.floor(interpolate(frame, [startFrame, startFrame + text.length * 2], [0, text.length], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }));
 const visibleText = text.slice(0, charCount);
 
 ### SVG 描边动画
@@ -85,3 +85,4 @@ path strokeDasharray={CURVE_LENGTH} strokeDashoffset={CURVE_LENGTH * (1 - linePr
 - [ ] 音频和画面同步
 - [ ] Studio 预览无报错
 - [ ] 渲染成功出 MP4
+
