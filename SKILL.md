@@ -2,9 +2,9 @@
 name: remotion-factory
 description: |
   把一篇文章或口播稿，用 Remotion 做成可直接渲染 MP4 的视频。
-  流程：原始文章 → 口播稿 + outline → 用户对齐 → Remotion 开发 → 音频嵌入 → 渲染 MP4。
+  流程：原始文章 → 口播稿 → 音频合成 → Remotion 开发 → 渲染 MP4。
   适用场景：B 站 / YouTube / 视频号教程、产品演示、数据可视化视频、动态 PPT。
-  本 Skill 不绑定特定样式，设计系统由用户偏好驱动。
+  默认设计风格：Anthropic 暖调赤陶色人文极简。用户可自定义。
 ---
 
 # Remotion Video Presentation
@@ -25,44 +25,113 @@ description: |
 - 音频用 Audio + staticFile 内嵌时间轴
 - Remotion Studio 实时预览
 - npx remotion render 一键渲染
+- 支持设计参考图：操作员可放置草图/截图，Claude 识别后参考创作
 
 ---
 
 ## 工作流总览
 
-Phase 1: 内容编写
-  1.1 识别用户输入
-  1.2 一次产出 script.md + outline.md
-  → Checkpoint Plan: 必须停，一次对齐 5 件事
-
-Phase 2: Remotion 开发
-  2.1 脚手架 + 设计系统
-  2.2 第 1 章 = 主线程 + 完整版本（强制 anchor）
-  → 硬节点: 用户验收第 1 章，不可跳过
-  2.3 第 2~N 章（按选定模式）
-
-Phase 3: 音频嵌入 + 渲染
+```
+Phase 1   内容编写
+   1.1  识别用户输入
+   1.2  产出 script.md + outline.md
+   ▼
+[Checkpoint Plan]      ← 必须停。一次对齐 5 件事
+   ▼
+Phase 2   音频合成（先音频，后开发）
+   2.1  生成 audio-segments.json
+   2.2  合成音频（MiMo TTS）
+   2.3  测量帧数 → 确定每个场景时长
+   ▼
+[Checkpoint Audio]     ← 必须停。确认音频 OK
+   ▼
+Phase 3   Remotion 开发
+   3.1  脚手架 + 设计系统
+   3.2  第 1 章 = 主线程 + 完整版本（强制 anchor）
+        ▼
+        [硬节点] 用户验收第 1 章 ← 不可跳过
+        ▼
+   3.3  第 2~N 章（按选定模式）
+   ▼
+[Checkpoint Render]    ← 必须停。章节 + 音频全部就绪才可渲染
+   ▼
+Phase 4   渲染 MP4
+```
 
 ---
 
 ## 工作目录约定
 
+```
 my-video/
-  article.md              # 用户原文
-  script.md               # 口播稿
-  outline.md              # 开发计划
-  audio-segments.json     # 场景 → 音频映射 + 口播文本
-  src/
-    index.ts              # registerRoot
-    Root.tsx              # Composition 注册
-    Chapter1.tsx          # 章节总控（Sequence 编排）
-    styles/tokens.css     # 设计系统
-    styles/global.css     # 全局样式 + 字体
-    components/           # 共享组件
-    scenes/               # 每个场景一个文件
-  public/audio/           # wav 文件
-  scripts/synthesize-audio.mjs  # MiMo TTS 合成脚本
-  out/                    # 渲染输出的 MP4
+├── article.md              # 用户原文
+├── script.md               # 口播稿
+├── outline.md              # 开发计划
+├── audio-segments.json     # 场景 → 音频映射 + 口播文本
+├── references/             # 设计参考图目录（可选）
+│   ├── sketch-01.png       # 操作员放的草图/截图
+│   └── layout-idea.jpg     # Claude 识别后参考创作
+└── src/
+    ├── index.ts            # registerRoot
+    ├── Root.tsx             # Composition 注册
+    ├── Chapter1.tsx         # 章节总控（Sequence 编排）
+    ├── styles/
+    │   ├── tokens.css       # 设计系统
+    │   └── global.css       # 全局样式 + 字体
+    ├── components/          # 共享组件
+    └── scenes/              # 每个场景一个文件
+├── public/
+│   └── audio/               # wav 文件
+├── scripts/
+│   └── synthesize-audio.mjs # MiMo TTS 合成脚本
+└── out/                     # 渲染输出的 MP4
+```
+
+**references/ 目录说明**：
+- 用于放置设计参考图（草图、截图、灵感图）
+- Claude 会读取这些图片作为视觉参考
+- 操作员如果对布局/风格有具体想法但说不清楚，截图放这里最有效
+- 支持格式：png, jpg, jpeg, webp, gif
+- 可选目录，不需要时可以不创建
+
+---
+
+## 设计风格
+
+### 默认风格：Anthropic 暖调赤陶色人文极简
+
+本 Skill 默认使用以下设计系统。用户可以自行修改 tokens.css 来定制风格。
+
+```css
+:root {
+  /* 色彩 */
+  --c-accent: #D97757;          /* 主色：暖调赤陶 */
+  --c-bg: #FAF9F5;              /* 背景：暖白 */
+  --c-surface: #FFFFFF;          /* 表面色 */
+  --c-text: #141413;             /* 主文字 */
+  --c-text-secondary: #6B6B6B;   /* 次文字 */
+  --c-text-muted: #9B9B9B;       /* 弱文字 */
+  --c-bg-warm: #F3F1EC;          /* 暖灰背景 */
+
+  /* 终端 */
+  --c-terminal-bg: #1E1E2E;      /* 终端背景（深色） */
+  --c-terminal-text: #CDD6F4;    /* 终端文字 */
+  --c-terminal-red: #F38BA8;     /* 终端强调色 */
+
+  /* 字体 */
+  --font-display: 'Inter', sans-serif;   /* 标题 */
+  --font-sans: 'Inter', sans-serif;      /* 正文 */
+  --font-mono: 'JetBrains Mono', monospace; /* 代码 */
+}
+```
+
+### 自定义风格
+
+用户可以通过修改 tokens.css 来定制：
+- 换主色：修改 --c-accent
+- 换字体：修改 --font-display / --font-sans / --font-mono
+- 换背景：修改 --c-bg
+- 暗色主题：将 --c-bg 改为深色，--c-text 改为浅色
 
 ---
 
@@ -92,61 +161,46 @@ outline.md: 章节切分 + 每步内容 + 信息池。
 outline 必须写：章节切分 / 每章 scene 数 / 估时 / 每步屏幕内容 / 章节级信息池
 outline 不要写：具体动画类型 / CSS 实现细节 / 时长数值
 
-Remotion 特有：outline 里要标注每步的音频段落映射。
+**检查 references/ 目录**：如果存在设计参考图，识别图片内容，在 outline 中注明参考了哪些视觉元素。
 
 ---
 
 ## Checkpoint Plan
 
 script.md + outline.md 写完后必须停下来，一次对齐 5 件事：
-1. 稿子要不要改？
-2. 开发计划要不要改？
-3. 选哪个设计风格？
-4. 素材怎么准备？
-5. 开发模式选哪个？（A 逐章确认 / B 顺序开发 / C 并行开发 Agent Teams）
+
+1. 稿子 (script.md) 要不要改？
+2. 开发计划 (outline.md) 要不要改？
+3. 设计风格确认（默认 Anthropic 暖调赤陶，还是自定义？）
+4. 素材怎么准备？（参考图是否已放入 references/）
+5. 开发模式选哪个？
+   - A) 逐章确认（推荐）
+   - B) 顺序开发
+   - C) 并行开发（Agent Teams，最大并行度 3）
 
 ---
 
-## Phase 2 — Remotion 开发
+## Phase 2 — 音频合成（先音频，后开发）
 
-### 2.0 版本锁定（重要）
+> **核心原则：先合成音频，确定每个场景的真实时长，再开发动画。**
 
-Remotion 生态版本敏感，以下组合已验证可用：
-- remotion: 4.0.301
-- @remotion/cli: 4.0.301
-- @remotion/media-utils: 4.0.301
-- react: ^18.3.1
-- typescript: ^5.6.3
+### 2.1 生成 audio-segments.json
 
-### 2.1 脚手架
+从 script.md 提取口播文本，按场景切分。
 
-mkdir my-video && cd my-video
-mkdir -p src/{styles,components,scenes} public/audio out scripts
+**内容保真原则**：
+- text 字段来自 script.md，不要再次精简
+- 保持 script.md 的信息密度
+- 对照 article.md 检查完整性
 
-### 2.2 第 1 章 — 主线程 + 强制验收
+**文本清理规则（TTS 友好）**：
+- -（连字符）→ 空格（max-retries → max retries）
+- _（下划线）→ 空格（init_chat_model → init chat model）
+- 保留中文标点
 
-核心：第 1 章 = 完整版本一次到位（节奏 + 视觉 + 音频时长对齐）。
+### 2.2 合成音频
 
-帧数必须从实际 WAV 文件测量，不要估算！
-
-做完第 1 章后必须停下来等用户验收。
-
-### 2.3 第 2~N 章
-
-三种模式：
-- A) 逐章确认：每章做完验收
-- B) 顺序开发：全部做完统一验收
-- C) 并行开发：Agent Teams 并行（推荐最大并行度 3）
-
----
-
-## Phase 3 — 音频嵌入 + 渲染
-
-### 音频合成（MiMo TTS）
-
-⚠️ 重要：必须使用 MiMo TTS，不要使用 hyperframes tts。
-hyperframes 使用的是 Kokoro 本地模型，与 MiMo TTS 完全不同。
-本项目的音频合成只走 scripts/synthesize-audio.mjs。
+> **⚠️ 必须使用 MiMo TTS，不要使用 hyperframes tts。**
 
 API 配置：
   Model: mimo-v2.5-tts
@@ -160,28 +214,9 @@ API 配置：
   node scripts/synthesize-audio.mjs           # 合成全部
   node scripts/synthesize-audio.mjs --force   # 强制重新合成
 
-### audio-segments.json 编写规范
+### 2.3 测量帧数
 
-**内容保真原则**：
-- text 字段的内容来自 script.md，不是对 script.md 的再次精简
-- 保持 script.md 的信息密度：要点数量、数据、案例、技术细节都要保留
-- 可以微调语气使其更适合 TTS 朗读（比如断句、停顿），但不要删减内容
-- 对照 article.md 检查：如果 article 有 7 个要点，script 有 7 个，audio-segments 也应该是 7 个
-
-**文本清理规则（TTS 友好）**：
-- 将 -（连字符）替换为空格，否则 TTS 会读出来
-- 将 _（下划线）替换为空格，否则 TTS 会读出来
-- 代码标识符如 init_chat_model → 口播时说 "init chat model"
-- 参数名如 max-retries → 口播时说 "max retries"
-- 保留中文标点
-
-示例：
-  { "chapter": "ch2", "scene": "Scene2_1CodeTerminal", "audio": "ch2-1.wav",
-    "text": "这里面有七个参数，我们一个一个说。model 和 model provider 是最基本的。" }
-
-注意：deepseek-v4-pro → deepseek v4 pro，init_chat_model → init chat model
-
-### 帧数计算（必须从 WAV 文件测量）
+合成完成后，立即测量每个 WAV 文件的帧数：
 
 node -e "
 const fs = require('fs');
@@ -192,13 +227,117 @@ const fs = require('fs');
   console.log(f + ': ' + (dataSize/byteRate).toFixed(2) + 's (' + Math.ceil(dataSize/byteRate*30) + ' frames)');
 });"
 
-铁律：帧数必须从 WAV 文件 header 计算，不要凭感觉估算。
+帧数 = 秒数 x 30，向上取整。铁律：必须从 WAV header 计算。
 
-### 渲染
+---
 
-npm start                    # Studio 预览
-npm run build                # 渲染默认章节
-npx remotion render src/index.ts Chapter2 out/ch2.mp4
+## Checkpoint Audio
+
+音频合成完成后必须停下来：
+
+```
+音频合成完成：
+  ✅ ch1-0.wav  3.84s (116 frames)
+  ✅ ch1-1.wav  16.16s (485 frames)
+  ...
+
+确认：
+  □ 每个音频都能正常播放？
+  □ TTS 有没有读出符号（下划线/连字符）？
+  □ 语速/语气是否合适？
+
+问题告诉我，我针对性修复。OK 了告诉我"继续"。
+```
+
+---
+
+## Phase 3 — Remotion 开发
+
+### 3.1 脚手架 + 设计系统
+
+版本锁定（重要，不要随意升级）：
+  remotion: 4.0.301
+  @remotion/cli: 4.0.301
+  @remotion/media-utils: 4.0.301
+  react: ^18.3.1
+  typescript: ^5.6.3
+
+脚手架：
+  mkdir src/{styles,components,scenes} public/audio out scripts references
+
+tokens.css 使用默认 Anthropic 暖调赤陶风格（见上方"设计风格"章节），用户可自定义。
+
+### 3.2 第 1 章 — 主线程 + 强制验收
+
+核心：第 1 章 = 完整版本一次到位。
+帧数已从 Phase 2 确定，直接使用。
+
+Chapter1.tsx 模板：
+```tsx
+import { AbsoluteFill, Audio, Sequence, staticFile } from 'remotion';
+
+// 帧数从 Phase 2 测量结果获取
+const SCENE0_AUDIO = 116;
+const SCENE1_AUDIO = 485;
+
+const S0_START = 0;
+const S1_START = S0_START + SCENE0_AUDIO;
+const TOTAL_FRAMES = S1_START + SCENE1_AUDIO;
+
+export { TOTAL_FRAMES };
+
+export const Chapter1: React.FC = () => (
+  <AbsoluteFill style={{ background: 'var(--c-bg)' }}>
+    <Sequence from={S0_START} durationInFrames={SCENE0_AUDIO} name="Scene 0">
+      <Audio src={staticFile('audio/ch1-0.wav')} volume={1} />
+      <Scene0 />
+    </Sequence>
+  </AbsoluteFill>
+);
+```
+
+做完第 1 章后必须停下来等用户验收。
+
+### 3.3 第 2~N 章
+
+三种模式：
+- A) 逐章确认：每章做完验收
+- B) 顺序开发：全部做完统一验收
+- C) 并行开发：Agent Teams 并行（推荐最大并行度 3）
+
+---
+
+## Checkpoint Render
+
+所有章节开发完成 + 音频就绪后，渲染前必须确认：
+
+```
+渲染前检查：
+  □ 所有章节开发完成？
+  □ 所有音频文件就绪？
+  □ Studio 预览确认无问题？
+  □ 帧数与音频时长匹配？
+
+只有全部确认通过才可渲染。未确认前禁止自动渲染。
+```
+
+**⚠️ 重要：渲染 MP4 必须在章节 + 音频全部就绪且用户确认后才能执行。任何阶段都不得自动渲染。**
+
+---
+
+## Phase 4 — 渲染 MP4
+
+```bash
+# Studio 预览（开发阶段用这个，不要渲染）
+npm start
+
+# 渲染（仅在 Checkpoint Render 通过后执行）
+npx remotion render src/index.ts Chapter1 out/chapter1.mp4
+npx remotion render src/index.ts FullVideo out/full-video.mp4
+
+# 国内网络指定本地 Chrome
+npx remotion render src/index.ts Chapter1 out/chapter1.mp4 --browser-executable="C:\Program Files\Google\Chrome\Application\chrome.exe"
+```
 
 ---
 
@@ -214,6 +353,7 @@ npx remotion render src/index.ts Chapter2 out/ch2.mp4
 
 动画速度保持快（~15 帧 ≈ 0.5s），只调整开始帧来对齐音频。
 
+```tsx
 const FAST = 15;
 const BULLET_FRAMES = [252, 375, 470]; // 音频提到要点的时刻
 
@@ -221,8 +361,9 @@ const bulletOp = (i) => interpolate(
   frame, [BULLET_FRAMES[i], BULLET_FRAMES[i] + FAST], [0, 1],
   { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic) }
 );
+```
 
-不要把动画拉慢来"对齐"音频，那样看起来会很拖沓。
+不要把动画拉慢来"对齐"音频。
 
 ### "出现就留下"模式
 
@@ -255,23 +396,34 @@ const bulletOp = (i) => interpolate(
 
 ---
 
-## 设计系统
+## 反 AI 味检查
 
-  --c-accent: #D97757
-  --c-bg: #FAF9F5
-  --c-surface: #FFFFFF
-  --c-text: #141413
-  --c-terminal-bg: #1E1E2E
-  --c-terminal-text: #CDD6F4
-  --font-display: 'Inter', sans-serif
-  --font-sans: 'Inter', sans-serif
-  --font-mono: 'JetBrains Mono', monospace
-
-反 AI 味检查：
 - 不要紫色粉红渐变
 - 不要 emoji 当图标
 - 不要赛博朋克暗色（终端深色除外）
 - 不要 SVG 画人
+
+---
+
+## 质检流程
+
+每个 Phase 完成后，使用 Agent Teams 创建两个独立 Agent 进行质检：
+
+### Phase 1 完成后
+- Agent 1：内容质检（script.md 与 article.md 的信息密度对比）
+- Agent 2：结构质检（outline.md 的章节划分合理性）
+
+### Phase 2 完成后
+- Agent 1：音频质检（TTS 输出是否正常，有无符号读出）
+- Agent 2：帧数质检（WAV 帧数计算是否正确）
+
+### Phase 3 完成后
+- Agent 1：代码质检（Remotion 组件的确定性、interpolate 规范、tokens.css 使用）
+- Agent 2：视觉质检（布局多样性、内容边界、反 AI 味）
+
+### Phase 4 渲染后
+- Agent 1：同步质检（音画是否同步）
+- Agent 2：成品质检（完整播放无报错）
 
 ---
 
@@ -298,3 +450,5 @@ const bulletOp = (i) => interpolate(
 | TTS 读出符号 | text 中把 _ 和 - 替换为空格 |
 | hyperframes 干扰 | 明确使用 MiMo TTS |
 | 重新生成音频后错位 | 重新测量 WAV 帧数，更新常量 |
+| 动画和音频对不上 | Phase 2 先合成音频，再开发动画 |
+| 渲染太早 | 必须通过 Checkpoint Render 才能渲染 |
