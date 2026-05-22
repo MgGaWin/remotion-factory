@@ -251,6 +251,31 @@
     gap: 6px;
   }
 
+  /* Language toggle */
+  .lang-toggle {
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    z-index: 9998;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--ink);
+    background: white;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 20px;
+    padding: 6px 16px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+  }
+  .lang-toggle:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
+  .lang-toggle .lang-icon { font-size: 0.85rem; }
+  .lang-toggle .lang-label { min-width: 18px; text-align: center; }
+
   /* ===== ANIMATION KEYFRAMES ===== */
   @keyframes drawIn {
     from { stroke-dashoffset: var(--path-len); }
@@ -310,9 +335,14 @@
 
 <div class="page">
 
-  <h1>Hand-drawn Sketch SVG</h1>
-  <p class="subtitle">Anthropic Humane Aesthetic &mdash; Full Catalog</p>
-  <p class="intro">
+  <button class="lang-toggle" onclick="toggleLang()" title="切换中文 / Switch to English">
+    <span class="lang-icon">🌐</span>
+    <span class="lang-label" id="langLabel">CN</span>
+  </button>
+
+  <h1 data-en="Hand-drawn Sketch SVG" data-zh="手绘涂鸦风 SVG">Hand-drawn Sketch SVG</h1>
+  <p class="subtitle" data-en="Anthropic Humane Aesthetic &mdash; Full Catalog" data-zh="Anthropic 人文美学 &mdash; 完整目录">Anthropic Humane Aesthetic &mdash; Full Catalog</p>
+  <p class="intro" data-en='A comprehensive library of hand-drawn SVG elements in the Anthropic style. Every shape uses <code>&lt;path&gt;</code> with jittered bezier curves, SVG turbulence filters for rough edges, and <code>stroke-dasharray</code> for draw-in animations. Click <strong>replay</strong> on any card to re-watch the animation.' data-zh='Anthropic 风格手绘涂鸦 SVG 元素完整库。每个形状都使用 <code>&lt;path&gt;</code> + 抖动贝塞尔曲线、SVG 湍流滤镜产生粗糙边缘、<code>stroke-dasharray</code> 实现笔画生长动画。点击任意卡片上的 <strong>replay</strong> 可重放动画。'>
     A comprehensive library of hand-drawn SVG elements in the Anthropic style.
     Every shape uses <code>&lt;path&gt;</code> with jittered bezier curves,
     SVG turbulence filters for rough edges, and <code>stroke-dasharray</code>
@@ -325,8 +355,8 @@
   <!-- CATEGORY A: BASIC SHAPES                                     -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>A. Basic Shapes</h2>
-    <p class="cat-desc">Imperfect geometric primitives — circles, rectangles, triangles, diamonds</p>
+    <h2 data-en="A. Basic Shapes" data-zh="A. 基础形状">A. Basic Shapes</h2>
+    <p class="cat-desc" data-en="Imperfect geometric primitives — circles, rectangles, triangles, diamonds" data-zh="不完美的几何基元 — 圆圈、矩形、三角形、菱形">Imperfect geometric primitives — circles, rectangles, triangles, diamonds</p>
   </div>
 
   <div class="grid-3">
@@ -402,8 +432,8 @@
   <!-- CATEGORY B: ARROWS & CONNECTORS                              -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>B. Arrows &amp; Connectors</h2>
-    <p class="cat-desc">Directional indicators and flow lines with hand-drawn character</p>
+    <h2 data-en="B. Arrows &amp; Connectors" data-zh="B. 箭头 &amp; 连接线">B. Arrows &amp; Connectors</h2>
+    <p class="cat-desc" data-en="Directional indicators and flow lines with hand-drawn character" data-zh="带手绘感的方向指示器和流线">Directional indicators and flow lines with hand-drawn character</p>
   </div>
 
   <div class="grid-3">
@@ -485,8 +515,8 @@
   <!-- CATEGORY C: TEXT EMPHASIS                                     -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>C. Text Emphasis &amp; Annotations</h2>
-    <p class="cat-desc">Underlines, highlights, circles, brackets — the humane way to call out text</p>
+    <h2 data-en="C. Text Emphasis &amp; Annotations" data-zh="C. 文字强调 &amp; 标注">C. Text Emphasis &amp; Annotations</h2>
+    <p class="cat-desc" data-en="Underlines, highlights, circles, brackets — the humane way to call out text" data-zh="下划线、高亮、圆圈、括号 — 人文风格的文字标注方式">Underlines, highlights, circles, brackets — the humane way to call out text</p>
   </div>
 
   <div class="grid-2">
@@ -555,8 +585,8 @@
   <!-- CATEGORY D: ICONS & SYMBOLS                                  -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>D. Icons &amp; Symbols</h2>
-    <p class="cat-desc">Common UI and conceptual icons drawn by hand</p>
+    <h2 data-en="D. Icons &amp; Symbols" data-zh="D. 图标 &amp; 符号">D. Icons &amp; Symbols</h2>
+    <p class="cat-desc" data-en="Common UI and conceptual icons drawn by hand" data-zh="手绘的常见 UI 和概念图标">Common UI and conceptual icons drawn by hand</p>
   </div>
 
   <div class="grid-4">
@@ -663,8 +693,8 @@
   <!-- CATEGORY E: DECORATIVE LINES & PATTERNS                      -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>E. Decorative Lines &amp; Patterns</h2>
-    <p class="cat-desc">Waves, zigzags, spirals, dots — ornamental sketch marks</p>
+    <h2 data-en="E. Decorative Lines &amp; Patterns" data-zh="E. 装饰线条 &amp; 图案">E. Decorative Lines &amp; Patterns</h2>
+    <p class="cat-desc" data-en="Waves, zigzags, spirals, dots — ornamental sketch marks" data-zh="波浪、锯齿、螺旋、圆点 — 装饰性涂鸦线条">Waves, zigzags, spirals, dots — ornamental sketch marks</p>
   </div>
 
   <div class="grid-3">
@@ -751,8 +781,8 @@
   <!-- CATEGORY F: CHARTS & GRAPHS                                  -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>F. Charts &amp; Graph Axes</h2>
-    <p class="cat-desc">Data visualization with a human touch</p>
+    <h2 data-en="F. Charts &amp; Graph Axes" data-zh="F. 图表 &amp; 坐标轴">F. Charts &amp; Graph Axes</h2>
+    <p class="cat-desc" data-en="Data visualization with a human touch" data-zh="带人文温度的数据可视化">Data visualization with a human touch</p>
   </div>
 
   <div class="grid-2">
@@ -819,8 +849,8 @@
   <!-- CATEGORY G: UI ELEMENTS                                      -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>G. UI Elements</h2>
-    <p class="cat-desc">Checkboxes, radio buttons, toggles, tabs — interface primitives with soul</p>
+    <h2 data-en="G. UI Elements" data-zh="G. UI 元素">G. UI Elements</h2>
+    <p class="cat-desc" data-en="Checkboxes, radio buttons, toggles, tabs — interface primitives with soul" data-zh="复选框、单选按钮、开关、标签页 — 有灵魂的界面基元">Checkboxes, radio buttons, toggles, tabs — interface primitives with soul</p>
   </div>
 
   <div class="grid-3">
@@ -909,8 +939,8 @@
   <!-- CATEGORY H: SPEECH & THOUGHT                                 -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>H. Speech &amp; Thought Bubbles</h2>
-    <p class="cat-desc">Communication shapes with organic edges</p>
+    <h2 data-en="H. Speech &amp; Thought Bubbles" data-zh="H. 对话 &amp; 思考气泡">H. Speech &amp; Thought Bubbles</h2>
+    <p class="cat-desc" data-en="Communication shapes with organic edges" data-zh="有机边缘的沟通形状">Communication shapes with organic edges</p>
   </div>
 
   <div class="grid-2">
@@ -942,8 +972,8 @@
   <!-- CATEGORY I: FLOWCHART & DIAGRAM                              -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>I. Flowchart &amp; Diagram Primitives</h2>
-    <p class="cat-desc">Building blocks for hand-drawn system diagrams</p>
+    <h2 data-en="I. Flowchart &amp; Diagram Primitives" data-zh="I. 流程图 &amp; 图表基元">I. Flowchart &amp; Diagram Primitives</h2>
+    <p class="cat-desc" data-en="Building blocks for hand-drawn system diagrams" data-zh="手绘系统图的构建块">Building blocks for hand-drawn system diagrams</p>
   </div>
 
   <div class="demo-card" id="i-flowchart" style="min-height:350px;">
@@ -994,8 +1024,8 @@
   <!-- CATEGORY J: COMBINED SCENE                                   -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>J. Full Composition</h2>
-    <p class="cat-desc">All elements combined into a cohesive Anthropic-style presentation slide</p>
+    <h2 data-en="J. Full Composition" data-zh="J. 完整组合">J. Full Composition</h2>
+    <p class="cat-desc" data-en="All elements combined into a cohesive Anthropic-style presentation slide" data-zh="所有元素组合成一个完整的 Anthropic 风格演示幻灯片">All elements combined into a cohesive Anthropic-style presentation slide</p>
   </div>
 
   <div class="demo-card" id="j-full" style="min-height:420px;flex-direction:column;">
@@ -1056,8 +1086,8 @@
   <!-- CATEGORY K: FILTER COMPARISON                                -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>K. Filter Comparison</h2>
-    <p class="cat-desc">Same path, different filter intensities — tune <code>baseFrequency</code> and <code>scale</code></p>
+    <h2 data-en="K. Filter Comparison" data-zh="K. 滤镜对比">K. Filter Comparison</h2>
+    <p class="cat-desc" data-en="Same path, different filter intensities — tune baseFrequency and scale" data-zh="同一路径，不同滤镜强度 — 调节 baseFrequency 和 scale">Same path, different filter intensities — tune <code>baseFrequency</code> and <code>scale</code></p>
   </div>
 
   <div class="grid-4">
@@ -1111,8 +1141,8 @@
   <!-- CATEGORY L: MORE ICONS                                       -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>L. Extended Icon Set</h2>
-    <p class="cat-desc">More essential icons — gear, lock, envelope, clock, eye, bookmark, bell, camera, pencil, globe, link, rocket, shield, lightning, fire, sun, moon, target</p>
+    <h2 data-en="L. Extended Icon Set" data-zh="L. 扩展图标集">L. Extended Icon Set</h2>
+    <p class="cat-desc" data-en="More essential icons — gear, lock, envelope, clock, eye, bookmark, bell, camera, pencil, globe, link, rocket, shield, lightning, fire, sun, moon, target" data-zh="更多常用图标 — 齿轮、锁、信封、时钟、眼睛、书签、铃铛、相机、铅笔、地球仪、链接、火箭、盾牌、闪电、火焰、太阳、月亮、靶心">More essential icons — gear, lock, envelope, clock, eye, bookmark, bell, camera, pencil, globe, link, rocket, shield, lightning, fire, sun, moon, target</p>
   </div>
 
   <div class="grid-4">
@@ -1349,8 +1379,8 @@
   <!-- CATEGORY M: TECH ICONS                                       -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>M. Tech &amp; Developer Icons</h2>
-    <p class="cat-desc">Terminal, code, database, server, wifi, battery, play/pause, bug, upload/download</p>
+    <h2 data-en="M. Tech &amp; Developer Icons" data-zh="M. 技术 &amp; 开发者图标">M. Tech &amp; Developer Icons</h2>
+    <p class="cat-desc" data-en="Terminal, code, database, server, wifi, battery, play/pause, bug, upload/download" data-zh="终端、代码、数据库、服务器、WiFi、电池、播放/暂停、Bug、上传/下载">Terminal, code, database, server, wifi, battery, play/pause, bug, upload/download</p>
   </div>
 
   <div class="grid-4">
@@ -1494,8 +1524,8 @@
   <!-- CATEGORY N: NATURE & WEATHER                                 -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>N. Nature &amp; Weather</h2>
-    <p class="cat-desc">Organic shapes from the natural world</p>
+    <h2 data-en="N. Nature &amp; Weather" data-zh="N. 自然 &amp; 天气">N. Nature &amp; Weather</h2>
+    <p class="cat-desc" data-en="Organic shapes from the natural world" data-zh="来自自然界的有机形状">Organic shapes from the natural world</p>
   </div>
 
   <div class="grid-4">
@@ -1580,8 +1610,8 @@
   <!-- CATEGORY O: TEXT & TYPOGRAPHY                                 -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>O. Text &amp; Typography Marks</h2>
-    <p class="cat-desc">Strikethrough, double underline, margin notes, bullet lists, quotation marks, footnotes</p>
+    <h2 data-en="O. Text &amp; Typography Marks" data-zh="O. 文字 &amp; 排版标记">O. Text &amp; Typography Marks</h2>
+    <p class="cat-desc" data-en="Strikethrough, double underline, margin notes, bullet lists, quotation marks, footnotes" data-zh="删除线、双下划线、页边注释、项目列表、引号、脚注">Strikethrough, double underline, margin notes, bullet lists, quotation marks, footnotes</p>
   </div>
 
   <div class="grid-3">
@@ -1647,8 +1677,8 @@
   <!-- CATEGORY P: COMPLEX COMPOSITIONS                             -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>P. Complex Compositions</h2>
-    <p class="cat-desc">Mind map, timeline, Venn diagram, kanban board, terminal mockup, browser window</p>
+    <h2 data-en="P. Complex Compositions" data-zh="P. 复杂组合">P. Complex Compositions</h2>
+    <p class="cat-desc" data-en="Mind map, timeline, Venn diagram, kanban board, terminal mockup, browser window" data-zh="思维导图、时间轴、韦恩图、看板、终端界面、浏览器窗口">Mind map, timeline, Venn diagram, kanban board, terminal mockup, browser window</p>
   </div>
 
   <!-- P1: Timeline -->
@@ -1846,8 +1876,8 @@
   <!-- CATEGORY Q: STICKY NOTES & CARDS                             -->
   <!-- ============================================================ -->
   <div class="category">
-    <h2>Q. Sticky Notes &amp; Cards</h2>
-    <p class="cat-desc">Paper-like elements with sketch borders and folded corners</p>
+    <h2 data-en="Q. Sticky Notes &amp; Cards" data-zh="Q. 便签 &amp; 卡片">Q. Sticky Notes &amp; Cards</h2>
+    <p class="cat-desc" data-en="Paper-like elements with sketch borders and folded corners" data-zh="带涂鸦边框和折角的纸张元素">Paper-like elements with sketch borders and folded corners</p>
   </div>
 
   <div class="grid-3">
@@ -1898,10 +1928,10 @@
   <!-- FINAL FOOTER                                                  -->
   <!-- ============================================================ -->
   <div style="margin-top:100px;text-align:center;padding-bottom:60px;">
-    <p style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:#bbb;margin-bottom:8px;">
+    <p style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:#bbb;margin-bottom:8px;" data-en="20 categories &amp; middot; 80+ hand-drawn elements" data-zh="20 个类别 &amp; middot; 80+ 个手绘元素">
       20 categories &middot; 80+ hand-drawn elements
     </p>
-    <p style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#ccc;">
+    <p style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#ccc;" data-en="All shapes: &lt;code&gt;&amp;lt;path&amp;gt;&lt;/code&gt; + jittered bezier curves + &lt;code&gt;feTurbulence&lt;/code&gt; displacement filter + &lt;code&gt;stroke-dasharray&lt;/code&gt; draw animation" data-zh="所有形状: &lt;code&gt;&amp;lt;path&amp;gt;&lt;/code&gt; + 抖动贝塞尔曲线 + &lt;code&gt;feTurbulence&lt;/code&gt; 位移滤镜 + &lt;code&gt;stroke-dasharray&lt;/code&gt; 笔画生长动画">
       All shapes: <code>&lt;path&gt;</code> + jittered bezier curves + <code>feTurbulence</code> displacement filter + <code>stroke-dasharray</code> draw animation
     </p>
   </div>
@@ -1935,6 +1965,11 @@ function replayAnim(id) {
   const clone = svg.cloneNode(true);
   svg.remove();
   el.insertBefore(clone, el.querySelector('.replay-btn'));
+  // Preserve language on replay buttons
+  if (currentLang === 'zh') {
+    el.querySelectorAll('.replay-btn').forEach(b => b.textContent = '重播');
+    el.querySelectorAll('.prompt-btn').forEach(b => b.textContent = '提示词');
+  }
 }
 
 // ===== Prompt Data =====
@@ -2688,10 +2723,10 @@ function copyPrompt() {
   const text = document.getElementById('modalCode').textContent;
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById('modalCopyBtn');
-    btn.textContent = 'Copied!';
+    btn.textContent = currentLang === 'en' ? 'Copied!' : '已复制！';
     btn.classList.add('copied');
     setTimeout(() => {
-      btn.textContent = 'Copy Prompt';
+      btn.textContent = currentLang === 'en' ? 'Copy Prompt' : '复制提示词';
       btn.classList.remove('copied');
     }, 2000);
   });
@@ -2701,6 +2736,102 @@ function copyPrompt() {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeModal();
 });
+
+// ===== Language Toggle =====
+let currentLang = 'en';
+
+const LABEL_ZH = {
+  "circle": "圆圈", "rectangle": "矩形", "rounded rect": "圆角矩形",
+  "triangle": "三角形", "diamond": "菱形", "ellipse": "椭圆",
+  "arrow →": "箭头 →", "bidirectional ↔": "双向箭头 ↔", "curved arrow": "弧形箭头",
+  "dashed line": "虚线", "L-connector": "L 型连接", "loop / return": "循环回路",
+  "check": "勾选", "cross": "叉号", "star": "星星", "heart": "爱心",
+  "lightbulb": "灯泡", "search": "搜索", "cloud": "云朵", "pointer": "指针",
+  "wave": "波浪", "zigzag": "锯齿", "spiral": "螺旋",
+  "scribble fill": "涂鸦填充", "dot trail": "点状轨迹", "cross-hatch": "交叉线",
+  "checkbox ✓": "复选框 ✓", "checkbox": "复选框", "radio ●": "单选按钮 ●",
+  "toggle on": "开关（开）", "tabs": "标签页", "progress": "进度条",
+  "gear": "齿轮", "lock": "锁", "envelope": "信封", "clock": "时钟",
+  "eye": "眼睛", "bookmark": "书签", "bell": "铃铛", "camera": "相机",
+  "pencil": "铅笔", "globe": "地球仪", "link": "链接", "rocket": "火箭",
+  "shield": "盾牌", "lightning": "闪电", "fire": "火焰", "sun": "太阳",
+  "moon": "月亮", "target": "靶心",
+  "terminal": "终端", "code": "代码", "database": "数据库", "server": "服务器",
+  "wifi": "WiFi", "battery": "电池", "play": "播放", "bug": "Bug",
+  "upload": "上传", "download": "下载",
+  "rain": "雨滴", "leaf": "树叶", "tree": "树木", "mountain": "山脉",
+  "snowflake": "雪花", "droplet": "水滴",
+};
+
+function toggleLang() {
+  currentLang = currentLang === 'en' ? 'zh' : 'en';
+  document.getElementById('langLabel').textContent = currentLang === 'en' ? 'CN' : 'EN';
+
+  // Translate elements with data-en / data-zh
+  document.querySelectorAll('[data-en][data-zh]').forEach(el => {
+    const key = currentLang === 'en' ? 'data-en' : 'data-zh';
+    el.innerHTML = el.getAttribute(key);
+  });
+
+  // Translate item labels
+  document.querySelectorAll('.item-label').forEach(el => {
+    const enText = el.getAttribute('data-en') || el.textContent;
+    if (!el.getAttribute('data-en')) el.setAttribute('data-en', enText);
+    if (currentLang === 'zh' && LABEL_ZH[enText]) {
+      el.textContent = LABEL_ZH[enText];
+    } else {
+      el.textContent = enText;
+    }
+  });
+
+  // Translate filter comparison labels
+  document.querySelectorAll('.demo-card div[style] > div:last-child').forEach(el => {
+    if (el.style.fontFamily && el.textContent.includes('filter')) {
+      const map = {
+        'No filter (clean)': '无滤镜（干净）',
+        'subtle (scale:1)': '轻微（scale:1）',
+        'medium (scale:2)': '中等（scale:2）',
+        'heavy (scale:4)': '强烈（scale:4）',
+      };
+      const enText = el.getAttribute('data-en') || el.textContent.trim();
+      if (!el.getAttribute('data-en')) el.setAttribute('data-en', enText);
+      if (currentLang === 'zh' && map[enText]) {
+        el.textContent = map[enText];
+      } else {
+        el.textContent = enText;
+      }
+    }
+  });
+
+  // Translate modal hint
+  const hint = document.querySelector('.modal-hint');
+  if (hint) {
+    hint.textContent = currentLang === 'en'
+      ? 'copy & use in any AI to regenerate this SVG'
+      : '复制后粘贴给任意 AI 即可重新生成该 SVG';
+  }
+
+  // Translate copy button text (if not in "copied" state)
+  const copyBtn = document.getElementById('modalCopyBtn');
+  if (copyBtn && !copyBtn.classList.contains('copied')) {
+    copyBtn.textContent = currentLang === 'en' ? 'Copy Prompt' : '复制提示词';
+  }
+
+  // Translate replay buttons
+  document.querySelectorAll('.replay-btn').forEach(btn => {
+    btn.textContent = currentLang === 'en' ? 'replay' : '重播';
+  });
+
+  // Translate prompt buttons
+  document.querySelectorAll('.prompt-btn').forEach(btn => {
+    btn.textContent = currentLang === 'en' ? 'prompt' : '提示词';
+  });
+
+  // Update page title
+  document.title = currentLang === 'en'
+    ? 'Anthropic Hand-drawn Sketch SVG — Full Catalog'
+    : 'Anthropic 手绘涂鸦风 SVG — 完整目录';
+}
 
 // ===== Auto-inject prompt buttons into all demo-cards =====
 document.querySelectorAll('.demo-card[id]').forEach(card => {
