@@ -94,6 +94,16 @@ my-video/
 - 支持格式：png, jpg, jpeg, webp, gif
 - 可选目录，不需要时可以不创建
 
+**Skill 内置参考文档**：
+- `references/SKETCH-SVG.md` — 手绘涂鸦风 SVG 完整指南（Anthropic Humane Aesthetic）
+  - 三步生成法：不完美 Path → 粗糙滤镜 → 生长动画
+  - SVG 滤镜详解（feTurbulence + feDisplacementMap）
+  - Path 编写技巧（圆、矩形、箭头、下划线、气泡、图标、图表）
+  - Remotion 集成模板（React 组件 + 帧驱动动画）
+  - 调参速查表（颜色、粗细、时长）
+- `references/AUDIO.md` — 音频合成参考
+- `references/CHAPTER-CRAFT.md` — 场景开发指南 + 动画模式库
+
 ---
 
 ## 设计风格
