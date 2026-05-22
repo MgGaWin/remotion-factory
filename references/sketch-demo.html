@@ -1925,11 +1925,517 @@
 
 
   <!-- ============================================================ -->
+  <!-- CATEGORY R: MULTI-LAYER COMPLEX COMPOSITIONS                 -->
+  <!-- ============================================================ -->
+  <div class="category">
+    <h2 data-en="R. Multi-Layer Complex Compositions" data-zh="R. 多层复杂组合">R. Multi-Layer Complex Compositions</h2>
+    <p class="cat-desc" data-en="Brain + network fusion, hand silhouettes with annotations, layered topologies — the Anthropic video aesthetic" data-zh="大脑+网络融合、手型轮廓+标注、分层拓扑 — Anthropic 视频美学">Brain + network fusion, hand silhouettes with annotations, layered topologies — the Anthropic video aesthetic</p>
+  </div>
+
+  <!-- R1: Brain + Network Fusion -->
+  <div class="demo-card" id="r-brain-net" style="min-height:420px;">
+    <svg width="420" height="380" viewBox="0 0 300 270">
+      <defs>
+        <filter id="rb1"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" seed="11" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.8" xChannelSelector="R" yChannelSelector="G"/></filter>
+        <filter id="rb1f"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="22" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.5" xChannelSelector="R" yChannelSelector="G"/></filter>
+      </defs>
+
+      <!-- Layer 0: Faint network background -->
+      <g opacity="0.15" filter="url(#rb1)">
+        <circle cx="45" cy="60" r="3" fill="#E8E6DC"/>
+        <circle cx="90" cy="35" r="2.5" fill="#E8E6DC"/>
+        <circle cx="150" cy="25" r="3" fill="#E8E6DC"/>
+        <circle cx="210" cy="40" r="2.5" fill="#E8E6DC"/>
+        <circle cx="250" cy="70" r="3" fill="#E8E6DC"/>
+        <circle cx="35" cy="120" r="2" fill="#E8E6DC"/>
+        <circle cx="80" cy="100" r="3" fill="#E8E6DC"/>
+        <circle cx="220" cy="110" r="2.5" fill="#E8E6DC"/>
+        <circle cx="260" cy="130" r="2" fill="#E8E6DC"/>
+        <circle cx="50" cy="180" r="2.5" fill="#E8E6DC"/>
+        <circle cx="250" cy="190" r="3" fill="#E8E6DC"/>
+        <path class="sketch-line draw-animated" d="M 45,60 L 90,35 L 150,25 L 210,40 L 250,70" stroke="#E8E6DC" stroke-width="0.8" style="--path-len:240;stroke-dasharray:240"/>
+        <path class="sketch-line draw-animated d1" d="M 45,60 L 80,100 L 35,120" stroke="#E8E6DC" stroke-width="0.8" style="--path-len:100;stroke-dasharray:100"/>
+        <path class="sketch-line draw-animated d1" d="M 250,70 L 260,130 L 250,190" stroke="#E8E6DC" stroke-width="0.8" style="--path-len:130;stroke-dasharray:130"/>
+        <path class="sketch-line draw-animated d2" d="M 90,35 L 80,100 L 50,180" stroke="#E8E6DC" stroke-width="0.8" style="--path-len:160;stroke-dasharray:160"/>
+        <path class="sketch-line draw-animated d2" d="M 210,40 L 220,110 L 250,190" stroke="#E8E6DC" stroke-width="0.8" style="--path-len:170;stroke-dasharray:170"/>
+        <path class="sketch-line draw-animated d3" d="M 80,100 L 150,105 L 220,110" stroke="#E8E6DC" stroke-width="0.8" style="--path-len:150;stroke-dasharray:150"/>
+        <path class="sketch-line draw-animated d3" d="M 50,180 L 150,200 L 250,190" stroke="#E8E6DC" stroke-width="0.8" style="--path-len:210;stroke-dasharray:210"/>
+      </g>
+
+      <!-- Layer 1: Brain outline (organic blob) -->
+      <path class="sketch-line draw-animated d2"
+        d="M 150,30 C 180,25 220,30 245,50 C 265,65 270,90 265,115 C 260,140 245,160 225,175 C 210,185 190,195 170,200 C 155,203 140,205 125,200 C 105,195 85,185 70,170 C 50,150 35,125 35,100 C 35,75 45,55 65,42 C 85,30 115,25 150,30
+         M 150,30 C 145,40 130,55 120,65 C 110,75 100,85 105,100 C 110,115 125,110 135,100 C 145,90 148,75 150,60"
+        stroke="#141413" stroke-width="2.5" fill="none" filter="url(#rb1f)"
+        style="--path-len:800;stroke-dasharray:800"/>
+
+      <!-- Brain internal folds -->
+      <path class="sketch-line draw-animated d3"
+        d="M 80,70 C 100,65 120,75 130,90 C 138,102 130,115 115,110 C 100,105 90,90 85,78"
+        stroke="#141413" stroke-width="1.5" fill="none" filter="url(#rb1f)" opacity="0.6"
+        style="--path-len:140;stroke-dasharray:140"/>
+      <path class="sketch-line draw-animated d4"
+        d="M 170,55 C 190,50 210,60 215,80 C 218,95 205,105 190,100 C 175,95 168,78 172,65"
+        stroke="#141413" stroke-width="1.5" fill="none" filter="url(#rb1f)" opacity="0.6"
+        style="--path-len:140;stroke-dasharray:140"/>
+      <path class="sketch-line draw-animated d4"
+        d="M 110,140 C 130,135 155,140 165,155 C 172,168 158,178 140,172 C 122,166 108,152 112,142"
+        stroke="#141413" stroke-width="1.5" fill="none" filter="url(#rb1f)" opacity="0.5"
+        style="--path-len:130;stroke-dasharray:130"/>
+
+      <!-- Layer 2: Internal network nodes (inside brain) -->
+      <g class="fade-in" style="animation-delay:2s">
+        <circle cx="100" cy="90" r="4" fill="none" stroke="#6A9BCC" stroke-width="1.5" filter="url(#rb1)"/>
+        <circle cx="150" cy="75" r="5" fill="none" stroke="#6A9BCC" stroke-width="1.5" filter="url(#rb1)"/>
+        <circle cx="200" cy="85" r="4" fill="none" stroke="#6A9BCC" stroke-width="1.5" filter="url(#rb1)"/>
+        <circle cx="130" cy="130" r="4.5" fill="none" stroke="#6A9BCC" stroke-width="1.5" filter="url(#rb1)"/>
+        <circle cx="175" cy="125" r="4" fill="none" stroke="#6A9BCC" stroke-width="1.5" filter="url(#rb1)"/>
+        <circle cx="150" cy="170" r="3.5" fill="none" stroke="#6A9BCC" stroke-width="1.5" filter="url(#rb1)"/>
+        <!-- Connections -->
+        <path class="sketch-line draw-animated d5" d="M 100,90 L 150,75 L 200,85" stroke="#6A9BCC" stroke-width="0.8" opacity="0.5" filter="url(#rb1)" style="--path-len:120;stroke-dasharray:120"/>
+        <path class="sketch-line draw-animated d5" d="M 100,90 L 130,130 L 150,170" stroke="#6A9BCC" stroke-width="0.8" opacity="0.5" filter="url(#rb1)" style="--path-len:100;stroke-dasharray:100"/>
+        <path class="sketch-line draw-animated d6" d="M 200,85 L 175,125 L 150,170" stroke="#6A9BCC" stroke-width="0.8" opacity="0.5" filter="url(#rb1)" style="--path-len:100;stroke-dasharray:100"/>
+        <path class="sketch-line draw-animated d6" d="M 130,130 L 175,125" stroke="#6A9BCC" stroke-width="0.8" opacity="0.5" filter="url(#rb1)" style="--path-len:50;stroke-dasharray:50"/>
+        <path class="sketch-line draw-animated d6" d="M 150,75 L 130,130 L 175,125 L 200,85" stroke="#6A9BCC" stroke-width="0.8" opacity="0.5" filter="url(#rb1)" style="--path-len:140;stroke-dasharray:140"/>
+      </g>
+
+      <!-- Layer 3: Red terracotta annotations (topmost) -->
+      <g filter="url(#rb1f)">
+        <path class="sketch-line draw-animated d7" d="M 90,78 C 110,72 135,76 140,92 C 144,108 128,118 108,114 C 88,110 78,96 82,82" stroke="#D97757" stroke-width="2.5" opacity="0.8" style="--path-len:140;stroke-dasharray:140"/>
+        <path class="sketch-line draw-animated d8" d="M 108,114 L 105,128 L 100,140" stroke="#D97757" stroke-width="2" opacity="0.8" style="--path-len:30;stroke-dasharray:30"/>
+        <path class="sketch-line draw-animated d8" d="M 97,133 L 105,128 L 95,125" stroke="#D97757" stroke-width="2" opacity="0.8" style="--path-len:18;stroke-dasharray:18"/>
+      </g>
+      <g filter="url(#rb1f)">
+        <path class="sketch-line draw-animated d8" d="M 180,65 C 200,58 225,68 222,85 C 219,102 198,108 182,100 C 166,92 165,75 182,65" stroke="#D97757" stroke-width="2" opacity="0.7" style="--path-len:130;stroke-dasharray:130"/>
+      </g>
+      <g filter="url(#rb1f)">
+        <path class="sketch-line draw-animated d8" d="M 230,90 L 260,75" stroke="#D97757" stroke-width="2.5" opacity="0.8" style="--path-len:35;stroke-dasharray:35"/>
+        <path class="sketch-line draw-animated d8" d="M 255,70 L 265,75 L 255,80" stroke="#D97757" stroke-width="2" opacity="0.8" style="--path-len:18;stroke-dasharray:18"/>
+      </g>
+
+      <!-- Floating annotation text blocks -->
+      <g class="fade-in" style="animation-delay:3.5s" filter="url(#rb1)">
+        <rect x="30" y="220" width="65" height="16" rx="2" fill="none" stroke="#D97757" stroke-width="1" opacity="0.5"/>
+        <text x="62" y="232" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="6" fill="#D97757" opacity="0.7">perception</text>
+      </g>
+      <g class="fade-in" style="animation-delay:3.8s" filter="url(#rb1)">
+        <rect x="200" y="220" width="58" height="16" rx="2" fill="none" stroke="#D97757" stroke-width="1" opacity="0.5"/>
+        <text x="229" y="232" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="6" fill="#D97757" opacity="0.7">reasoning</text>
+      </g>
+    </svg>
+    <button class="replay-btn" onclick="replayAnim('r-brain-net')">replay</button>
+  </div>
+
+  <div class="grid-2" style="margin-top:24px;">
+    <!-- R2: Hand silhouette + network + red annotations -->
+    <div class="demo-card" id="r-hand-net" style="min-height:380px;">
+      <svg width="100%" height="340" viewBox="0 0 260 240">
+        <defs>
+          <filter id="rh1"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="33" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.6" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <filter id="rh1f"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="4" seed="44" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G"/></filter>
+        </defs>
+
+        <!-- Layer 0: Background network (milk white) -->
+        <g opacity="0.12" filter="url(#rh1)">
+          <circle cx="30" cy="40" r="2.5" fill="#E8E6DC"/><circle cx="80" cy="25" r="2" fill="#E8E6DC"/>
+          <circle cx="130" cy="35" r="3" fill="#E8E6DC"/><circle cx="190" cy="30" r="2" fill="#E8E6DC"/>
+          <circle cx="230" cy="50" r="2.5" fill="#E8E6DC"/><circle cx="20" cy="100" r="2" fill="#E8E6DC"/>
+          <circle cx="70" cy="90" r="2.5" fill="#E8E6DC"/><circle cx="240" cy="110" r="2" fill="#E8E6DC"/>
+          <circle cx="40" cy="160" r="2" fill="#E8E6DC"/><circle cx="220" cy="170" r="2.5" fill="#E8E6DC"/>
+          <circle cx="130" cy="200" r="3" fill="#E8E6DC"/>
+          <path class="sketch-line draw-animated" d="M 30,40 L 80,25 L 130,35 L 190,30 L 230,50" stroke="#E8E6DC" stroke-width="0.6" style="--path-len:220;stroke-dasharray:220"/>
+          <path class="sketch-line draw-animated d1" d="M 20,100 L 70,90 L 130,35" stroke="#E8E6DC" stroke-width="0.6" style="--path-len:130;stroke-dasharray:130"/>
+          <path class="sketch-line draw-animated d1" d="M 230,50 L 240,110 L 220,170" stroke="#E8E6DC" stroke-width="0.6" style="--path-len:130;stroke-dasharray:130"/>
+          <path class="sketch-line draw-animated d2" d="M 40,160 L 130,200 L 220,170" stroke="#E8E6DC" stroke-width="0.6" style="--path-len:200;stroke-dasharray:200"/>
+          <path class="sketch-line draw-animated d2" d="M 70,90 L 130,130 L 240,110" stroke="#E8E6DC" stroke-width="0.6" style="--path-len:190;stroke-dasharray:190"/>
+        </g>
+
+        <!-- Layer 1: Hand silhouette (simplified open hand) -->
+        <path class="sketch-line draw-animated d2"
+          d="M 65,200 C 60,185 55,165 58,148 C 60,135 65,125 68,118 L 62,95 C 60,80 65,68 72,65 C 78,62 82,70 82,82 L 85,108 L 88,88 C 88,72 94,62 100,62 C 106,62 110,72 108,88 L 105,112 L 110,90 C 110,75 116,65 122,66 C 128,67 130,78 127,92 L 120,118 L 128,100 C 130,88 136,82 140,86 C 144,90 142,100 138,112 L 125,145 C 122,155 118,165 115,175 C 110,190 100,205 90,210 C 78,215 68,208 65,200"
+          stroke="#141413" stroke-width="2.5" fill="none" filter="url(#rh1f)"
+          style="--path-len:700;stroke-dasharray:700"/>
+
+        <!-- Wrist -->
+        <path class="sketch-line draw-animated d3"
+          d="M 65,200 C 60,215 65,228 75,232 L 100,234 C 110,234 115,225 115,215"
+          stroke="#141413" stroke-width="2" fill="none" filter="url(#rh1f)"
+          style="--path-len:100;stroke-dasharray:100"/>
+
+        <!-- Layer 2: Red annotations on the hand -->
+        <g filter="url(#rh1f)">
+          <!-- Red circle around fingertip area -->
+          <path class="sketch-line draw-animated d5"
+            d="M 95,60 C 108,55 125,58 128,70 C 131,82 120,92 105,90 C 90,88 82,76 86,64"
+            stroke="#D97757" stroke-width="2.5" opacity="0.8"
+            style="--path-len:120;stroke-dasharray:120"/>
+          <!-- Arrow pointing down from circle -->
+          <path class="sketch-line draw-animated d6"
+            d="M 107,92 L 110,115 L 108,130"
+            stroke="#D97757" stroke-width="2" opacity="0.8"
+            style="--path-len:45;stroke-dasharray:45"/>
+          <path class="sketch-line draw-animated d6"
+            d="M 103,122 L 110,132 L 117,122"
+            stroke="#D97757" stroke-width="2" opacity="0.8"
+            style="--path-len:18;stroke-dasharray:18"/>
+        </g>
+
+        <!-- Red annotation block (simulated text) -->
+        <g class="fade-in" style="animation-delay:3s" filter="url(#rh1)">
+          <rect x="140" y="70" width="52" height="14" rx="2" fill="none" stroke="#D97757" stroke-width="1" opacity="0.5"/>
+          <text x="166" y="80" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="5.5" fill="#D97757" opacity="0.7">input node</text>
+        </g>
+
+        <!-- Red dashed connector -->
+        <path class="sketch-line draw-animated d7"
+          d="M 138,72 L 148,72"
+          stroke="#D97757" stroke-width="1" stroke-dasharray="3 2" opacity="0.5"
+          style="--path-len:12;stroke-dasharray:3 2 12 0"/>
+
+        <!-- Red scribble emphasis on palm -->
+        <path class="sketch-line draw-animated d7"
+          d="M 85,150 C 95,145 110,148 112,158 C 114,168 100,174 88,168 C 76,162 78,152 88,148"
+          stroke="#D97757" stroke-width="2" opacity="0.6"
+          style="--path-len:100;stroke-dasharray:100"/>
+      </svg>
+      <button class="replay-btn" onclick="replayAnim('r-hand-net')">replay</button>
+    </div>
+
+    <!-- R3: Layered network topology with depth -->
+    <div class="demo-card" id="r-topology" style="min-height:380px;">
+      <svg width="100%" height="340" viewBox="0 0 260 240">
+        <defs>
+          <filter id="rt1"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="55" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <filter id="rt2"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="4" seed="66" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2" xChannelSelector="R" yChannelSelector="G"/></filter>
+        </defs>
+
+        <!-- Layer 0: Deep background network (very faint) -->
+        <g opacity="0.08">
+          <circle cx="20" cy="30" r="2" fill="#E8E6DC"/><circle cx="60" cy="15" r="2.5" fill="#E8E6DC"/>
+          <circle cx="100" cy="25" r="2" fill="#E8E6DC"/><circle cx="160" cy="20" r="3" fill="#E8E6DC"/>
+          <circle cx="220" cy="35" r="2" fill="#E8E6DC"/><circle cx="250" cy="60" r="2.5" fill="#E8E6DC"/>
+          <circle cx="15" cy="80" r="2" fill="#E8E6DC"/><circle cx="240" cy="100" r="2" fill="#E8E6DC"/>
+          <circle cx="30" cy="200" r="2.5" fill="#E8E6DC"/><circle cx="230" cy="210" r="2" fill="#E8E6DC"/>
+          <path class="sketch-line draw-animated" d="M 20,30 L 60,15 L 100,25 L 160,20 L 220,35 L 250,60" stroke="#E8E6DC" stroke-width="0.5" style="--path-len:260;stroke-dasharray:260"/>
+          <path class="sketch-line draw-animated d1" d="M 15,80 L 100,25 L 240,100" stroke="#E8E6DC" stroke-width="0.5" style="--path-len:260;stroke-dasharray:260"/>
+          <path class="sketch-line draw-animated d1" d="M 30,200 L 130,150 L 230,210" stroke="#E8E6DC" stroke-width="0.5" style="--path-len:220;stroke-dasharray:220"/>
+        </g>
+
+        <!-- Layer 1: Primary network (larger nodes, blue) -->
+        <g filter="url(#rt1)">
+          <circle cx="60" cy="60" r="6" fill="none" stroke="#6A9BCC" stroke-width="1.5" class="fade-in" style="animation-delay:0.6s"/>
+          <circle cx="130" cy="45" r="7" fill="none" stroke="#6A9BCC" stroke-width="1.5" class="fade-in" style="animation-delay:0.8s"/>
+          <circle cx="200" cy="55" r="6" fill="none" stroke="#6A9BCC" stroke-width="1.5" class="fade-in" style="animation-delay:1s"/>
+          <circle cx="45" cy="130" r="5.5" fill="none" stroke="#6A9BCC" stroke-width="1.5" class="fade-in" style="animation-delay:1.2s"/>
+          <circle cx="130" cy="120" r="8" fill="none" stroke="#6A9BCC" stroke-width="1.5" class="fade-in" style="animation-delay:1s"/>
+          <circle cx="215" cy="125" r="5.5" fill="none" stroke="#6A9BCC" stroke-width="1.5" class="fade-in" style="animation-delay:1.4s"/>
+          <circle cx="80" cy="190" r="6" fill="none" stroke="#6A9BCC" stroke-width="1.5" class="fade-in" style="animation-delay:1.6s"/>
+          <circle cx="180" cy="195" r="6" fill="none" stroke="#6A9BCC" stroke-width="1.5" class="fade-in" style="animation-delay:1.8s"/>
+          <!-- Connections -->
+          <path class="sketch-line draw-animated d2" d="M 60,60 L 130,45 L 200,55" stroke="#6A9BCC" stroke-width="1" opacity="0.5" style="--path-len:160;stroke-dasharray:160"/>
+          <path class="sketch-line draw-animated d2" d="M 60,60 L 45,130 L 80,190" stroke="#6A9BCC" stroke-width="1" opacity="0.5" style="--path-len:145;stroke-dasharray:145"/>
+          <path class="sketch-line draw-animated d3" d="M 200,55 L 215,125 L 180,195" stroke="#6A9BCC" stroke-width="1" opacity="0.5" style="--path-len:155;stroke-dasharray:155"/>
+          <path class="sketch-line draw-animated d3" d="M 45,130 L 130,120 L 215,125" stroke="#6A9BCC" stroke-width="1" opacity="0.5" style="--path-len:185;stroke-dasharray:185"/>
+          <path class="sketch-line draw-animated d3" d="M 130,45 L 130,120" stroke="#6A9BCC" stroke-width="1" opacity="0.5" style="--path-len:80;stroke-dasharray:80"/>
+          <path class="sketch-line draw-animated d4" d="M 80,190 L 130,120 L 180,195" stroke="#6A9BCC" stroke-width="1" opacity="0.5" style="--path-len:160;stroke-dasharray:160"/>
+          <path class="sketch-line draw-animated d4" d="M 80,190 L 180,195" stroke="#6A9BCC" stroke-width="1" opacity="0.4" style="--path-len:105;stroke-dasharray:105"/>
+        </g>
+
+        <!-- Layer 2: Hub highlight (central node emphasis) -->
+        <g filter="url(#rt2)">
+          <path class="sketch-line draw-animated d5"
+            d="M 115,108 C 125,102 145,102 150,112 C 155,122 148,138 130,140 C 112,138 105,125 110,112"
+            stroke="#D97757" stroke-width="2.5" opacity="0.8"
+            style="--path-len:100;stroke-dasharray:100"/>
+        </g>
+
+        <!-- Layer 3: Red annotation arrows -->
+        <g filter="url(#rt2)">
+          <path class="sketch-line draw-animated d6" d="M 200,55 L 230,40" stroke="#D97757" stroke-width="2" opacity="0.7" style="--path-len:35;stroke-dasharray:35"/>
+          <path class="sketch-line draw-animated d6" d="M 225,35 L 235,40 L 225,45" stroke="#D97757" stroke-width="1.5" opacity="0.7" style="--path-len:16;stroke-dasharray:16"/>
+          <path class="sketch-line draw-animated d7" d="M 45,130 L 20,145" stroke="#D97757" stroke-width="2" opacity="0.7" style="--path-len:30;stroke-dasharray:30"/>
+          <path class="sketch-line draw-animated d7" d="M 25,140 L 18,148 L 28,148" stroke="#D97757" stroke-width="1.5" opacity="0.7" style="--path-len:14;stroke-dasharray:14"/>
+        </g>
+
+        <!-- Labels -->
+        <text x="130" y="165" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="#D97757" opacity="0.6" class="fade-in" style="animation-delay:3.5s">hub node</text>
+        <text x="240" y="35" font-family="'JetBrains Mono',monospace" font-size="6" fill="#D97757" opacity="0.5" class="fade-in" style="animation-delay:3.8s">edge</text>
+        <text x="8" y="155" font-family="'JetBrains Mono',monospace" font-size="6" fill="#D97757" opacity="0.5" class="fade-in" style="animation-delay:4s">leaf</text>
+      </svg>
+      <button class="replay-btn" onclick="replayAnim('r-topology')">replay</button>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:24px;">
+    <!-- R4: Abstract system with interacting layers -->
+    <div class="demo-card" id="r-system" style="min-height:380px;">
+      <svg width="100%" height="340" viewBox="0 0 260 240">
+        <defs>
+          <filter id="rs1"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="77" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.5" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <filter id="rs2"><feTurbulence type="fractalNoise" baseFrequency="0.055" numOctaves="4" seed="88" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.5" xChannelSelector="R" yChannelSelector="G"/></filter>
+        </defs>
+
+        <!-- Layer 0: Grid dots background -->
+        <g opacity="0.06">
+          <g id="gridDots">
+            <!-- Generate a faint dot grid -->
+            <circle cx="20" cy="20" r="1" fill="#E8E6DC"/><circle cx="50" cy="20" r="1" fill="#E8E6DC"/>
+            <circle cx="80" cy="20" r="1" fill="#E8E6DC"/><circle cx="110" cy="20" r="1" fill="#E8E6DC"/>
+            <circle cx="140" cy="20" r="1" fill="#E8E6DC"/><circle cx="170" cy="20" r="1" fill="#E8E6DC"/>
+            <circle cx="200" cy="20" r="1" fill="#E8E6DC"/><circle cx="230" cy="20" r="1" fill="#E8E6DC"/>
+            <circle cx="20" cy="50" r="1" fill="#E8E6DC"/><circle cx="50" cy="50" r="1" fill="#E8E6DC"/>
+            <circle cx="80" cy="50" r="1" fill="#E8E6DC"/><circle cx="110" cy="50" r="1" fill="#E8E6DC"/>
+            <circle cx="140" cy="50" r="1" fill="#E8E6DC"/><circle cx="170" cy="50" r="1" fill="#E8E6DC"/>
+            <circle cx="200" cy="50" r="1" fill="#E8E6DC"/><circle cx="230" cy="50" r="1" fill="#E8E6DC"/>
+            <circle cx="20" cy="80" r="1" fill="#E8E6DC"/><circle cx="50" cy="80" r="1" fill="#E8E6DC"/>
+            <circle cx="80" cy="80" r="1" fill="#E8E6DC"/><circle cx="110" cy="80" r="1" fill="#E8E6DC"/>
+            <circle cx="140" cy="80" r="1" fill="#E8E6DC"/><circle cx="170" cy="80" r="1" fill="#E8E6DC"/>
+            <circle cx="200" cy="80" r="1" fill="#E8E6DC"/><circle cx="230" cy="80" r="1" fill="#E8E6DC"/>
+            <circle cx="20" cy="110" r="1" fill="#E8E6DC"/><circle cx="50" cy="110" r="1" fill="#E8E6DC"/>
+            <circle cx="80" cy="110" r="1" fill="#E8E6DC"/><circle cx="110" cy="110" r="1" fill="#E8E6DC"/>
+            <circle cx="140" cy="110" r="1" fill="#E8E6DC"/><circle cx="170" cy="110" r="1" fill="#E8E6DC"/>
+            <circle cx="200" cy="110" r="1" fill="#E8E6DC"/><circle cx="230" cy="110" r="1" fill="#E8E6DC"/>
+            <circle cx="20" cy="140" r="1" fill="#E8E6DC"/><circle cx="50" cy="140" r="1" fill="#E8E6DC"/>
+            <circle cx="80" cy="140" r="1" fill="#E8E6DC"/><circle cx="110" cy="140" r="1" fill="#E8E6DC"/>
+            <circle cx="140" cy="140" r="1" fill="#E8E6DC"/><circle cx="170" cy="140" r="1" fill="#E8E6DC"/>
+            <circle cx="200" cy="140" r="1" fill="#E8E6DC"/><circle cx="230" cy="140" r="1" fill="#E8E6DC"/>
+            <circle cx="20" cy="170" r="1" fill="#E8E6DC"/><circle cx="50" cy="170" r="1" fill="#E8E6DC"/>
+            <circle cx="80" cy="170" r="1" fill="#E8E6DC"/><circle cx="110" cy="170" r="1" fill="#E8E6DC"/>
+            <circle cx="140" cy="170" r="1" fill="#E8E6DC"/><circle cx="170" cy="170" r="1" fill="#E8E6DC"/>
+            <circle cx="200" cy="170" r="1" fill="#E8E6DC"/><circle cx="230" cy="170" r="1" fill="#E8E6DC"/>
+            <circle cx="20" cy="200" r="1" fill="#E8E6DC"/><circle cx="50" cy="200" r="1" fill="#E8E6DC"/>
+            <circle cx="80" cy="200" r="1" fill="#E8E6DC"/><circle cx="110" cy="200" r="1" fill="#E8E6DC"/>
+            <circle cx="140" cy="200" r="1" fill="#E8E6DC"/><circle cx="170" cy="200" r="1" fill="#E8E6DC"/>
+            <circle cx="200" cy="200" r="1" fill="#E8E6DC"/><circle cx="230" cy="200" r="1" fill="#E8E6DC"/>
+            <circle cx="20" cy="230" r="1" fill="#E8E6DC"/><circle cx="50" cy="230" r="1" fill="#E8E6DC"/>
+            <circle cx="80" cy="230" r="1" fill="#E8E6DC"/><circle cx="110" cy="230" r="1" fill="#E8E6DC"/>
+            <circle cx="140" cy="230" r="1" fill="#E8E6DC"/><circle cx="170" cy="230" r="1" fill="#E8E6DC"/>
+            <circle cx="200" cy="230" r="1" fill="#E8E6DC"/><circle cx="230" cy="230" r="1" fill="#E8E6DC"/>
+          </g>
+        </g>
+
+        <!-- Layer 1: Organic blob shapes (3 overlapping) -->
+        <path class="sketch-line draw-animated d1"
+          d="M 80,50 C 110,35 155,40 160,65 C 165,90 140,110 110,108 C 80,106 55,85 58,65 C 60,52 65,48 82,50"
+          stroke="#141413" stroke-width="2" fill="none" filter="url(#rs1)"
+          style="--path-len:300;stroke-dasharray:300"/>
+        <path class="sketch-line draw-animated d2"
+          d="M 120,80 C 150,68 195,75 198,100 C 201,125 175,145 145,142 C 115,139 95,118 100,98 C 104,85 110,80 122,80"
+          stroke="#6A9BCC" stroke-width="1.8" fill="none" filter="url(#rs1)" opacity="0.7"
+          style="--path-len:300;stroke-dasharray:300"/>
+        <path class="sketch-line draw-animated d3"
+          d="M 60,120 C 90,108 130,115 132,140 C 134,165 108,182 80,178 C 52,174 35,155 40,135 C 44,122 50,118 62,120"
+          stroke="#788C5D" stroke-width="1.8" fill="none" filter="url(#rs1)" opacity="0.6"
+          style="--path-len:280;stroke-dasharray:280"/>
+
+        <!-- Layer 2: Connection lines between blobs -->
+        <g filter="url(#rs1)">
+          <path class="sketch-line draw-animated d4" d="M 110,108 C 115,115 118,125 120,130" stroke="#141413" stroke-width="1.2" opacity="0.4" style="--path-len:25;stroke-dasharray:25"/>
+          <path class="sketch-line draw-animated d4" d="M 145,142 C 130,148 115,155 100,160" stroke="#141413" stroke-width="1.2" opacity="0.4" style="--path-len:55;stroke-dasharray:55"/>
+          <path class="sketch-line draw-animated d4" d="M 160,65 C 165,75 168,85 170,90" stroke="#141413" stroke-width="1.2" opacity="0.4" style="--path-len:30;stroke-dasharray:30"/>
+        </g>
+
+        <!-- Layer 3: Red annotation overlay -->
+        <g filter="url(#rs2)">
+          <!-- Red circle around intersection -->
+          <path class="sketch-line draw-animated d6"
+            d="M 100,95 C 115,88 135,92 138,105 C 141,118 128,128 110,126 C 92,124 84,110 90,98"
+            stroke="#D97757" stroke-width="2.5" opacity="0.8"
+            style="--path-len:120;stroke-dasharray:120"/>
+          <!-- Arrow pointing right -->
+          <path class="sketch-line draw-animated d7" d="M 140,105 L 175,95" stroke="#D97757" stroke-width="2" opacity="0.8" style="--path-len:40;stroke-dasharray:40"/>
+          <path class="sketch-line draw-animated d7" d="M 168,90 L 178,95 L 168,100" stroke="#D97757" stroke-width="1.5" opacity="0.8" style="--path-len:18;stroke-dasharray:18"/>
+          <!-- Red underline -->
+          <path class="sketch-line draw-animated d8"
+            d="M 55,190 C 80,186 130,192 170,188"
+            stroke="#D97757" stroke-width="2" opacity="0.6"
+            style="--path-len:125;stroke-dasharray:125"/>
+        </g>
+
+        <!-- Annotation labels -->
+        <text x="180" y="90" font-family="'JetBrains Mono',monospace" font-size="6" fill="#D97757" opacity="0.6" class="fade-in" style="animation-delay:3.5s">overlap zone</text>
+        <text x="80" y="205" font-family="'EB Garamond',serif" font-size="9" font-style="italic" fill="#D97757" opacity="0.5" class="fade-in" style="animation-delay:3.8s">where ideas converge</text>
+      </svg>
+      <button class="replay-btn" onclick="replayAnim('r-system')">replay</button>
+    </div>
+
+    <!-- R5: Neural pathways with signal flow -->
+    <div class="demo-card" id="r-neural" style="min-height:380px;">
+      <svg width="100%" height="340" viewBox="0 0 260 240">
+        <defs>
+          <filter id="rn1"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="99" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.6" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <filter id="rn2"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="4" seed="110" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.5" xChannelSelector="R" yChannelSelector="G"/></filter>
+        </defs>
+
+        <!-- Layer 0: Faint background mesh -->
+        <g opacity="0.07">
+          <path class="sketch-line draw-animated" d="M 0,40 L 260,40 M 0,80 L 260,80 M 0,120 L 260,120 M 0,160 L 260,160 M 0,200 L 260,200" stroke="#E8E6DC" stroke-width="0.5" style="--path-len:1300;stroke-dasharray:1300"/>
+          <path class="sketch-line draw-animated d1" d="M 40,0 L 40,240 M 80,0 L 80,240 M 120,0 L 120,240 M 160,0 L 160,240 M 200,0 L 200,240" stroke="#E8E6DC" stroke-width="0.5" style="--path-len:1200;stroke-dasharray:1200"/>
+        </g>
+
+        <!-- Layer 1: Neuron cell bodies (large organic circles) -->
+        <g filter="url(#rn1)">
+          <path class="sketch-line draw-animated d1"
+            d="M 65,55 C 82,45 105,48 108,65 C 111,82 95,95 75,92 C 55,89 45,72 50,58 C 54,48 58,46 68,48"
+            stroke="#141413" stroke-width="2.5" fill="none"
+            style="--path-len:170;stroke-dasharray:170"/>
+          <path class="sketch-line draw-animated d2"
+            d="M 175,45 C 195,35 220,40 222,60 C 224,80 205,92 185,88 C 165,84 155,68 160,52 C 164,42 168,40 178,42"
+            stroke="#141413" stroke-width="2.5" fill="none"
+            style="--path-len:180;stroke-dasharray:180"/>
+          <path class="sketch-line draw-animated d3"
+            d="M 115,155 C 140,142 170,148 172,170 C 174,192 152,205 130,200 C 108,195 95,178 100,160 C 104,148 108,145 118,148"
+            stroke="#141413" stroke-width="2.5" fill="none"
+            style="--path-len:200;stroke-dasharray:200"/>
+        </g>
+
+        <!-- Layer 2: Axon pathways (thinner connecting lines) -->
+        <g filter="url(#rn1)">
+          <!-- Long axon from top-left to bottom-center -->
+          <path class="sketch-line draw-animated d4"
+            d="M 85,90 C 90,110 95,125 100,135 C 105,145 108,150 115,155"
+            stroke="#141413" stroke-width="1.5" fill="none" opacity="0.7"
+            style="--path-len:80;stroke-dasharray:80"/>
+          <!-- Long axon from top-right to bottom-center -->
+          <path class="sketch-line draw-animated d4"
+            d="M 185,86 C 178,105 170,125 160,140 C 150,152 140,158 132,162"
+            stroke="#141413" stroke-width="1.5" fill="none" opacity="0.7"
+            style="--path-len:100;stroke-dasharray:100"/>
+          <!-- Cross connection -->
+          <path class="sketch-line draw-animated d5"
+            d="M 108,65 C 130,55 155,50 175,48"
+            stroke="#141413" stroke-width="1.2" fill="none" opacity="0.5"
+            style="--path-len:75;stroke-dasharray:75"/>
+          <!-- Dendrite branches -->
+          <path class="sketch-line draw-animated d5" d="M 65,55 C 45,40 30,35 20,30" stroke="#141413" stroke-width="1" fill="none" opacity="0.5" style="--path-len:55;stroke-dasharray:55"/>
+          <path class="sketch-line draw-animated d5" d="M 65,55 C 50,45 35,50 25,55" stroke="#141413" stroke-width="1" fill="none" opacity="0.5" style="--path-len:48;stroke-dasharray:48"/>
+          <path class="sketch-line draw-animated d5" d="M 222,60 C 238,50 248,42 255,35" stroke="#141413" stroke-width="1" fill="none" opacity="0.5" style="--path-len:42;stroke-dasharray:42"/>
+          <path class="sketch-line draw-animated d5" d="M 222,60 C 240,65 250,72 258,78" stroke="#141413" stroke-width="1" fill="none" opacity="0.5" style="--path-len:42;stroke-dasharray:42"/>
+          <path class="sketch-line draw-animated d6" d="M 115,155 C 95,168 80,180 65,195" stroke="#141413" stroke-width="1" fill="none" opacity="0.5" style="--path-len:60;stroke-dasharray:60"/>
+          <path class="sketch-line draw-animated d6" d="M 172,170 C 190,182 205,190 220,200" stroke="#141413" stroke-width="1" fill="none" opacity="0.5" style="--path-len:60;stroke-dasharray:60"/>
+        </g>
+
+        <!-- Layer 3: Signal flow indicators (red) -->
+        <g filter="url(#rn2)">
+          <!-- Signal dot on axon 1 -->
+          <circle cx="92" cy="115" r="4" fill="none" stroke="#D97757" stroke-width="2" opacity="0.8" class="fade-in" style="animation-delay:2.5s"/>
+          <!-- Signal dot on axon 2 -->
+          <circle cx="172" cy="110" r="4" fill="none" stroke="#D97757" stroke-width="2" opacity="0.8" class="fade-in" style="animation-delay:2.8s"/>
+          <!-- Red annotation circle around bottom neuron -->
+          <path class="sketch-line draw-animated d7"
+            d="M 105,145 C 125,135 155,138 160,158 C 165,178 145,198 120,195 C 95,192 82,172 90,152"
+            stroke="#D97757" stroke-width="2.5" opacity="0.7"
+            style="--path-len:170;stroke-dasharray:170"/>
+          <!-- Red arrow showing signal direction -->
+          <path class="sketch-line draw-animated d8" d="M 95,115 L 100,135" stroke="#D97757" stroke-width="2" opacity="0.8" style="--path-len:25;stroke-dasharray:25"/>
+          <path class="sketch-line draw-animated d8" d="M 96,128 L 102,138 L 106,128" stroke="#D97757" stroke-width="1.5" opacity="0.8" style="--path-len:16;stroke-dasharray:16"/>
+        </g>
+
+        <!-- Labels -->
+        <text x="80" y="75" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="6" fill="#141413" opacity="0.4" class="fade-in" style="animation-delay:2s">input</text>
+        <text x="195" y="70" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="6" fill="#141413" opacity="0.4" class="fade-in" style="animation-delay:2.2s">context</text>
+        <text x="138" y="180" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="6" fill="#D97757" opacity="0.6" class="fade-in" style="animation-delay:3.5s">integrate</text>
+      </svg>
+      <button class="replay-btn" onclick="replayAnim('r-neural')">replay</button>
+    </div>
+  </div>
+
+  <!-- R6: Three hands arrangement with annotations -->
+  <div style="margin-top:24px;">
+    <div class="demo-card" id="r-three-hands" style="min-height:400px;">
+      <svg width="100%" height="380" viewBox="0 0 500 280">
+        <defs>
+          <filter id="rth1"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="121" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.5" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <filter id="rth2"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="4" seed="132" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.5" xChannelSelector="R" yChannelSelector="G"/></filter>
+        </defs>
+
+        <!-- Layer 0: Background network (milk white) -->
+        <g opacity="0.1" filter="url(#rth1)">
+          <circle cx="50" cy="40" r="2.5" fill="#E8E6DC"/><circle cx="120" cy="25" r="2" fill="#E8E6DC"/>
+          <circle cx="200" cy="35" r="3" fill="#E8E6DC"/><circle cx="300" cy="30" r="2.5" fill="#E8E6DC"/>
+          <circle cx="380" cy="40" r="2" fill="#E8E6DC"/><circle cx="450" cy="55" r="2.5" fill="#E8E6DC"/>
+          <circle cx="40" cy="120" r="2" fill="#E8E6DC"/><circle cx="460" cy="130" r="2" fill="#E8E6DC"/>
+          <circle cx="80" cy="200" r="2.5" fill="#E8E6DC"/><circle cx="250" cy="220" r="3" fill="#E8E6DC"/>
+          <circle cx="420" cy="210" r="2" fill="#E8E6DC"/>
+          <path class="sketch-line draw-animated" d="M 50,40 L 120,25 L 200,35 L 300,30 L 380,40 L 450,55" stroke="#E8E6DC" stroke-width="0.6" style="--path-len:430;stroke-dasharray:430"/>
+          <path class="sketch-line draw-animated d1" d="M 40,120 L 200,35 L 460,130" stroke="#E8E6DC" stroke-width="0.6" style="--path-len:460;stroke-dasharray:460"/>
+          <path class="sketch-line draw-animated d1" d="M 80,200 L 250,220 L 420,210" stroke="#E8E6DC" stroke-width="0.6" style="--path-len:360;stroke-dasharray:360"/>
+          <path class="sketch-line draw-animated d2" d="M 120,25 L 80,200" stroke="#E8E6DC" stroke-width="0.6" style="--path-len:185;stroke-dasharray:185"/>
+          <path class="sketch-line draw-animated d2" d="M 380,40 L 420,210" stroke="#E8E6DC" stroke-width="0.6" style="--path-len:180;stroke-dasharray:180"/>
+          <path class="sketch-line draw-animated d2" d="M 200,35 L 250,220" stroke="#E8E6DC" stroke-width="0.6" style="--path-len:190;stroke-dasharray:190"/>
+        </g>
+
+        <!-- Layer 1: Three hand silhouettes (triangular arrangement) -->
+        <!-- Hand 1: Left, reaching right -->
+        <path class="sketch-line draw-animated d2"
+          d="M 55,210 C 50,195 48,178 52,162 L 48,140 C 46,128 50,118 56,115 C 62,112 66,120 65,132 L 68,150 L 72,132 C 72,118 78,110 84,112 C 90,114 90,125 87,138 L 82,158 L 88,142 C 90,130 96,125 100,128 C 104,131 102,142 98,152 L 88,178 C 84,190 78,205 70,215 C 62,222 56,218 55,210"
+          stroke="#141413" stroke-width="2.5" fill="none" filter="url(#rth2)"
+          style="--path-len:400;stroke-dasharray:400"/>
+
+        <!-- Hand 2: Right, reaching left -->
+        <path class="sketch-line draw-animated d3"
+          d="M 430,200 C 435,185 438,168 434,152 L 438,130 C 440,118 436,108 430,105 C 424,102 420,110 421,122 L 418,140 L 414,122 C 414,108 408,100 402,102 C 396,104 396,115 399,128 L 404,148 L 398,132 C 396,120 390,115 386,118 C 382,121 384,132 388,142 L 398,168 C 402,180 408,195 416,205 C 424,212 430,208 430,200"
+          stroke="#141413" stroke-width="2.5" fill="none" filter="url(#rth2)"
+          style="--path-len:400;stroke-dasharray:400"/>
+
+        <!-- Hand 3: Top center, pointing down -->
+        <path class="sketch-line draw-animated d4"
+          d="M 230,80 C 225,65 228,48 235,38 L 232,22 C 230,12 235,5 242,5 C 249,5 252,14 250,24 L 252,38 L 256,22 C 256,10 262,4 268,6 C 274,8 274,18 270,28 L 265,45 L 272,30 C 274,20 280,16 284,20 C 288,24 285,34 280,42 L 268,62 C 262,72 255,82 248,88 C 240,94 232,90 230,80"
+          stroke="#141413" stroke-width="2.5" fill="none" filter="url(#rth2)"
+          style="--path-len:300;stroke-dasharray:300"/>
+
+        <!-- Layer 2: Red terracotta annotation circles -->
+        <g filter="url(#rth2)">
+          <!-- Circle on hand 1's palm -->
+          <path class="sketch-line draw-animated d6"
+            d="M 58,155 C 70,148 85,152 87,165 C 89,178 78,188 64,185 C 50,182 44,170 50,158"
+            stroke="#D97757" stroke-width="2.5" opacity="0.8"
+            style="--path-len:110;stroke-dasharray:110"/>
+
+          <!-- Circle on hand 2's palm -->
+          <path class="sketch-line draw-animated d6"
+            d="M 405,148 C 418,140 434,145 435,160 C 436,175 424,185 410,182 C 396,179 390,166 396,152"
+            stroke="#D97757" stroke-width="2.5" opacity="0.8"
+            style="--path-len:110;stroke-dasharray:110"/>
+
+          <!-- Arrow from hand 1 circle pointing to center -->
+          <path class="sketch-line draw-animated d7" d="M 88,165 L 160,150" stroke="#D97757" stroke-width="2" opacity="0.8" style="--path-len:80;stroke-dasharray:80"/>
+          <path class="sketch-line draw-animated d7" d="M 152,145 L 162,150 L 152,155" stroke="#D97757" stroke-width="1.5" opacity="0.8" style="--path-len:16;stroke-dasharray:16"/>
+
+          <!-- Arrow from hand 2 circle pointing to center -->
+          <path class="sketch-line draw-animated d7" d="M 395,160 L 325,150" stroke="#D97757" stroke-width="2" opacity="0.8" style="--path-len:75;stroke-dasharray:75"/>
+          <path class="sketch-line draw-animated d7" d="M 332,145 L 322,150 L 332,155" stroke="#D97757" stroke-width="1.5" opacity="0.8" style="--path-len:16;stroke-dasharray:16"/>
+
+          <!-- Red circle in center (convergence point) -->
+          <path class="sketch-line draw-animated d8"
+            d="M 220,140 C 240,132 268,135 272,152 C 276,169 258,182 238,178 C 218,174 205,160 212,145"
+            stroke="#D97757" stroke-width="2.5" opacity="0.8"
+            style="--path-len:140;stroke-dasharray:140"/>
+
+          <!-- Arrow from top hand pointing down to center -->
+          <path class="sketch-line draw-animated d8" d="M 255,90 L 252,125" stroke="#D97757" stroke-width="2" opacity="0.8" style="--path-len:40;stroke-dasharray:40"/>
+          <path class="sketch-line draw-animated d8" d="M 248,118 L 252,128 L 256,118" stroke="#D97757" stroke-width="1.5" opacity="0.8" style="--path-len:16;stroke-dasharray:16"/>
+        </g>
+
+        <!-- Annotation labels -->
+        <g class="fade-in" style="animation-delay:4s">
+          <text x="70" y="200" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="#D97757" opacity="0.6">perceive</text>
+          <text x="420" y="195" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="#D97757" opacity="0.6">generate</text>
+          <text x="250" y="55" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="#D97757" opacity="0.6">reason</text>
+          <text x="250" y="170" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8" fill="#D97757" opacity="0.7">synthesize</text>
+        </g>
+      </svg>
+      <button class="replay-btn" onclick="replayAnim('r-three-hands')">replay</button>
+    </div>
+  </div>
+
+
+  <!-- ============================================================ -->
   <!-- FINAL FOOTER                                                  -->
   <!-- ============================================================ -->
   <div style="margin-top:100px;text-align:center;padding-bottom:60px;">
-    <p style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:#bbb;margin-bottom:8px;" data-en="20 categories &amp; middot; 80+ hand-drawn elements" data-zh="20 个类别 &amp; middot; 80+ 个手绘元素">
-      20 categories &middot; 80+ hand-drawn elements
+    <p style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:#bbb;margin-bottom:8px;" data-en="21 categories &middot; 90+ hand-drawn elements" data-zh="21 个类别 &middot; 90+ 个手绘元素">
+      21 categories &middot; 90+ hand-drawn elements
     </p>
     <p style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#ccc;" data-en="All shapes: &lt;code&gt;&amp;lt;path&amp;gt;&lt;/code&gt; + jittered bezier curves + &lt;code&gt;feTurbulence&lt;/code&gt; displacement filter + &lt;code&gt;stroke-dasharray&lt;/code&gt; draw animation" data-zh="所有形状: &lt;code&gt;&amp;lt;path&amp;gt;&lt;/code&gt; + 抖动贝塞尔曲线 + &lt;code&gt;feTurbulence&lt;/code&gt; 位移滤镜 + &lt;code&gt;stroke-dasharray&lt;/code&gt; 笔画生长动画">
       All shapes: <code>&lt;path&gt;</code> + jittered bezier curves + <code>feTurbulence</code> displacement filter + <code>stroke-dasharray</code> draw animation
@@ -2700,7 +3206,67 @@ Requirements:
 - Same path shape
 - feTurbulence baseFrequency="0.06", numOctaves="4", feDisplacementMap scale="4"
 - Line color: #D97757, stroke-width: 2.5
-- Label: "heavy (scale:4)"`
+- Label: "heavy (scale:4)"`,
+
+  "r-brain-net": `Please write an HTML/SVG code for a complex multi-layer brain + network fusion illustration.
+Requirements — 4 layers from bottom to top:
+Layer 0 (Background): Faint milk-white (#E8E6DC) network of dots and connecting lines, opacity 0.15
+Layer 1 (Brain outline): Organic blob-shaped brain outline using <path> with bezier curves, black (#141413) stroke-width 2.5, with internal fold lines. The brain should look hand-drawn with slight imperfections.
+Layer 2 (Internal network): Blue (#6A9BCC) circle nodes inside the brain connected by thin lines, representing neural pathways. Nodes should be imperfect circles.
+Layer 3 (Red annotations): Terracotta (#D97757) circles and arrows overlaid on specific parts of the brain, with small annotation labels ("perception", "reasoning").
+- All elements use SVG rough-edge filter (feTurbulence + feDisplacementMap)
+- Staggered draw-in animation with delays per layer
+- Brain outline must be transparent inside so the network shows through`,
+
+  "r-hand-net": `Please write an HTML/SVG code for a complex multi-layer hand silhouette + network + annotations illustration.
+Requirements — 4 layers:
+Layer 0: Faint milk-white (#E8E6DC) background network of dots and lines, opacity 0.12
+Layer 1: Black (#141413) hand silhouette — simplified open hand with fingers, drawn with bezier curves, stroke-width 2.5. Hand should be transparent (fill="none") to show network beneath.
+Layer 2: Terracotta (#D97757) annotation circle around the fingertip area, with an arrow pointing down from the circle. Small annotation text boxes.
+Layer 3: Red scribble emphasis on the palm area.
+- SVG rough-edge filter on all layers
+- Staggered animation: network first, then hand, then red annotations
+- The hand must be positioned so its interior overlaps with the background network nodes`,
+
+  "r-topology": `Please write an HTML/SVG code for a complex multi-layer network topology diagram.
+Requirements — 4 layers:
+Layer 0: Very faint (opacity 0.08) background dot grid and connecting lines in milk-white
+Layer 1: Primary network with larger blue (#6A9BCC) circle nodes (imperfect, r=5-8) connected by thin lines. 8 nodes arranged in a distributed topology.
+Layer 2: Central hub node highlighted with a terracotta (#D97757) circle annotation around it
+Layer 3: Red annotation arrows pointing to edge and leaf nodes with small labels ("hub node", "edge", "leaf")
+- SVG rough-edge filter on all layers
+- Staggered draw-in animation
+- Use different filter seeds for each layer to avoid visual repetition`,
+
+  "r-system": `Please write an HTML/SVG code for a complex multi-layer abstract system illustration showing overlapping organic shapes.
+Requirements — 4 layers:
+Layer 0: Faint dot grid background (opacity 0.06)
+Layer 1: Three overlapping organic blob shapes in different colors — black (#141413), blue (#6A9BCC), green (#788C5D) — each drawn with bezier curves as imperfect ellipses
+Layer 2: Thin connecting lines between the blobs where they overlap
+Layer 3: Terracotta (#D97757) annotation circle around the intersection zone, arrow pointing to the overlap, wavy underline at bottom with italic annotation text
+- SVG rough-edge filter
+- Each blob uses different opacity (1.0, 0.7, 0.6) for depth
+- Staggered animation per layer`,
+
+  "r-neural": `Please write an HTML/SVG code for a complex multi-layer neural pathway illustration.
+Requirements — 4 layers:
+Layer 0: Faint grid lines background (opacity 0.07)
+Layer 1: Three neuron cell bodies — large organic circles (imperfect, drawn with bezier curves) in black, positioned in triangular arrangement (2 top, 1 bottom)
+Layer 2: Axon pathways — thinner connecting lines between neurons, plus dendrite branches extending outward from each neuron
+Layer 3: Red signal flow indicators — small terracotta circles on the axons, arrows showing signal direction, annotation circle around the bottom (integration) neuron, labels ("input", "context", "integrate")
+- SVG rough-edge filter on all elements
+- Dendrite branches should be short, asymmetric lines radiating from cell bodies
+- Staggered animation: grid → neurons → axons → red signals`,
+
+  "r-three-hands": `Please write an HTML/SVG code for a complex multi-layer illustration with three hand silhouettes in triangular arrangement.
+Requirements — 4 layers:
+Layer 0: Faint milk-white (#E8E6DC) background network (opacity 0.1), connecting all three hand positions
+Layer 1: Three black (#141413) hand silhouettes arranged in a triangle — left hand reaching right, right hand reaching left, top hand pointing down. Each hand drawn with bezier curves, stroke-width 2.5, fill="none" (transparent)
+Layer 2: Terracotta (#D97757) annotation circles on each hand's palm area, with arrows pointing from each hand toward the center convergence point
+Layer 3: Central terracotta circle at the convergence point, plus text labels for each hand ("perceive", "generate", "reason") and center ("synthesize")
+- SVG rough-edge filter (feTurbulence + feDisplacementMap)
+- Staggered animation: background → hands (one by one) → red annotations
+- Hands should be simplified but recognizable, with 4-5 fingers each`
 };
 
 // ===== Modal Logic =====
@@ -2761,6 +3327,10 @@ const LABEL_ZH = {
   "upload": "上传", "download": "下载",
   "rain": "雨滴", "leaf": "树叶", "tree": "树木", "mountain": "山脉",
   "snowflake": "雪花", "droplet": "水滴",
+  // R-category labels (if any item-labels exist)
+  "brain + network": "大脑 + 网络", "hand + network": "手型 + 网络",
+  "topology": "拓扑图", "organic system": "有机系统",
+  "neural pathways": "神经通路", "three hands": "三手组合",
 };
 
 function toggleLang() {
