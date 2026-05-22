@@ -101,6 +101,9 @@ my-video/
   - Path 编写技巧（圆、矩形、箭头、下划线、气泡、图标、图表）
   - Remotion 集成模板（React 组件 + 帧驱动动画）
   - 调参速查表（颜色、粗细、时长）
+- `references/sketch-demo.html` — 涂鸦 SVG 交互式演示（88 个动画元素 + 提示词一键复制）
+  - 浏览器直接打开即可预览全部涂鸦效果
+  - 每个元素右上角 prompt 按钮 → 弹出 AI 生成提示词 → 一键复制
 - `references/AUDIO.md` — 音频合成参考
 - `references/CHAPTER-CRAFT.md` — 场景开发指南 + 动画模式库
 
