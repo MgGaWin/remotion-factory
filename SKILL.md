@@ -1,5 +1,6 @@
-﻿---
+---
 name: remotion-factory
+version: 1.3.1
 description: |
   把一篇文章或口播稿，用 Remotion 做成可直接渲染 MP4 的视频。
   流程：原始文章 → 口播稿 → 音频合成 → Remotion 开发 → 渲染 MP4。
@@ -328,8 +329,8 @@ my-video/
 
 开发完所有章节后，检查全片的明暗节奏：
 - 每 3-5 个亮色场景后，应该有 1 个暗色场景
-- 不要出现连续 4 个以上亮色场景（观众会审美疲劳）
-- 不要出现连续 3 个以上暗色场景（压抑）
+- 连续亮色场景最多 3 个（超过会审美疲劳）
+- 连续暗色场景最多 2 个（超过会压抑）
 
 ### 实现方式
 
@@ -349,9 +350,9 @@ export const SceneWithTheme: React.FC = () => {
     extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
   });
 
-  const bgColor = interpolateColor(themeProgress, ['#FAF9F5', '#191917']);
-  const textColor = interpolateColor(themeProgress, ['#141413', '#EBEAE4']);
-  const accentColor = interpolateColor(themeProgress, ['#D97757', '#EE6B3E']);
+  const bgColor = interpolateColor(frame, [SWITCH_FRAME, SWITCH_FRAME + FAST], ['#FAF9F5', '#191917']);
+  const textColor = interpolateColor(frame, [SWITCH_FRAME, SWITCH_FRAME + FAST], ['#141413', '#EBEAE4']);
+  const accentColor = interpolateColor(frame, [SWITCH_FRAME, SWITCH_FRAME + FAST], ['#D97757', '#EE6B3E']);
 
   return (
     <AbsoluteFill style={{ background: bgColor, color: textColor }}>
@@ -363,39 +364,35 @@ export const SceneWithTheme: React.FC = () => {
 
 #### 整场景暗色（推荐方式）
 
-如果整个场景都是暗色，直接在场景组件中使用暗色变量：
+在场景组件的根 AbsoluteFill 上加 className="dark-theme"。
+CSS 变量通过 global.css 的 .dark-theme 规则生效，子元素用 var(--c-xxx) 引用。
 
 ```tsx
+// SceneDark.tsx
+import React from 'react';
+import { AbsoluteFill, useCurrentFrame } from 'remotion';
+
 export const SceneDark: React.FC = () => {
   const frame = useCurrentFrame();
 
   return (
-    <AbsoluteFill style={{
-      background: 'var(--c-bg)',     /* 自动使用 .dark-theme 的值 */
-      color: 'var(--c-text)',
-    }}>
-      {/* 内容 */}
+    <AbsoluteFill className="dark-theme" style={{ padding: 100 }}>
+      <h1 style={{ fontFamily: 'var(--font-display)', color: 'var(--c-text)' }}>标题</h1>
+      <p style={{ color: 'var(--c-accent)' }}>强调文字</p>
     </AbsoluteFill>
   );
 };
 ```
 
-然后在 Chapter 编排中通过 className 控制：
+Chapter 编排中无需额外处理，主题已在场景组件内部决定：
 
 ```tsx
 // Chapter1.tsx
 <Sequence from={S0} durationInFrames={S0_DUR} name="Title">
-  <div className="dark-theme">  {/* 开场标题用暗色 */}
-    <Scene0Title />
-  </div>
+  <Scene0Title />  {/* 组件内部已设置 dark-theme */}
 </Sequence>
 <Sequence from={S1} durationInFrames={S1_DUR} name="Content">
-  <Scene1Content />  {/* 正文用亮色（默认） */}
-</Sequence>
-<Sequence from={S2} durationInFrames={S2_DUR} name="Code">
-  <div className="dark-theme">  {/* 代码用暗色 */}
-    <Scene2Code />
-  </div>
+  <Scene1Content />  {/* 无 dark-theme，默认亮色 */}
 </Sequence>
 ```
 
