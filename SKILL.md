@@ -246,6 +246,193 @@ my-video/
 ---
 
 
+
+## 明暗主题切换系统
+
+### 为什么需要明暗交替
+
+一成不变的白底会让 7 分钟的视频显得单调。通过"明暗交替"制造视觉节奏感：
+- 白底：承载报刊质感的正文、图表、卡片（主体内容，~60-70%）
+- 暗底：承载代码终端、章节首尾、核心结论（节奏重音，~30-40%）
+
+### 暗色主题变量
+
+```css
+.dark-theme {
+  /* 底色 */
+  --c-bg: #191917;              /* 深炭墨，带暖意的黑 */
+  --c-bg-warm: #242422;         /* 深炭灰 */
+  --c-surface: #2D2C2A;         /* 表面色 */
+
+  /* 文字（拒绝死白，保持暖意） */
+  --c-text: #EBEAE4;             /* 暖奶白 */
+  --c-text-secondary: #9E9C94;   /* 亚光浅灰 */
+  --c-text-muted: #666560;       /* 弱文字 */
+  --c-divider: rgba(158, 156, 148, 0.15);
+
+  /* 品牌色（暗底提亮对比度） */
+  --c-accent: #EE6B3E;           /* 亮赤陶橙，微弱发光感 */
+  --c-accent-deep: #E58565;      /* 柔和粉赤陶 */
+
+  /* 辅助色（略微提亮） */
+  --c-chart-blue: #81A9D4;
+  --c-chart-green: #8DA173;
+  --c-chart-gray: #3A3936;
+
+  /* 终端 */
+  --c-terminal-bg: #151521;
+  --c-terminal-text: #CDD6F4;
+  --c-terminal-red: #F38BA8;
+  --c-terminal-line: #2A2A3A;          /* 代码行间交替色 */
+  --c-terminal-highlight: rgba(238, 107, 62, 0.12); /* 高亮行背景 */
+}
+```
+
+### 自动决策规则（Claude 必须遵守）
+
+开发每个场景时，Claude 必须根据以下规则自动判断使用暗色还是亮色。**不需要用户手动指定**。
+
+#### 规则一：场景内容分类 → 主题映射
+
+| 场景内容类型 | 主题 | 原因 |
+|------------|------|------|
+| 开场标题（Chapter Title） | **暗色** | 电影感开场，"沉下来"聚焦 |
+| 代码终端（Terminal/Code） | **暗色** | 终端天然深色，视觉一致 |
+| 核心结论/总结 | **暗色** | 节奏收尾，强调分量 |
+| 重要观点强调（单句大字） | **暗色** | 暗底+亮赤陶=视觉焦点 |
+| 正文内容（卡片/列表/图表） | 亮色 | 报刊质感，清晰可读 |
+| 数据可视化（SVG/图表） | 亮色 | 小字在暗底可读性差 |
+| 流程步骤 | 亮色 | 需要清晰视觉层次 |
+| 过渡/引入 | 跟随前一场景 | 保持连贯 |
+
+#### 规则二：章节内节奏约束
+
+```
+每个章节的暗色场景比例：20%~40%
+连续暗色场景：最多 2 个
+连续亮色场景：最多 3 个
+章节第一个场景：暗色（开场）
+章节最后一个场景：可选暗色（总结）
+```
+
+**示例**（5 个场景的章节）：
+```
+场景 0: 暗色（开场标题）
+场景 1: 亮色（正文内容）
+场景 2: 亮色（图表展示）
+场景 3: 暗色（代码终端）
+场景 4: 亮色或暗色（总结/下一步）
+```
+
+#### 规则三：全片节奏检查
+
+开发完所有章节后，检查全片的明暗节奏：
+- 每 3-5 个亮色场景后，应该有 1 个暗色场景
+- 不要出现连续 4 个以上亮色场景（观众会审美疲劳）
+- 不要出现连续 3 个以上暗色场景（压抑）
+
+### 实现方式
+
+#### 单场景内切换（场景内局部暗色）
+
+用 `interpolateColor` 实现平滑过渡（**不要用 CSS transition，Remotion 不支持**）：
+
+```tsx
+import { useCurrentFrame, interpolate, interpolateColor } from 'remotion';
+
+export const SceneWithTheme: React.FC = () => {
+  const frame = useCurrentFrame();
+  const FAST = 5; // 过渡 5 帧 ≈ 0.17s
+
+  // 在 frame 100 时切换到暗色
+  const themeProgress = interpolate(frame, [100, 100 + FAST], [0, 1], {
+    extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+  });
+
+  const bgColor = interpolateColor(themeProgress, ['#FAF9F5', '#191917']);
+  const textColor = interpolateColor(themeProgress, ['#141413', '#EBEAE4']);
+  const accentColor = interpolateColor(themeProgress, ['#D97757', '#EE6B3E']);
+
+  return (
+    <AbsoluteFill style={{ background: bgColor, color: textColor }}>
+      <h1 style={{ color: accentColor }}>标题</h1>
+    </AbsoluteFill>
+  );
+};
+```
+
+#### 整场景暗色（推荐方式）
+
+如果整个场景都是暗色，直接在场景组件中使用暗色变量：
+
+```tsx
+export const SceneDark: React.FC = () => {
+  const frame = useCurrentFrame();
+
+  return (
+    <AbsoluteFill style={{
+      background: 'var(--c-bg)',     /* 自动使用 .dark-theme 的值 */
+      color: 'var(--c-text)',
+    }}>
+      {/* 内容 */}
+    </AbsoluteFill>
+  );
+};
+```
+
+然后在 Chapter 编排中通过 className 控制：
+
+```tsx
+// Chapter1.tsx
+<Sequence from={S0} durationInFrames={S0_DUR} name="Title">
+  <div className="dark-theme">  {/* 开场标题用暗色 */}
+    <Scene0Title />
+  </div>
+</Sequence>
+<Sequence from={S1} durationInFrames={S1_DUR} name="Content">
+  <Scene1Content />  {/* 正文用亮色（默认） */}
+</Sequence>
+<Sequence from={S2} durationInFrames={S2_DUR} name="Code">
+  <div className="dark-theme">  {/* 代码用暗色 */}
+    <Scene2Code />
+  </div>
+</Sequence>
+```
+
+#### 分屏对比（左右明暗）
+
+同一帧内渲染两套主题，用内联 style：
+
+```tsx
+<div style={{ display: 'flex', width: '100%', height: '100%' }}>
+  <div style={{ width: '50%', background: '#FAF9F5', color: '#141413' }}>
+    {/* 左：亮色 */}
+  </div>
+  <div style={{ width: '50%', background: '#191917', color: '#EBEAE4' }}>
+    {/* 右：暗色 */}
+  </div>
+</div>
+```
+
+### 开发流程中的应用
+
+**Phase 3 开发场景时**，Claude 必须：
+
+1. 为每个场景标注主题类型（在 outline.md 中）
+2. 按规则一自动判断亮/暗
+3. 检查规则二的节奏约束
+4. 在场景组件中实现对应主题
+
+**outline.md 标注示例**：
+
+```markdown
+## Chapter 1: 模型基础（~90s）
+- Scene 0: 开场标题（3.8s, ch1-0.wav）【暗色】
+- Scene 1: LLM 概念 + 涌现曲线（16s, ch1-1.wav）【亮色】
+- Scene 2: 三种模型类型（30s, ch1-2.wav）【亮色】
+```
+
+---
 ## Phase 1 — 内容编写
 
 ### 1.1 识别用户输入
@@ -560,6 +747,9 @@ const bulletOp = (i) => interpolate(
 - [ ] 代码高亮只跟随当前参数
 - [ ] Studio 预览无报错
 - [ ] 渲染成功
+- 明暗主题节奏合理（暗色 20%-40%，无连续 3+ 亮/暗）
+- 暗色场景使用 .dark-theme 或 interpolateColor
+- 未使用 CSS transition（Remotion 不支持）
 
 ---
 
@@ -574,4 +764,6 @@ const bulletOp = (i) => interpolate(
 | 重新生成音频后错位 | 重新测量 WAV 帧数，更新常量 |
 | 动画和音频对不上 | Phase 2 先合成音频，再开发动画 |
 | 渲染太早 | 必须通过 Checkpoint Render 才能渲染 |
+
+
 

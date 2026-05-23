@@ -61,6 +61,16 @@ const value = interpolate(frame, [startFrame, endFrame], [0, targetValue], { ext
 const charCount = Math.floor(interpolate(frame, [startFrame, startFrame + text.length * 2], [0, text.length], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }));
 const visibleText = text.slice(0, charCount);
 
+### 明暗主题组件
+
+整场景暗色（推荐）：
+\
+场景内局部切换（用 interpolateColor）：
+\
+注意：不要用 CSS transition，Remotion 不支持。必须用 interpolateColor。
+
+分屏对比（左右明暗）：
+\
 ### SVG 描边动画
 const lineProgress = interpolate(frame, [startFrame, endFrame], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 path strokeDasharray={CURVE_LENGTH} strokeDashoffset={CURVE_LENGTH * (1 - lineProgress)}
