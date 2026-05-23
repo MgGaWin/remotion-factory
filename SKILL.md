@@ -1,6 +1,6 @@
 ---
 name: remotion-factory
-version: 1.4.0
+version: 1.5.0
 description: |
   把一篇文章或口播稿，用 Remotion 做成可直接渲染 MP4 的视频。
   流程：原始文章 → 口播稿 → 音频合成 → Remotion 开发 → 渲染 MP4。
@@ -617,37 +617,81 @@ export const Chapter1: React.FC = () => (
 
 ## Checkpoint Render
 
-所有章节开发完成 + 音频就绪后，渲染前必须确认：
+所有章节开发完成 + 音频就绪后，渲染前必须确认并选择：
 
-```
-渲染前检查：
-  □ 所有章节开发完成？
-  □ 所有音频文件就绪？
-  □ Studio 预览确认无问题？
-  □ 帧数与音频时长匹配？
+### 渲染前检查
 
-只有全部确认通过才可渲染。未确认前禁止自动渲染。
-```
+  - 所有章节开发完成？
+  - 所有音频文件就绪？
+  - Studio 预览确认无问题？
+  - 帧数与音频时长匹配？
 
-**⚠️ 重要：渲染 MP4 必须在章节 + 音频全部就绪且用户确认后才能执行。任何阶段都不得自动渲染。**
+### 渲染前选择
 
----
+确认通过后，询问用户以下选项：
+
+**1. 配音选择**（在 Checkpoint Audio 阶段已确认，此处再次确认）：
+  - 使用配置的配音（默认，MiMo TTS 苏打音色）
+  - 不加配音（纯视觉，无音频）
+
+**2. 字幕选择**：
+  - 加字幕（使用 subtitle-timings.json 逐句显示）
+  - 不加字幕（纯视觉，底部无文字）
+
+如果不加字幕，跳过字幕相关渲染。如果加字幕，确认 subtitle-timings.json 已生成。
+
+**3. 渲染范围**：
+  - A) 仅渲染各章节（Chapter1-5 分别输出）
+  - B) 仅渲染完整视频（FullVideo 一个文件）
+  - C) 两者都渲染（章节 + 完整视频）
+
+**渲染 MP4 必须在章节 + 音频全部就绪且用户确认后才能执行。任何阶段不得自动渲染。**
+
 
 ## Phase 4 — 渲染 MP4
 
+根据 Checkpoint Render 的选择执行渲染。
+
+### 渲染命令
+
+国内网络需要指定本地 Chrome：
+  --browser-executable="C:\Program Files\Google\Chrome\Application\chrome.exe"
+
+**选项 A：仅渲染各章节**
 ```bash
-# Studio 预览（开发阶段用这个，不要渲染）
-npm start
-
-# 渲染（仅在 Checkpoint Render 通过后执行）
 npx remotion render src/index.ts Chapter1 out/chapter1.mp4
-npx remotion render src/index.ts FullVideo out/full-video.mp4
-
-# 国内网络指定本地 Chrome
-npx remotion render src/index.ts Chapter1 out/chapter1.mp4 --browser-executable="C:\Program Files\Google\Chrome\Application\chrome.exe"
+npx remotion render src/index.ts Chapter2 out/chapter2.mp4
+npx remotion render src/index.ts Chapter3 out/chapter3.mp4
+npx remotion render src/index.ts Chapter4 out/chapter4.mp4
+npx remotion render src/index.ts Chapter5 out/chapter5.mp4
 ```
 
----
+**选项 B：仅渲染完整视频**
+```bash
+npx remotion render src/index.ts FullVideo out/full-video.mp4
+```
+
+**选项 C：两者都渲染**
+```bash
+# 先渲染各章节
+npx remotion render src/index.ts Chapter1 out/chapter1.mp4
+npx remotion render src/index.ts Chapter2 out/chapter2.mp4
+npx remotion render src/index.ts Chapter3 out/chapter3.mp4
+npx remotion render src/index.ts Chapter4 out/chapter4.mp4
+npx remotion render src/index.ts Chapter5 out/chapter5.mp4
+
+# 再渲染完整视频
+npx remotion render src/index.ts FullVideo out/full-video.mp4
+```
+
+### 不加字幕时
+
+如果用户选择不加字幕，需要临时注释或移除场景组件中的 `<Subtitle>` 组件，渲染完成后再恢复。或者通过 Composition 的 defaultProps 控制。
+
+### 渲染完成
+
+输出文件在 out/ 目录下。告知用户文件路径和大小。
+
 
 ## 动画系统
 
