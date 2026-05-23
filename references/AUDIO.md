@@ -63,14 +63,3 @@ const fs = require('fs');
 3. 如果动画帧号是手动指定的，需要重新听音频确认
 4. Studio 预览确认同步
 
-## 常见问题
-
-| 问题 | 解决 |
-|------|------|
-| 合成超时 | 检查 MIMO_API_KEY |
-| 音频空白 | 检查 text 是否为空 |
-| 时长不对 | 用 WAV header 计算 |
-| 渲染后没声音 | Audio 在 Sequence 内部 |
-| TTS 读出符号 | text 中替换 _ 和 - |
-| 被 hyperframes 干扰 | 使用 MiMo TTS |
-

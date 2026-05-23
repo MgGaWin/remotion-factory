@@ -1,6 +1,6 @@
 ---
 name: remotion-factory
-version: 1.5.1
+version: 1.5.2
 description: |
   把一篇文章或口播稿，用 Remotion 做成可直接渲染 MP4 的视频。
   流程：原始文章 → 口播稿 → 音频合成 → Remotion 开发 → 渲染 MP4。
@@ -76,6 +76,7 @@ my-video/
     ├── index.ts            # registerRoot
     ├── Root.tsx             # Composition 注册
     ├── Chapter1.tsx         # 章节总控（Sequence 编排）
+    ├── FullVideo.tsx        # 全片合并（Sequence 编排各 Chapter）
     ├── styles/
     │   ├── tokens.css       # 设计系统
     │   └── global.css       # 全局样式 + 字体
@@ -346,9 +347,7 @@ export const SceneWithTheme: React.FC = () => {
   const FAST = 5; // 过渡 5 帧 ≈ 0.17s
 
   // 在 frame 100 时切换到暗色
-  const themeProgress = interpolate(frame, [100, 100 + FAST], [0, 1], {
-    extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
-  });
+  const SWITCH_FRAME = 100; // 在此帧切换到暗色
 
   const bgColor = interpolateColor(frame, [SWITCH_FRAME, SWITCH_FRAME + FAST], ['#FAF9F5', '#191917']);
   const textColor = interpolateColor(frame, [SWITCH_FRAME, SWITCH_FRAME + FAST], ['#141413', '#EBEAE4']);
@@ -518,16 +517,7 @@ API 配置：
 
 ### 2.3 测量帧数
 
-合成完成后，立即测量每个 WAV 文件的帧数：
-
-node -e "
-const fs = require('fs');
-['ch1-0','ch1-1'].forEach(f => {
-  const buf = fs.readFileSync('public/audio/' + f + '.wav');
-  const byteRate = buf.readUInt32LE(28);
-  const dataSize = buf.readUInt32LE(40);
-  console.log(f + ': ' + (dataSize/byteRate).toFixed(2) + 's (' + Math.ceil(dataSize/byteRate*30) + ' frames)');
-});"
+合成完成后，测量每个 WAV 文件的帧数。详见 references/AUDIO.md 的"测量时长"章节。
 
 帧数 = 秒数 x 30，向上取整。铁律：必须从 WAV header 计算。
 

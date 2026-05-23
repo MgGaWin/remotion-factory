@@ -64,12 +64,30 @@ const visibleText = text.slice(0, charCount);
 ### 明暗主题组件
 
 整场景暗色（推荐）：
-\
+```tsx
+<AbsoluteFill className="dark-theme" style={{ padding: 100 }}>
+  <h1 style={{ color: "var(--c-text)" }}>标题</h1>
+</AbsoluteFill>
+```
+
 场景内局部切换（用 interpolateColor）：
-\
+```tsx
+import { interpolateColor } from "remotion";
+const SWITCH_FRAME = 100;
+const FAST = 5;
+const bgColor = interpolateColor(frame, [SWITCH_FRAME, SWITCH_FRAME + FAST], ["#FAF9F5", "#191917"]);
+const textColor = interpolateColor(frame, [SWITCH_FRAME, SWITCH_FRAME + FAST], ["#141413", "#EBEAE4"]);
+```
+
 注意：不要用 CSS transition，Remotion 不支持。必须用 interpolateColor。
 
 分屏对比（左右明暗）：
+```tsx
+<div style={{ display: "flex", width: "100%", height: "100%" }}>
+  <div style={{ width: "50%", background: "#FAF9F5", color: "#141413" }}>{/* 亮 */}</div>
+  <div style={{ width: "50%", background: "#191917", color: "#EBEAE4" }}>{/* 暗 */}</div>
+</div>
+```
 \
 ### SVG 描边动画
 const lineProgress = interpolate(frame, [startFrame, endFrame], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
