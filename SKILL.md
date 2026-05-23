@@ -1,6 +1,6 @@
 ---
 name: remotion-factory
-version: 1.5.2
+version: 1.6.0
 description: |
   把一篇文章或口播稿，用 Remotion 做成可直接渲染 MP4 的视频。
   流程：原始文章 → 口播稿 → 音频合成 → Remotion 开发 → 渲染 MP4。
@@ -178,6 +178,16 @@ my-video/
   --c-terminal-text: #CDD6F4;    /* 终端文字 */
   --c-terminal-red: #F38BA8;     /* 终端强调色 */
 
+  /* ── 卡片系统 ── */
+  --c-card-bg: #FFFFFF;                                    /* 默认卡片：白底 */
+  --c-card-text: #141413;                                   /* 默认卡片：深字 */
+  --c-card-featured-bg: rgba(217, 119, 87, 0.08);           /* 重点卡片：浅品牌底 */
+  --c-card-featured-text: #141413;                          /* 重点卡片：深字 */
+  --c-card-featured-accent: #D97757;                        /* 重点卡片：强调色 */
+  --c-card-terminal-bg: #191917;                            /* 终端卡片：深炭底 */
+  --c-card-terminal-text: #CDD6F4;                          /* 终端卡片：蓝白字 */
+  --c-card-terminal-accent: #D97757;                        /* 终端卡片：强调色 */
+
   /* ── 字体 ── */
   --font-display: 'Lora', Georgia, serif;          /* 大标题：衬线体，富有张力和经典印刷感 */
   --font-sans: 'Poppins', Arial, sans-serif;       /* 正文：现代人文感无衬线体 */
@@ -287,6 +297,16 @@ my-video/
   --c-terminal-red: #F38BA8;
   --c-terminal-line: #2A2A3A;          /* 代码行间交替色 */
   --c-terminal-highlight: rgba(238, 107, 62, 0.12); /* 高亮行背景 */
+
+  /* 卡片系统 */
+  --c-card-bg: #2D2C2A;                                    /* 默认卡片：深灰底 */
+  --c-card-text: #EBEAE4;                                   /* 默认卡片：暖白字 */
+  --c-card-featured-bg: rgba(238, 107, 62, 0.1);            /* 重点卡片：浅品牌底 */
+  --c-card-featured-text: #EBEAE4;                          /* 重点卡片：暖白字 */
+  --c-card-featured-accent: #EE6B3E;                        /* 重点卡片：亮品牌色 */
+  --c-card-terminal-bg: #151521;                            /* 终端卡片：深紫底 */
+  --c-card-terminal-text: #CDD6F4;                          /* 终端卡片：蓝白字 */
+  --c-card-terminal-accent: #EE6B3E;                        /* 终端卡片：亮品牌色 */
 }
 ```
 
@@ -801,8 +821,17 @@ import subtitleTimings from '../../subtitle-timings.json';
 
 **卡片样式**：
 - 用 boxShadow 不用 border（Anthropic 风格）
-- 彩色卡片用同色系阴影：boxShadow: 0 4px 20px rgba(r,g,b,0.2)
 - 边框仅用于功能性元素（滑块、时间线节点）
+
+**三种卡片类型**（tokens.css 已定义变量）：
+
+| 类型 | 亮色背景 | 暗色背景 | 文字 | 用途 |
+|------|---------|---------|------|------|
+| 默认 | #FFFFFF | #2D2C2A | --c-card-text | 普通内容卡片 |
+| 重点 | rgba(accent,0.08) | rgba(accent,0.1) | --c-card-featured-text | 核心观点/推荐项（每场景最多1个） |
+| 终端 | #191917 | #151521 | --c-card-terminal-text | 代码/技术内容 |
+
+重点卡片的强调色（标题、图标）用 --c-card-featured-accent，背景只用极浅底。不要用品牌色全填背景。
 
 ---
 
