@@ -1,6 +1,6 @@
 ---
 name: remotion-factory
-version: 1.3.1
+version: 1.4.0
 description: |
   把一篇文章或口播稿，用 Remotion 做成可直接渲染 MP4 的视频。
   流程：原始文章 → 口播稿 → 音频合成 → Remotion 开发 → 渲染 MP4。
@@ -506,8 +506,15 @@ API 配置：
   请求间隔: 500ms
 
 运行：
-  node scripts/synthesize-audio.mjs           # 合成全部
-  node scripts/synthesize-audio.mjs --force   # 强制重新合成
+  node scripts/synthesize-audio.mjs           # 合成全部（跳过已存在）
+  node scripts/synthesize-audio.mjs --force   # 强制重新合成全部
+
+**只重新生成单个文件**（不要用 --force 全部重新生成）：
+  1. 临时把 audio-segments.json 只保留要重新生成的条目
+  2. 运行合成脚本（--force）
+  3. 恢复完整的 audio-segments.json
+  4. 测量新帧数，更新 ChapterX.tsx 常量
+  5. 更新 subtitle-timings.json
 
 ### 2.3 测量帧数
 
@@ -540,8 +547,9 @@ const fs = require('fs');
 
 确认：
   □ 每个音频都能正常播放？
-  □ TTS 有没有读出符号（下划线/连字符）？
-  □ 语速/语气是否合适？
+  □ TTS 有没有读出符号（下划线/连字符）？如果有，修改 text 重新生成
+  □ 语速/语气是否合适？不合适的单独重新生成（不要 --force 全部）
+  □ 帧数是否已写入 ChapterX.tsx？
 
 问题告诉我，我针对性修复。OK 了告诉我"继续"。
 ```
@@ -675,6 +683,43 @@ const bulletOp = (i) => interpolate(
 
 元素出现后保持可见，不加退出动画：const exitOp = 1;
 
+
+### 字幕系统
+
+教学视频必须加字幕。字幕按句子逐行显示，跟随音频节奏。
+
+**组件**：src/components/Subtitle.tsx
+**数据**：subtitle-timings.json（每句的 start/end 帧号）
+
+**句子拆分规则**（重要）：
+- 只按句末标点断句：。！？
+- 超过 50 字的句子才按 ；： 再拆
+- 相邻短句（<12字）自动合并
+- 禁止按逗号 ，, 拆分（会碎片化，如 "LLM，" 变成独立一句）
+
+**时间戳生成**：
+- 根据每句字符数占总文本的比例分配帧数（长句多分，短句少分）
+- 不要均分时间（每句一样长会和音频不同步）
+- 生成脚本：node /tmp/gen-subtitle-timings.js
+
+**字幕样式**：
+- 底部居中，bottom: 40px
+- 半透明深色背景 rgba(20,20,19,0.85)
+- 白色文字 #EBEAE4，28px
+- 8 帧淡入 + 6 帧淡出
+
+**集成方式**：
+```tsx
+import { Subtitle } from '../components/Subtitle';
+import subtitleTimings from '../../subtitle-timings.json';
+
+// 在根 AbsoluteFill 的最后
+<Subtitle timings={subtitleTimings.SceneName} />
+```
+
+**重新生成音频后**：必须同步更新 subtitle-timings.json（帧数变了，时间戳要重算）。
+
+
 ### 代码高亮规则
 
 代码高亮只跟随当前参数，之前的参数恢复默认色（不持久高亮）。
@@ -700,6 +745,29 @@ const bulletOp = (i) => interpolate(
 - 字体 >= 24px
 - 每屏 1-2 个核心信息点
 
+### 布局间距规则（重要）
+
+字号提升后（如 14px → 24px），容器尺寸必须同步调整，否则会重叠。
+
+**标题-内容间距**：
+- 标题区（top:50 + 40px h2 + 24px 副标题 + 间距）约 120-140px
+- 内容起始位置：150-170px（留 10-30px 呼吸空间）
+- 不要让内容紧贴标题下方
+
+**卡片间距**：
+- gap: 18 → gap: 22（字号提升后）
+- 卡片 padding: 18px 24px → 24px 28px
+- 列表项 marginBottom: 14 → 18
+
+**行高**：
+- 代码块 lineHeight: 1.7（不要 1.8，会溢出）
+- 正文 lineHeight: 1.6
+
+**卡片样式**：
+- 用 boxShadow 不用 border（Anthropic 风格）
+- 彩色卡片用同色系阴影：boxShadow: 0 4px 20px rgba(r,g,b,0.2)
+- 边框仅用于功能性元素（滑块、时间线节点）
+
 ---
 
 ## 反 AI 味检查
@@ -724,12 +792,28 @@ const bulletOp = (i) => interpolate(
 - Agent 2：帧数质检（WAV 帧数计算是否正确）
 
 ### Phase 3 完成后
-- Agent 1：代码质检（Remotion 组件的确定性、interpolate 规范、tokens.css 使用）
-- Agent 2：视觉质检（布局多样性、内容边界、反 AI 味）
+- Agent 1：代码质检
+  - 所有 interpolate 有 extrapolateLeft/Right: clamp
+  - 无 Date.now / Math.random
+  - 暗色场景用 AbsoluteFill className="dark-theme"（不要 div 包裹 Sequence）
+  - interpolateColor 用 3 参数形式
+  - 字体 >= 24px（grep 所有 fontSize < 24）
+  - 无 emoji 当图标
+- Agent 2：视觉质检
+  - 标题-内容间距 >= 30px（检查 top 值差）
+  - 连续场景布局不重复
+  - 暗色场景比例 20-40%
+  - 所有内容 y < 930
+  - 卡片用 boxShadow 不用 border
 
 ### Phase 4 渲染后
-- Agent 1：同步质检（音画是否同步）
-- Agent 2：成品质检（完整播放无报错）
+- Agent 1：同步质检
+  - 字幕与音频是否对齐
+  - 动画切换是否在音频提到内容时发生
+- Agent 2：成品质检
+  - 完整播放无报错
+  - 暗色场景视觉效果正确
+  - 字幕不遮挡主内容
 
 ---
 
@@ -737,30 +821,22 @@ const bulletOp = (i) => interpolate(
 
 - [ ] 每个场景都有入场动画
 - [ ] 音频和画面严格同步
-- [ ] 字体 >= 24px
+- [ ] 字幕与音频对齐（逐句显示，非全文）
+- [ ] 字体 >= 24px（grep 验证无遗漏）
 - [ ] 颜色来自 tokens.css
 - [ ] 无 Date.now() / Math.random()
 - [ ] 所有内容在 y=930 以上
 - [ ] 代码高亮只跟随当前参数
+- [ ] 标题-内容间距 >= 30px
+- [ ] 卡片用 boxShadow 不用 border
+- [ ] 暗色场景用 AbsoluteFill className
+- [ ] 明暗节奏合理（20-40% 暗色）
+- [ ] 无 emoji 当图标
 - [ ] Studio 预览无报错
 - [ ] 渲染成功
-- 明暗主题节奏合理（暗色 20%-40%，无连续 3+ 亮/暗）
-- 暗色场景使用 .dark-theme 或 interpolateColor
-- 未使用 CSS transition（Remotion 不支持）
 
 ---
 
-## 常见问题
-
-| 问题 | 解决 |
-|------|------|
-| 音频没声音 | Audio 必须在 Sequence 内部 |
-| 空白帧 | 帧数从 WAV header 计算，不要估算 |
-| TTS 读出符号 | text 中把 _ 和 - 替换为空格 |
-| hyperframes 干扰 | 明确使用 MiMo TTS |
-| 重新生成音频后错位 | 重新测量 WAV 帧数，更新常量 |
-| 动画和音频对不上 | Phase 2 先合成音频，再开发动画 |
-| 渲染太早 | 必须通过 Checkpoint Render 才能渲染 |
 
 
 
