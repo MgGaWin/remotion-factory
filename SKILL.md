@@ -1,6 +1,6 @@
 ---
 name: remotion-factory
-version: 1.5.0
+version: 1.5.1
 description: |
   把一篇文章或口播稿，用 Remotion 做成可直接渲染 MP4 的视频。
   流程：原始文章 → 口播稿 → 音频合成 → Remotion 开发 → 渲染 MP4。
@@ -688,6 +688,8 @@ npx remotion render src/index.ts FullVideo out/full-video.mp4
 
 如果用户选择不加字幕，需要临时注释或移除场景组件中的 `<Subtitle>` 组件，渲染完成后再恢复。或者通过 Composition 的 defaultProps 控制。
 
+**重要**：即使不加字幕，布局仍然必须在 y=930 以上留白。用户发布视频时可能外挂字幕（B站/YouTube 自动字幕或手动添加），底部空间是字幕的永久预留区域。
+
 ### 渲染完成
 
 输出文件在 out/ 目录下。告知用户文件路径和大小。
@@ -785,7 +787,7 @@ import subtitleTimings from '../../subtitle-timings.json';
 
 ### 内容边界
 
-- 所有内容在 y=930 以上（给字幕留空间）
+- 所有内容在 y=930 以上（永远遵守，即使不加字幕——用户发布时可能外挂字幕）
 - 字体 >= 24px
 - 每屏 1-2 个核心信息点
 
@@ -869,7 +871,7 @@ import subtitleTimings from '../../subtitle-timings.json';
 - [ ] 字体 >= 24px（grep 验证无遗漏）
 - [ ] 颜色来自 tokens.css
 - [ ] 无 Date.now() / Math.random()
-- [ ] 所有内容在 y=930 以上
+- [ ] 所有内容在 y=930 以上（永远遵守，不论是否加字幕）
 - [ ] 代码高亮只跟随当前参数
 - [ ] 标题-内容间距 >= 30px
 - [ ] 卡片用 boxShadow 不用 border
