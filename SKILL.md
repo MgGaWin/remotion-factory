@@ -1,11 +1,16 @@
 ---
 name: remotion-factory
-version: 1.6.0
+version: 1.8.1
 description: |
   把一篇文章或口播稿，用 Remotion 做成可直接渲染 MP4 的视频。
   流程：原始文章 → 口播稿 → 音频合成 → Remotion 开发 → 渲染 MP4。
   适用场景：B 站 / YouTube / 视频号教程、产品演示、数据可视化视频、动态 PPT。
   默认设计风格：Anthropic 暖调赤陶色人文极简。用户可自定义。
+changelog:
+  - 1.8.1: 拆分场景节奏系统与卡片系统、Phase 1/2/3 执行细节补全、合并自检清单与质检流程
+  - 1.8.0: 四种卡片形态（标准/Oat/Feature/终端）+ 内容语义决策树 + 否定清单
+  - 1.7.0: 节奏驱动主题系统、三模式（Light/Dark/LightWithDarkCard）、暖灰色修正
+  - 1.6.0: 卡片系统初版（三种类型）、tokens.css 卡片变量
 ---
 
 # Remotion Video Presentation
@@ -278,7 +283,7 @@ my-video/
 
 
 
-## 明暗主题切换系统
+## 场景节奏系统
 
 ### 为什么需要明暗交替
 
@@ -336,18 +341,18 @@ my-video/
 }
 ```
 
-### 场景模式与卡片系统
-
-视频使用两种场景模式 + 四种卡片形态：
-
-#### 场景模式
+### 场景模式
 
 | 模式 | 背景 | 用途 |
 |------|------|------|
 | **SceneLight** | `var(--c-bg)` 羊皮纸白 | 正文、图表、流程步骤 |
 | **SceneDark** | 深炭墨 `#191917` | 开场标题、核心结论（重音拍） |
 
-#### 四种卡片形态（按内容语义选择）
+---
+
+## 卡片系统
+
+### 四种卡片形态（按内容语义选择）
 
 | 形态 | 背景 | 边框 | 圆角 | 语义 |
 |------|------|------|------|------|
@@ -428,7 +433,7 @@ my-video/
 | 小节小结 / 观点推进前的铺垫 | Oat 卡 ② | 有分量但非高潮 |
 | 全章核心结论（一句话） | Feature 暗卡 ③ | 不容错过 |
 | 反转性观点 / 最终答案 | Feature 暗卡 ③ | 让观众停下来想 |
-| 代码 / 终端输出 / 技术内容 | 终端卡 ④ | 代码天然深色 |
+| 代码 / 终端输出 / 技术内容 | 终端卡 ④（亮色场景下用 SceneLightWithDarkCard 包裹，不切整页） | 代码天然深色 |
 
 #### 硬性约束
 
@@ -649,7 +654,7 @@ script.md: B 站 / YouTube 风格口播稿，口语化、有节奏感。
 
 outline.md: 章节切分 + 每步内容 + 信息池。
 
-outline 必须写：章节切分 / 每章 scene 数 / 估时 / 每步屏幕内容 / 章节级信息池 / **每张卡片的形态标注（标准/Oat/Feature/终端）**
+outline 必须写：章节切分 / 每章 scene 数 / 估时 / 每步屏幕内容 / 章节级信息池 / **每张卡片的形态标注（标准卡① / Oat卡② / Feature暗卡③ / 终端卡④）**
 outline 不要写：具体动画类型 / CSS 实现细节 / 时长数值
 
 **检查 references/ 目录**：如果存在设计参考图，识别图片内容，在 outline 中注明参考了哪些视觉元素。
@@ -714,11 +719,33 @@ API 配置：
 
 ### 2.3 测量帧数
 
-合成完成后，测量每个 WAV 文件的帧数。详见 references/AUDIO.md 的"测量时长"章节。
+合成完成后，从 WAV header 计算每个文件的真实帧数。
 
-帧数 = 秒数 x 30，向上取整。铁律：必须从 WAV header 计算。
+**铁律：帧数 = 秒数 × 30，向上取整。必须从 WAV header 读取，不能估算。**
 
-如果测量帧数与 ChapterX.tsx 中声明的常量相差超过 2 帧，必须重新测量并更新常量。
+**通用测量脚本**（自动读取 audio-segments.json，无需手动枚举文件名）：
+
+```bash
+node -e "
+const fs = require('fs');
+const segs = JSON.parse(fs.readFileSync('audio-segments.json', 'utf8'));
+const seen = new Set();
+segs.forEach(s => {
+  if (seen.has(s.audio)) return;
+  seen.add(s.audio);
+  const p = 'public/audio/' + s.audio;
+  if (!fs.existsSync(p)) { console.log(s.audio + ': 文件不存在'); return; }
+  const buf = fs.readFileSync(p);
+  const byteRate = buf.readUInt32LE(28);
+  const dataSize = buf.readUInt32LE(40);
+  const secs = dataSize / byteRate;
+  const frames = Math.ceil(secs * 30);
+  console.log(s.audio + ': ' + secs.toFixed(2) + 's (' + frames + ' frames)');
+});
+"
+```
+
+**误差检查**：测量结果与 `ChapterX.tsx` 中已声明的帧数常量相差超过 **2 帧**，必须重新测量并更新常量，不可忽略。
 
 ---
 
@@ -791,7 +818,18 @@ export const Chapter1: React.FC = () => (
 );
 ```
 
-做完第 1 章后必须停下来等用户验收。
+做完第 1 章后必须停下来等用户验收。验收清单：
+
+```
+第 1 章开发完成，请验收：
+  □ 音画同步（口播和画面出现时机一致）
+  □ 卡片形态是否按 outline 标注实现（标准/Oat/Feature/终端）
+  □ 明暗节奏是否符合规则（20~35% 暗色）
+  □ 所有字体 >= 24px，颜色来自 tokens.css
+  □ Studio 预览无报错
+
+确认 OK 后回复「继续」。
+```
 
 ### 3.3 第 2~N 章
 
@@ -1000,13 +1038,6 @@ import subtitleTimings from '../../subtitle-timings.json';
 
 ---
 
-## 反 AI 味检查
-
-- 不要紫色粉红渐变
-- 不要 emoji 当图标
-- 不要赛博朋克暗色（终端深色除外）
-- 不要 SVG 画人
-
 ---
 
 ## 质检流程
@@ -1021,25 +1052,34 @@ import subtitleTimings from '../../subtitle-timings.json';
 - Agent 1：音频质检（TTS 输出是否正常，有无符号读出）
 - Agent 2：帧数质检（WAV 帧数计算是否正确）
 
-### Phase 3 完成后
-- Agent 1：代码质检
-  - 所有 interpolate 有 extrapolateLeft/Right: clamp
-  - 无 Date.now / Math.random
-  - 暗色场景用 AbsoluteFill className="dark-theme"（不要 div 包裹 Sequence）
-  - interpolateColor 用 3 参数形式
-  - 字体 >= 24px（grep 所有 fontSize < 24）
-  - 无 emoji 当图标
-  - 动画时长 >= 18 帧（FAST 常量 + 内联范围）
-- Agent 2：视觉质检
-  - 标题-内容间距 >= 30px（检查 top 值差）
-  - 连续场景布局不重复
-  - 暗色场景比例 20-40%
-  - 所有内容 y < 930
-  - 标准卡有 `border: 0.5px solid var(--c-card-border)`
-  - Oat 卡无 border、无 boxShadow（纯靠 #E3DACC 背景区分）
-  - Feature 暗卡每章恰好 1 个（background: var(--c-card-feature-bg)）
-  - 卡片文字不用绿/蓝/红（用中性色阶或 accent）
-  - 无 `var(--c-surface)` 或 `var(--c-card-featured-*)` 残留
+### Phase 3 完成后（含自检清单）
+
+双 Agent 质检 + 自检清单合并，逐条核对：
+
+**Agent 1：代码质检**
+- [ ] 所有 interpolate 有 extrapolateLeft/Right: clamp
+- [ ] 无 Date.now / Math.random
+- [ ] 暗色场景用 AbsoluteFill className="dark-theme"（不要 div 包裹 Sequence）
+- [ ] interpolateColor 用 3 参数形式
+- [ ] 字体 >= 24px（grep 所有 fontSize < 24）
+- [ ] 无 emoji 当图标
+- [ ] 动画时长 >= 18 帧（FAST 常量 + 内联范围）
+- [ ] 无 `var(--c-surface)` 或 `var(--c-card-featured-*)` 残留
+
+**Agent 2：视觉质检**
+- [ ] 标题-内容间距 >= 30px（检查 top 值差）
+- [ ] 连续场景布局不重复
+- [ ] 暗色场景比例 20-35%
+- [ ] 所有内容 y < 930
+- [ ] 标准卡有 `border: 0.5px solid var(--c-card-border)`
+- [ ] Oat 卡无 border、无 boxShadow（纯靠 #E3DACC 背景区分）
+- [ ] Feature 暗卡每章恰好 1 个（background: var(--c-card-feature-bg)）
+- [ ] 卡片文字不用绿/蓝/红（用中性色阶或 accent）
+- [ ] 每个场景都有入场动画（无跳切）
+- [ ] 音频和画面严格同步
+- [ ] 颜色来自 tokens.css（无硬编码 hex/rgba）
+- [ ] 明暗节奏合理（20-35% 暗色）
+- [ ] Studio 预览无报错
 
 ### Phase 4 渲染后
 - Agent 1：同步质检
@@ -1049,29 +1089,6 @@ import subtitleTimings from '../../subtitle-timings.json';
   - 完整播放无报错
   - 暗色场景视觉效果正确
   - 字幕不遮挡主内容
-
----
-
-## 自检清单
-
-- [ ] 每个场景都有入场动画（无跳切）
-- [ ] 动画时长 >= 18 帧（FAST 常量 + 内联范围）
-- [ ] 音频和画面严格同步
-- [ ] 字幕与音频对齐（逐句显示，非全文）
-- [ ] 字体 >= 24px（grep 验证无遗漏）
-- [ ] 颜色来自 tokens.css（无硬编码 hex/rgba）
-- [ ] 无 Date.now() / Math.random()
-- [ ] 所有内容在 y=930 以上（永远遵守，不论是否加字幕）
-- [ ] 标准卡有 border: 0.5px solid var(--c-card-border)
-- [ ] Oat 卡无 border、无 boxShadow
-- [ ] 每章恰好 1 个 Feature 暗卡
-- [ ] 暗卡文字用中性色阶（不用绿/蓝/红）
-- [ ] 无 var(--c-surface) 或 var(--c-card-featured-*) 残留
-- [ ] 暗色场景用 AbsoluteFill className
-- [ ] 明暗节奏合理（20-40% 暗色）
-- [ ] 无 emoji 当图标
-- [ ] Studio 预览无报错
-- [ ] 渲染成功
 
 ---
 
