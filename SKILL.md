@@ -310,76 +310,98 @@ my-video/
 }
 ```
 
-### 自动决策规则（Claude 必须遵守）
+### 三种场景模式
 
-开发每个场景时，Claude 必须根据以下规则自动判断使用暗色还是亮色。**不需要用户手动指定**。
+视频中使用三种视觉模式，而非简单的"亮/暗"二选一：
 
-#### 规则一：场景内容分类 → 主题映射
+| 模式 | 背景 | 用途 | 实现 |
+|------|------|------|------|
+| **SceneLight** | `var(--c-bg)` 羊皮纸白 | 正文、图表、流程步骤 | 默认，无需额外设置 |
+| **SceneDark** | 深炭墨 `#191917` | 开场标题、核心结论（重音拍） | `<AbsoluteFill className="dark-theme">` |
+| **SceneLightWithDarkCard** | 亮底 + 深色圆角卡片 | 代码展示、数据对比 | 亮底上浮一张 `border-radius: 24px` 的暗卡片 |
 
-| 场景内容类型 | 主题 | 原因 |
-|------------|------|------|
-| 开场标题（Chapter Title） | **暗色** | 电影感开场，"沉下来"聚焦 |
-| 代码终端（Terminal/Code） | **暗色** | 终端天然深色，视觉一致 |
-| 核心结论/总结 | **暗色** | 节奏收尾，强调分量 |
-| 重要观点强调（单句大字） | **暗色** | 暗底+亮赤陶=视觉焦点 |
-| 正文内容（卡片/列表/图表） | 亮色 | 报刊质感，清晰可读 |
-| 数据可视化（SVG/图表） | 亮色 | 小字在暗底可读性差 |
-| 流程步骤 | 亮色 | 需要清晰视觉层次 |
-| 过渡/引入 | 跟随前一场景 | 保持连贯 |
-
-#### 规则二：章节内节奏约束
-
-```
-每个章节的暗色场景比例：20%~40%
-连续暗色场景：最多 2 个
-连续亮色场景：最多 3 个
-章节第一个场景：暗色（开场）
-章节最后一个场景：可选暗色（总结）
-```
-
-**示例**（5 个场景的章节）：
-```
-场景 0: 暗色（开场标题）
-场景 1: 亮色（正文内容）
-场景 2: 亮色（图表展示）
-场景 3: 暗色（代码终端）
-场景 4: 亮色或暗色（总结/下一步）
-```
-
-#### 规则三：全片节奏检查
-
-开发完所有章节后，检查全片的明暗节奏：
-- 每 3-5 个亮色场景后，应该有 1 个暗色场景
-- 连续亮色场景最多 3 个（超过会审美疲劳）
-- 连续暗色场景最多 2 个（超过会压抑）
-
-### 实现方式
-
-#### 单场景内切换（场景内局部暗色）
-
-用 `interpolateColor` 实现平滑过渡（**不要用 CSS transition，Remotion 不支持**）：
+**SceneLightWithDarkCard**（亮底暗卡片）是 Anthropic 官网最常用的模式——代码/终端不需要切换整页为暗色，而是在亮底上浮一张深色卡片，不全出血到边缘，硬边切换、零渐变。
 
 ```tsx
-import { useCurrentFrame, interpolate, interpolateColor } from 'remotion';
-
-export const SceneWithTheme: React.FC = () => {
-  const frame = useCurrentFrame();
-  const FAST = 5; // 过渡 5 帧 ≈ 0.17s
-
-  // 在 frame 100 时切换到暗色
-  const SWITCH_FRAME = 100; // 在此帧切换到暗色
-
-  const bgColor = interpolateColor(frame, [SWITCH_FRAME, SWITCH_FRAME + FAST], ['#FAF9F5', '#191917']);
-  const textColor = interpolateColor(frame, [SWITCH_FRAME, SWITCH_FRAME + FAST], ['#141413', '#EBEAE4']);
-  const accentColor = interpolateColor(frame, [SWITCH_FRAME, SWITCH_FRAME + FAST], ['#D97757', '#EE6B3E']);
-
-  return (
-    <AbsoluteFill style={{ background: bgColor, color: textColor }}>
-      <h1 style={{ color: accentColor }}>标题</h1>
-    </AbsoluteFill>
-  );
-};
+// SceneLightWithDarkCard 模式示例
+<AbsoluteFill style={{ background: 'var(--c-bg)', padding: '80px 100px' }}>
+  <h2 style={{ color: 'var(--c-text)' }}>标题在亮色区域</h2>
+  {/* 暗色卡片：border-radius 24px，不全出血 */}
+  <div style={{
+    background: '#191917',
+    borderRadius: 24,
+    padding: '48px 56px',
+    color: '#EBEAE4',
+    marginTop: 32,
+  }}>
+    <code>代码在暗卡片里</code>
+  </div>
+</AbsoluteFill>
 ```
+
+### 节奏驱动决策规则（替代内容驱动）
+
+**旧规则（已弃用）**：内容类型 → 固定主题（代码=暗、图表=亮…）
+- 问题：主题可预测，观众提前知道下一个颜色，节奏感消失
+
+**新规则**：节奏位置 → 决定主题，内容适配主题
+
+暗色是「重音拍」，固定出现在：
+1. 章节第 0 场景（开场）
+2. 章节每隔 3~4 个亮色场景后（一次重音）
+3. 全片最后一个场景（收尾）
+
+**内容适配主题**：
+- 代码终端在亮色场景 → 用 SceneLightWithDarkCard（卡片暗色，不切整页）
+- 结论在亮色场景 → 用大字 + 赤陶色强调，不换暗底
+- 开场在暗色 → 大字白色 + 赤陶 accent，无需任何卡片
+
+#### 节奏约束
+
+```
+连续暗色场景：最多 1 个（比旧规则更克制）
+连续亮色场景：最多 4 个（含 LightWithDarkCard，体感不同）
+暗色场景比例：20%~35%
+章节第一个场景：暗色（开场重音拍）
+章节最后一个场景：可选暗色（收尾重音拍）
+```
+
+**示例**（6 个场景的章节）：
+```
+场景 0: SceneDark                ← 开场，重音拍 #1
+场景 1: SceneLight               ← 正文
+场景 2: SceneLight               ← 图表
+场景 3: SceneLightWithDarkCard   ← 代码（不切整页！）
+场景 4: SceneLight               ← 流程步骤
+场景 5: SceneDark                ← 核心结论，重音拍 #2（3 个亮之后）
+```
+
+### 动画过渡规则
+
+**场景间切换**：硬切（直接换组件，无过渡动画）
+- 暗→亮、亮→暗的切换是整场景组件级的替换
+- 不需要 interpolateColor 做场景间的渐变
+- Anthropic 官网风格：零渐变、零阴影柔化，硬边切换
+
+**场景内元素出现**：18~24 帧 easeOut
+- 比原来 5 帧慢 3~5 倍，像「翻书」而非「闪烁」
+- 淡入 + 轻微上滑配合使用
+
+```tsx
+const FAST = 18; // 场景内动画时长
+const opacity = interpolate(frame, [delay, delay + FAST], [0, 1], {
+  extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+  easing: Easing.out(Easing.cubic),
+});
+const y = interpolate(frame, [delay, delay + FAST], [24, 0], {
+  extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+  easing: Easing.out(Easing.cubic),
+});
+```
+
+**仅在单场景内需要局部切换时**才用 `interpolateColor`（18 帧 easeInOut），多数情况直接换场景组件。
+
+### 实现方式
 
 #### 整场景暗色（推荐方式）
 
@@ -434,18 +456,18 @@ Chapter 编排中无需额外处理，主题已在场景组件内部决定：
 
 **Phase 3 开发场景时**，Claude 必须：
 
-1. 为每个场景标注主题类型（在 outline.md 中）
-2. 按规则一自动判断亮/暗
-3. 检查规则二的节奏约束
-4. 在场景组件中实现对应主题
+1. 按**节奏驱动规则**为每个场景标注模式（SceneDark / SceneLight / SceneLightWithDarkCard）
+2. 检查节奏约束（连续暗色 ≤1，连续亮色 ≤4）
+3. 代码/终端场景优先用 SceneLightWithDarkCard，而非整页暗色
+4. 在场景组件中实现对应模式
 
 **outline.md 标注示例**：
 
 ```markdown
 ## Chapter 1: 模型基础（~90s）
-- Scene 0: 开场标题（3.8s, ch1-0.wav）【暗色】
-- Scene 1: LLM 概念 + 涌现曲线（16s, ch1-1.wav）【亮色】
-- Scene 2: 三种模型类型（30s, ch1-2.wav）【亮色】
+- Scene 0: 开场标题（3.8s, ch1-0.wav）【SceneDark — 重音拍 #1】
+- Scene 1: LLM 概念 + 涌现曲线（16s, ch1-1.wav）【SceneLight】
+- Scene 2: 三种模型类型（30s, ch1-2.wav）【SceneLight】
 ```
 
 ---
