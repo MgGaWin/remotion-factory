@@ -641,7 +641,7 @@ script.md: B 站 / YouTube 风格口播稿，口语化、有节奏感。
 
 outline.md: 章节切分 + 每步内容 + 信息池。
 
-outline 必须写：章节切分 / 每章 scene 数 / 估时 / 每步屏幕内容 / 章节级信息池
+outline 必须写：章节切分 / 每章 scene 数 / 估时 / 每步屏幕内容 / 章节级信息池 / **每张卡片的形态标注（标准/Oat/Feature/终端）**
 outline 不要写：具体动画类型 / CSS 实现细节 / 时长数值
 
 **检查 references/ 目录**：如果存在设计参考图，识别图片内容，在 outline 中注明参考了哪些视觉元素。
@@ -1033,12 +1033,17 @@ import subtitleTimings from '../../subtitle-timings.json';
   - interpolateColor 用 3 参数形式
   - 字体 >= 24px（grep 所有 fontSize < 24）
   - 无 emoji 当图标
+  - 动画时长 >= 18 帧（FAST 常量 + 内联范围）
 - Agent 2：视觉质检
   - 标题-内容间距 >= 30px（检查 top 值差）
   - 连续场景布局不重复
   - 暗色场景比例 20-40%
   - 所有内容 y < 930
-  - 卡片用 boxShadow 不用 border
+  - 标准卡有 `border: 0.5px solid var(--c-card-border)`
+  - Oat 卡无 border、无 boxShadow（纯靠 #E3DACC 背景区分）
+  - Feature 暗卡每章恰好 1 个（background: var(--c-card-feature-bg)）
+  - 卡片文字不用绿/蓝/红（用中性色阶或 accent）
+  - 无 `var(--c-surface)` 或 `var(--c-card-featured-*)` 残留
 
 ### Phase 4 渲染后
 - Agent 1：同步质检
@@ -1053,16 +1058,19 @@ import subtitleTimings from '../../subtitle-timings.json';
 
 ## 自检清单
 
-- [ ] 每个场景都有入场动画
+- [ ] 每个场景都有入场动画（无跳切）
+- [ ] 动画时长 >= 18 帧（FAST 常量 + 内联范围）
 - [ ] 音频和画面严格同步
 - [ ] 字幕与音频对齐（逐句显示，非全文）
 - [ ] 字体 >= 24px（grep 验证无遗漏）
-- [ ] 颜色来自 tokens.css
+- [ ] 颜色来自 tokens.css（无硬编码 hex/rgba）
 - [ ] 无 Date.now() / Math.random()
 - [ ] 所有内容在 y=930 以上（永远遵守，不论是否加字幕）
-- [ ] 代码高亮只跟随当前参数
-- [ ] 标题-内容间距 >= 30px
-- [ ] 卡片用 boxShadow 不用 border
+- [ ] 标准卡有 border: 0.5px solid var(--c-card-border)
+- [ ] Oat 卡无 border、无 boxShadow
+- [ ] 每章恰好 1 个 Feature 暗卡
+- [ ] 暗卡文字用中性色阶（不用绿/蓝/红）
+- [ ] 无 var(--c-surface) 或 var(--c-card-featured-*) 残留
 - [ ] 暗色场景用 AbsoluteFill className
 - [ ] 明暗节奏合理（20-40% 暗色）
 - [ ] 无 emoji 当图标
