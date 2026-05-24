@@ -173,20 +173,34 @@ my-video/
   --c-chart-green: #788C5D;      /* 鼠尾草绿，低饱和度 */
   --c-chart-gray: #E8E6DC;       /* 浅灰底色 */
 
+  /* ── 中性色阶（Anthropic 官方 10 档） ── */
+  --c-slate-medium: #3D3D3A;     /* 边框 / focus 环 */
+  --c-slate-light: #5E5D59;      /* 三级文字 / 说明 */
+  --c-cloud-dark: #87867F;       /* 次要文字 / 时间戳 */
+  --c-cloud-light: #D1CFC5;      /* 卡片细边框 / 分割线 */
+  --c-oat: #E3DACC;              /* 暖填充卡底色 */
+  --c-ivory-medium: #F0EEE6;     /* 二级面 / 导航背景 */
+
   /* ── 终端（代码展示用） ── */
   --c-terminal-bg: #1E1E2E;      /* 深色终端背景 */
   --c-terminal-text: #CDD6F4;    /* 终端文字 */
   --c-terminal-red: #F38BA8;     /* 终端强调色 */
 
   /* ── 卡片系统 ── */
-  --c-card-bg: #FFFFFF;                                    /* 默认卡片：白底 */
-  --c-card-text: #141413;                                   /* 默认卡片：深字 */
-  --c-card-featured-bg: rgba(217, 119, 87, 0.08);           /* 重点卡片：浅品牌底 */
-  --c-card-featured-text: #141413;                          /* 重点卡片：深字 */
-  --c-card-featured-accent: #D97757;                        /* 重点卡片：强调色 */
-  --c-card-terminal-bg: #191917;                            /* 终端卡片：深炭底 */
-  --c-card-terminal-text: #CDD6F4;                          /* 终端卡片：蓝白字 */
-  --c-card-terminal-accent: #D97757;                        /* 终端卡片：强调色 */
+  /* 默认卡片：与页面同色 + 细边框区分（Anthropic 官方做法） */
+  --c-card-bg: #FAF9F5;
+  --c-card-border: #D1CFC5;
+  --c-card-text: #141413;
+
+  /* 重点卡片：Oat 暖填充底 + accent 只用于文字/CTA */
+  --c-card-featured-bg: #E3DACC;
+  --c-card-featured-text: #141413;
+  --c-card-featured-accent: #D97757;
+
+  /* 终端卡片：比页面略亮，浮起来（非凹陷） */
+  --c-card-terminal-bg: #1E1E2E;
+  --c-card-terminal-text: #CDD6F4;
+  --c-card-terminal-accent: #F38BA8;   /* 冷调 terminal-red，与字色同温 */
 
   /* ── 字体 ── */
   --font-display: 'Lora', Georgia, serif;          /* 大标题：衬线体，富有张力和经典印刷感 */
@@ -300,13 +314,14 @@ my-video/
 
   /* 卡片系统 */
   --c-card-bg: #2D2C2A;                                    /* 默认卡片：深灰底 */
+  --c-card-border: rgba(158, 156, 148, 0.15);              /* 暗色细边框 */
   --c-card-text: #EBEAE4;                                   /* 默认卡片：暖白字 */
-  --c-card-featured-bg: rgba(238, 107, 62, 0.1);            /* 重点卡片：浅品牌底 */
+  --c-card-featured-bg: #3A3936;                            /* 重点卡片：chart-gray 替代 rgba 品牌底 */
   --c-card-featured-text: #EBEAE4;                          /* 重点卡片：暖白字 */
   --c-card-featured-accent: #EE6B3E;                        /* 重点卡片：亮品牌色 */
-  --c-card-terminal-bg: #151521;                            /* 终端卡片：深紫底 */
+  --c-card-terminal-bg: #1E1E2E;                            /* 终端卡片：比页面略亮，浮起来 */
   --c-card-terminal-text: #CDD6F4;                          /* 终端卡片：蓝白字 */
-  --c-card-terminal-accent: #EE6B3E;                        /* 终端卡片：亮品牌色 */
+  --c-card-terminal-accent: #F38BA8;                        /* 终端卡片：冷调，与字色同温 */
 }
 ```
 
@@ -328,16 +343,34 @@ my-video/
   <h2 style={{ color: 'var(--c-text)' }}>标题在亮色区域</h2>
   {/* 暗色卡片：border-radius 24px，不全出血 */}
   <div style={{
-    background: '#191917',
+    background: 'var(--c-card-terminal-bg)',
     borderRadius: 24,
     padding: '48px 56px',
-    color: '#EBEAE4',
+    color: 'var(--c-card-terminal-text)',
     marginTop: 32,
   }}>
     <code>代码在暗卡片里</code>
   </div>
 </AbsoluteFill>
 ```
+
+#### 卡片圆角规范
+
+| 卡片类型 | border-radius | 说明 |
+|---------|---------------|------|
+| 默认卡片（标准/Oat） | 8px | 普通内容卡片 |
+| 面板/大块区域 | 16px | 中等容器 |
+| Feature 大卡（暗色） | 24px | SceneLightWithDarkCard 中的暗卡片 |
+
+#### 卡片使用规范
+
+**accent 赤陶色（`#D97757`）只用于**：CTA 文字、标签色、强调文字、箭头图标
+**accent 不用于**：背景底色（即使是极低透明度）
+**每个版块最多出现一处 accent**，默认状态下整页接近无彩色
+
+**默认卡片**：与页面同色 `#FAF9F5` + `0.5px solid #D1CFC5` 细边框，靠边框与页面区分
+**重点卡片（Oat）**：`#E3DACC` 暖填充底，无边框，靠颜色与页面区分
+**终端卡片**：`#1E1E2E` 比页面略亮，浮起来而非凹陷
 
 ### 节奏驱动决策规则（替代内容驱动）
 
