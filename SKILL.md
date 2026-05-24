@@ -193,9 +193,14 @@ my-video/
   --c-card-text: #141413;
 
   /* 重点卡片：Oat 暖填充底 + accent 只用于文字/CTA */
-  --c-card-featured-bg: #E3DACC;
-  --c-card-featured-text: #141413;
-  --c-card-featured-accent: #D97757;
+  --c-card-oat-bg: #E3DACC;
+  --c-card-oat-text: #141413;
+
+  /* Feature 暗卡：近黑底，全章最重要的结论 */
+  --c-card-feature-bg: #141413;
+  --c-card-feature-text: #FAF9F5;       /* Ivory Light，暖白非纯白 */
+  --c-card-feature-secondary: #B0AEA5;  /* Cloud Medium，次要文字 */
+  --c-card-feature-accent: #D97757;     /* 仅用于 CTA/标签 */
 
   /* 终端卡片：比页面略亮，浮起来（非凹陷） */
   --c-card-terminal-bg: #1E1E2E;
@@ -316,61 +321,129 @@ my-video/
   --c-card-bg: #2D2C2A;                                    /* 默认卡片：深灰底 */
   --c-card-border: rgba(158, 156, 148, 0.15);              /* 暗色细边框 */
   --c-card-text: #EBEAE4;                                   /* 默认卡片：暖白字 */
-  --c-card-featured-bg: #3A3936;                            /* 重点卡片：chart-gray 替代 rgba 品牌底 */
-  --c-card-featured-text: #EBEAE4;                          /* 重点卡片：暖白字 */
-  --c-card-featured-accent: #EE6B3E;                        /* 重点卡片：亮品牌色 */
+  --c-card-oat-bg: #3A3936;                            /* Oat 卡：暗色下用 chart-gray */
+  --c-card-oat-text: #EBEAE4;                          /* Oat 卡：暖白字 */
+
+  /* Feature 暗卡：暗色主题下与亮色一致（近黑底） */
+  --c-card-feature-bg: #141413;
+  --c-card-feature-text: #FAF9F5;
+  --c-card-feature-secondary: #B0AEA5;
+  --c-card-feature-accent: #EE6B3E;
+
   --c-card-terminal-bg: #1E1E2E;                            /* 终端卡片：比页面略亮，浮起来 */
   --c-card-terminal-text: #CDD6F4;                          /* 终端卡片：蓝白字 */
   --c-card-terminal-accent: #F38BA8;                        /* 终端卡片：冷调，与字色同温 */
 }
 ```
 
-### 三种场景模式
+### 场景模式与卡片系统
 
-视频中使用三种视觉模式，而非简单的"亮/暗"二选一：
+视频使用两种场景模式 + 四种卡片形态：
 
-| 模式 | 背景 | 用途 | 实现 |
-|------|------|------|------|
-| **SceneLight** | `var(--c-bg)` 羊皮纸白 | 正文、图表、流程步骤 | 默认，无需额外设置 |
-| **SceneDark** | 深炭墨 `#191917` | 开场标题、核心结论（重音拍） | `<AbsoluteFill className="dark-theme">` |
-| **SceneLightWithDarkCard** | 亮底 + 深色圆角卡片 | 代码展示、数据对比 | 亮底上浮一张 `border-radius: 24px` 的暗卡片 |
+#### 场景模式
 
-**SceneLightWithDarkCard**（亮底暗卡片）是 Anthropic 官网最常用的模式——代码/终端不需要切换整页为暗色，而是在亮底上浮一张深色卡片，不全出血到边缘，硬边切换、零渐变。
+| 模式 | 背景 | 用途 |
+|------|------|------|
+| **SceneLight** | `var(--c-bg)` 羊皮纸白 | 正文、图表、流程步骤 |
+| **SceneDark** | 深炭墨 `#191917` | 开场标题、核心结论（重音拍） |
+
+#### 四种卡片形态（按内容语义选择）
+
+| 形态 | 背景 | 边框 | 圆角 | 语义 |
+|------|------|------|------|------|
+| ① 标准卡 | `#FAF9F5`（与页面同色） | `0.5px solid #D1CFC5` | 8px | 信息陈列，平等对待每条内容 |
+| ② Oat 暖填充卡 | `#E3DACC` | 无 | 8px | 内容有分量但不是最高潮，给观众一个"停顿" |
+| ③ Feature 暗卡 | `#141413` | 无 | 24px | 全章最重要的结论，不容错过 |
+| ④ 终端卡 | `#1E1E2E` | 无 | 24px | 代码/技术内容 |
+
+**Feature 暗卡 vs 终端卡**：两者背景色不同（`#141413` vs `#1E1E2E`），文字色不同（暖白 `#FAF9F5` vs 冷蓝白 `#CDD6F4`），语义不同（核心结论 vs 代码展示）。
 
 ```tsx
-// SceneLightWithDarkCard 模式示例
-<AbsoluteFill style={{ background: 'var(--c-bg)', padding: '80px 100px' }}>
-  <h2 style={{ color: 'var(--c-text)' }}>标题在亮色区域</h2>
-  {/* 暗色卡片：border-radius 24px，不全出血 */}
-  <div style={{
-    background: 'var(--c-card-terminal-bg)',
-    borderRadius: 24,
-    padding: '48px 56px',
-    color: 'var(--c-card-terminal-text)',
-    marginTop: 32,
-  }}>
-    <code>代码在暗卡片里</code>
-  </div>
-</AbsoluteFill>
+// ① 标准卡
+<div style={{
+  background: 'var(--c-card-bg)',
+  border: '0.5px solid var(--c-card-border)',
+  borderRadius: 8,
+  color: 'var(--c-card-text)',
+}}>普通内容</div>
+
+// ② Oat 暖填充卡
+<div style={{
+  background: 'var(--c-card-oat-bg)',
+  borderRadius: 8,
+  color: 'var(--c-card-oat-text)',
+}}>重要但不是高潮的内容</div>
+
+// ③ Feature 暗卡
+<div style={{
+  background: 'var(--c-card-feature-bg)',
+  borderRadius: 24,
+  color: 'var(--c-card-feature-text)',
+}}>
+  <p style={{ color: 'var(--c-card-feature-secondary)' }}>FEATURED</p>
+  <h3>全章最重要的结论</h3>
+  <span style={{ color: 'var(--c-card-feature-accent)' }}>了解更多 →</span>
+</div>
+
+// ④ 终端卡
+<div style={{
+  background: 'var(--c-card-terminal-bg)',
+  borderRadius: 24,
+  color: 'var(--c-card-terminal-text)',
+}}>$ echo "code here"</div>
 ```
 
-#### 卡片圆角规范
+#### 卡片形态决策树（Claude 必须遵守）
 
-| 卡片类型 | border-radius | 说明 |
-|---------|---------------|------|
-| 默认卡片（标准/Oat） | 8px | 普通内容卡片 |
-| 面板/大块区域 | 16px | 中等容器 |
-| Feature 大卡（暗色） | 24px | SceneLightWithDarkCard 中的暗卡片 |
+开发每个场景的卡片时，问自己三个问题：
 
-#### 卡片使用规范
+**Q1：这块内容，如果去掉，观众会错过什么核心认知？**
+- 「去掉也没大碍」→ 标准卡 ①
+- 「会少一个关键点」→ Oat 卡 ②
+- 「整段内容的灵魂」→ Feature 暗卡 ③
+
+**Q2：这章里，已经用过暗卡了吗？**
+- 「没用过」→ 当前内容若是核心结论，可以用暗卡
+- 「已经用过一次」→ 强制降级为 Oat 卡，暗卡每章最多 1 次
+
+**Q3：这块内容是「一条」还是「多条并列」？**
+- 「多条并列，需要对比」→ 强制标准卡 ①，暗卡不能容纳列表
+- 「一句话 / 一个观点」→ 可考虑暗卡或 Oat 卡
+
+#### 内容类型 → 卡片形态映射
+
+| 内容类型 | 卡片形态 | 原因 |
+|---------|---------|------|
+| 功能列举 / 步骤拆解 / 多概念并排 | 标准卡 ① | 平等陈列 |
+| 数据表格 / 对比方案 / 引用来源 | 标准卡 ① | 需要扫读 |
+| 重要背景知识 / 关键定义 | Oat 卡 ② | 值得停顿 |
+| 小节小结 / 观点推进前的铺垫 | Oat 卡 ② | 有分量但非高潮 |
+| 全章核心结论（一句话） | Feature 暗卡 ③ | 不容错过 |
+| 反转性观点 / 最终答案 | Feature 暗卡 ③ | 让观众停下来想 |
+| 代码 / 终端输出 / 技术内容 | 终端卡 ④ | 代码天然深色 |
+
+#### 硬性约束
+
+| 约束 | 说明 |
+|------|------|
+| 暗卡每章最多 1 次 | 超过就失去"最重要"的含义 |
+| 全片暗卡总数 ≤ 章节数 | 5 章最多 5 个暗卡 |
+| 列表/多条内容不进暗卡 | 暗卡只放单句核心结论 |
+| 连续两个 Oat 卡禁止 | Oat 后必须接标准卡（节奏落下来） |
+| 整章全用标准卡禁止 | 太平淡，至少 1 个 Oat |
+| 同一场景内非标准卡最多 1 种 | 其余全用标准卡 |
+| accent 只用于文字/CTA | 不作为背景底色 |
+
+#### accent 使用规范
 
 **accent 赤陶色（`#D97757`）只用于**：CTA 文字、标签色、强调文字、箭头图标
 **accent 不用于**：背景底色（即使是极低透明度）
 **每个版块最多出现一处 accent**，默认状态下整页接近无彩色
 
-**默认卡片**：与页面同色 `#FAF9F5` + `0.5px solid #D1CFC5` 细边框，靠边框与页面区分
-**重点卡片（Oat）**：`#E3DACC` 暖填充底，无边框，靠颜色与页面区分
-**终端卡片**：`#1E1E2E` 比页面略亮，浮起来而非凹陷
+**Feature 暗卡内部文字规范**：
+- 标题：`#FAF9F5` Ivory Light（暖白，非纯白）
+- 次要：`#B0AEA5` Cloud Medium
+- accent：`#D97757` Clay（仅用于 CTA/标签，不进入正文）
 
 ### 节奏驱动决策规则（替代内容驱动）
 
