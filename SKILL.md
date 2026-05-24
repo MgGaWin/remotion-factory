@@ -445,6 +445,21 @@ my-video/
 - 次要：`#B0AEA5` Cloud Medium
 - accent：`#D97757` Clay（仅用于 CTA/标签，不进入正文）
 
+#### 否定清单（禁止的模式）
+
+| 禁止 | 原因 | 正确做法 |
+|------|------|---------|
+| Oat 卡有 border / boxShadow | Oat 靠颜色区分，不需要边框 | 无边框无阴影 |
+| Oat 卡用绿/蓝/红文字 | Anthropic 卡片文字只用中性色阶 | 用 `var(--c-card-oat-text)` 或 `var(--c-accent)` |
+| Feature 暗卡用绿/蓝/红文字 | 暗卡文字用 Ivory Light / Cloud Medium | 用 `var(--c-card-feature-text)` / `var(--c-card-feature-secondary)` |
+| 标准卡无边框 | 与页面同色，没有边框就看不见 | 必须有 `border: 0.5px solid var(--c-card-border)` |
+| 列表/多条内容放进暗卡 | 暗卡只放单句核心结论 | 列表用标准卡 |
+| 一章没有 Feature 暗卡 | 每章需要一个视觉重音拍 | 每章底部总结用暗卡 |
+| 一章多个 Feature 暗卡 | 超过 1 个就失去"最重要"含义 | 多余的降级为 Oat |
+| 连续两个 Oat 卡 | 节奏没有落下来 | Oat 后必须接标准卡 |
+| 整章全用标准卡 | 太平淡，无节奏 | 至少 1 个 Oat + 1 个暗卡 |
+| 卡片内硬编码颜色 | 应该用 tokens.css 变量 | 用 `var(--c-card-*)` 系列 |
+
 ### 节奏驱动决策规则（替代内容驱动）
 
 **旧规则（已弃用）**：内容类型 → 固定主题（代码=暗、图表=亮…）
@@ -560,12 +575,32 @@ Chapter 编排中无需额外处理，主题已在场景组件内部决定：
 
 ### 开发流程中的应用
 
-**Phase 3 开发场景时**，Claude 必须：
+**Phase 3 开发场景时**，Claude 必须按以下顺序执行：
 
-1. 按**节奏驱动规则**为每个场景标注模式（SceneDark / SceneLight / SceneLightWithDarkCard）
-2. 检查节奏约束（连续暗色 ≤1，连续亮色 ≤4）
-3. 代码/终端场景优先用 SceneLightWithDarkCard，而非整页暗色
-4. 在场景组件中实现对应模式
+**步骤一：场景模式标注**
+按节奏驱动规则为每个场景标注模式（SceneDark / SceneLight），检查节奏约束。
+
+**步骤二：卡片形态标注（强制，不可跳过）**
+对每个场景中的每张卡片，按决策树标注形态：
+
+```
+场景 X：场景名称
+  - 卡片 A（标题/内容摘要）→ 标准卡 ①
+  - 卡片 B（标题/内容摘要）→ Oat 卡 ②（推荐/重要但非高潮）
+  - 底部总结（一句话）→ Feature 暗卡 ③（每章仅此 1 个）
+```
+
+**检查清单**（每章完成后核对）：
+- [ ] 每章有且仅有 1 个 Feature 暗卡（放核心结论）
+- [ ] Feature 暗卡内用 `var(--c-card-feature-text)` / `var(--c-card-feature-secondary)`，不用绿/蓝/红
+- [ ] Oat 卡无边框、无 boxShadow、无彩色点缀，纯靠 `#E3DACC` 背景区分
+- [ ] 标准卡有 `border: 0.5px solid var(--c-card-border)`
+- [ ] 列表/多条并列内容不进暗卡
+- [ ] 不连续出现 Oat 卡
+- [ ] 整章不全用标准卡（至少 1 个 Oat）
+
+**步骤三：编码实现**
+按标注结果实现卡片，不要在编码阶段临时决定卡片形态。
 
 **outline.md 标注示例**：
 
@@ -573,7 +608,13 @@ Chapter 编排中无需额外处理，主题已在场景组件内部决定：
 ## Chapter 1: 模型基础（~90s）
 - Scene 0: 开场标题（3.8s, ch1-0.wav）【SceneDark — 重音拍 #1】
 - Scene 1: LLM 概念 + 涌现曲线（16s, ch1-1.wav）【SceneLight】
+  - 涌现曲线图 → 标准卡 ①
+  - 底部总结"LLM 的核心能力是涌现" → Feature 暗卡 ③
 - Scene 2: 三种模型类型（30s, ch1-2.wav）【SceneLight】
+  - LLM 卡 → 标准卡 ①
+  - Chat Model 卡（推荐）→ Oat 卡 ②
+  - Embedding 卡 → 标准卡 ①
+  - 底部总结"LangChain 主要使用 Chat Model" → 已在 Scene 1 用过暗卡，降级为 Oat
 ```
 
 ---
