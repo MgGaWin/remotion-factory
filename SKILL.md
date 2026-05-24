@@ -185,7 +185,41 @@ my-video/
   --c-cloud-light: #D1CFC5;      /* 卡片细边框 / 分割线 */
   --c-oat: #E3DACC;              /* 暖填充卡底色 */
   --c-ivory-medium: #F0EEE6;     /* 二级面 / 导航背景 */
+```
 
+**色阶选择指南**（开发每个元素时必须做一次选择）：
+
+**文字层级 → 对应色阶**（必须用 token，不硬编码）：
+
+| 信息层级 | 浅底（#FAF9F5） | 深底（#141413） | 何时用 |
+|---------|-----------------|-----------------|--------|
+| 标题/主文 | `var(--c-text)` #141413 | `var(--c-card-feature-text)` #FAF9F5 | 核心信息、段落首句 |
+| 次要说明 | `var(--c-text-secondary)` #7A7870 | `var(--c-card-feature-secondary)` #B0AEA5 | 补充说明、描述、注释 |
+| 弱化标注 | `var(--c-text-muted)` #9E9C94 | `var(--c-cloud-dark)` #87867F | 时间戳、来源、标签、括号内注释 |
+| 强调/CTA | `var(--c-accent)` #D97757 | `var(--c-card-feature-accent)` #D97757 | 按钮、推荐标签、关键词高亮 |
+
+**决策规则**：写每一行文字时，先判断"这行文字的信息层级是什么"，再选对应色阶。不要所有文字都用 `var(--c-text)`。
+
+**背景层级 → 对应色阶**：
+
+| 层级 | 色值 | token | 何时用 |
+|------|------|-------|--------|
+| 页面底 | #FAF9F5 | `var(--c-bg)` | 最底层，永远不改 |
+| 卡片底 | #FAF9F5 + 边框 | `var(--c-card-bg)` + `var(--c-card-border)` | 标准内容卡 |
+| 暖填充底 | #E3DACC | `var(--c-card-oat-bg)` | 重要内容、推荐项 |
+| 二级面 | #F0EEE6 | `var(--c-ivory-medium)` | 大块容器背景、代码区底色 |
+| 暗色底 | #141413 | `var(--c-card-feature-bg)` | 核心结论 |
+| 终端底 | #1E1E2E | `var(--c-card-terminal-bg)` | 代码块 |
+
+**边框/分割线 → 对应色阶**：
+
+| 用途 | 色值 | token |
+|------|------|-------|
+| 卡片边框 | #D1CFC5 | `var(--c-card-border)` |
+| 内部分割线 | #B0AEA5 半透明 | `var(--c-divider)` |
+| 暗色边框 | rgba(158,156,148,0.15) | `var(--c-card-border)`（暗色主题） |
+
+```css
   /* ── 终端（代码展示用） ── */
   --c-terminal-bg: #1E1E2E;      /* 深色终端背景 */
   --c-terminal-text: #CDD6F4;    /* 终端文字 */
