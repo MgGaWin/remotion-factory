@@ -96,7 +96,7 @@ my-video/
 
 **audio-segments.json 格式**：
 
-`json
+```json
 [
   {
     "chapter": "ch1",
@@ -930,16 +930,16 @@ npx remotion render src/index.ts FullVideo out/full-video.mp4
 
 ### 动画导入
 
-`	sx
+```tsx
 import { useCurrentFrame, interpolate, Easing } from 'remotion';
-`
+```
 
 ### 动画节奏：延迟对齐 + 快速动画
 
-动画速度保持快（~15 帧 ≈ 0.5s），只调整开始帧来对齐音频。
+动画速度保持快（~18 帧 ≈ 0.6s），只调整开始帧来对齐音频。
 
 ```tsx
-const FAST = 15;
+const FAST = 18;
 const BULLET_FRAMES = [252, 375, 470]; // 音频提到要点的时刻
 
 const bulletOp = (i) => interpolate(
@@ -1089,8 +1089,6 @@ import subtitleTimings from '../../subtitle-timings.json';
   - 完整播放无报错
   - 暗色场景视觉效果正确
   - 字幕不遮挡主内容
-
----
 
 
 

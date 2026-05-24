@@ -1,6 +1,6 @@
 ﻿{
   "name": "remotion-factory",
-  "version": "1.2.0",
+  "version": "1.8.1",
   "category": "Video / Presentation",
   "description": "Turn articles or scripts into MP4 videos using Remotion. Audio-first workflow, content-faithful narration via MiMo TTS, Anthropic warm terracotta default style, reference images support, and Agent Teams quality checks.",
   "homepage": "https://github.com/MgGaWin/remotion-factory",
