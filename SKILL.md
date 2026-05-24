@@ -996,19 +996,7 @@ import subtitleTimings from '../../subtitle-timings.json';
 - 代码块 lineHeight: 1.7（不要 1.8，会溢出）
 - 正文 lineHeight: 1.6
 
-**卡片样式**：
-- 用 boxShadow 不用 border（Anthropic 风格）
-- 边框仅用于功能性元素（滑块、时间线节点）
-
-**三种卡片类型**（tokens.css 已定义变量）：
-
-| 类型 | 亮色背景 | 暗色背景 | 文字 | 用途 |
-|------|---------|---------|------|------|
-| 默认 | #FFFFFF | #2D2C2A | --c-card-text | 普通内容卡片 |
-| 重点 | rgba(accent,0.08) | rgba(accent,0.1) | --c-card-featured-text | 核心观点/推荐项（每场景最多1个） |
-| 终端 | #191917 | #151521 | --c-card-terminal-text | 代码/技术内容 |
-
-重点卡片的强调色（标题、图标）用 --c-card-featured-accent，背景只用极浅底。不要用品牌色全填背景。
+**卡片样式**：按上方"四种卡片形态"表格实现（标准卡有边框，Oat/Feature/终端无边框）。禁止使用 `var(--c-surface)` 做卡片背景，只用 `var(--c-card-*)` 系列。
 
 ---
 
