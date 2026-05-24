@@ -37,6 +37,20 @@ Anthropic 官网和视频中大量使用的手绘涂鸦风格 SVG，核心是 **
 - 线条起点/终点有轻微重叠 → 模仿手绘时的首尾交接
 - 滤镜强度克制（scale 1~3）→ 保持可读性
 
+### 适合用涂鸦的场景
+
+- 概念关系图（A → B 的连接线）
+- 文字强调（下划线、圆圈高亮）
+- 章节开场的装饰性图形
+- 流程图的非精确连线
+
+### 不适合用涂鸦的场景
+
+- 数据可视化图表（需要精确 SVG，不加粗糙滤镜）
+- 代码 / 终端场景（风格冲突）
+- 信息密集的卡片内部（涂鸦会抢注意力）
+- 每个场景最多 1~2 处涂鸦，不要铺满
+
 ---
 
 ## 2. 技术原理
@@ -230,6 +244,9 @@ C 波谷2  波峰3  波谷3
 
 ## 6. 动画实现
 
+> ⚠️ 以下 CSS 写法仅用于 HTML 演示（sketch-demo.html）。
+> Remotion 组件里禁止使用 CSS animation，必须用 interpolate 驱动，见第 7 节。
+
 ### 6.1 基础生长动画
 
 ```css
@@ -332,7 +349,7 @@ export const SketchCircle: React.FC<{
   const { fps } = useVideoConfig();
 
   const pathLen = 440;
-  const duration = fps * 1.5; // 1.5 秒画完
+  const duration = 28; // 涂鸦生长动画，比普通淡入稍慢但不超过 30 帧
   const progress = interpolate(frame - delay, [0, duration], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -389,8 +406,8 @@ const items = [/* path configs */];
 items.map((item, i) => {
   const itemDelay = i * 8; // 每个元素延迟 8 帧
   const progress = interpolate(frame - itemDelay, [0, 30], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
+    extrapolateLeft: 'clamp',   // ← 必须有
+    extrapolateRight: 'clamp',  // ← 必须有
   });
   // ...
 });
@@ -399,6 +416,8 @@ items.map((item, i) => {
 ### 7.4 帧抖动（Remotion 版）
 
 ```tsx
+// Math.sin/cos 是帧驱动的，同一帧永远同一结果 → 允许使用
+// Math.random() 每帧不同 → 严格禁止
 // 微弱的帧抖动，模拟胶片质感
 const jitterX = Math.sin(frame * 0.8) * 0.3;
 const jitterY = Math.cos(frame * 0.6) * 0.2;
@@ -574,6 +593,9 @@ const jitterY = Math.cos(frame * 0.6) * 0.2;
 --gold: #D9A057;          /* 辅助金 */
 --rose: #C97B7B;          /* 辅助红（错误/否定） */
 ```
+
+> 暗色场景下：线条改用 `var(--c-text)`（#EBEAE4），accent 改用 `var(--c-accent)`（#EE6B3E）。
+> `--gold: #D9A057` 和 `--rose: #C97B7B` 是本文件扩展色，tokens.css 里没有对应 token，使用时直接硬编码，不要用 var()。
 
 ### 线条粗细
 
