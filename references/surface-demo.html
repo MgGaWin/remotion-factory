@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>配色体系 — 克制点缀 + 左边框提示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Poppins', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #FAF9F5;
+    color: #141413;
+    padding: 48px;
+  }
+  h1 { font-family: 'Georgia', serif; font-size: 26px; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: #7A7870; margin-bottom: 40px; }
+  h2 { font-size: 16px; font-weight: 600; color: #5E5D59; margin: 40px 0 16px; }
+  h3 { font-size: 13px; font-weight: 600; color: #7A7870; margin: 20px 0 10px; }
+
+  .card {
+    background: #FAF9F5;
+    border: 0.5px solid #D1CFC5;
+    border-radius: 8px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+  }
+  .card-oat {
+    background: #E3DACC;
+    border-radius: 8px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+  }
+  .card-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; color: #141413; }
+  .card-subtitle { font-size: 13px; color: #7A7870; margin-bottom: 16px; }
+
+  .tag {
+    display: inline-block;
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #FFF;
+  }
+  .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  :root {
+    --c-tint-blue: #EBF2F8;
+    --c-tint-green: #ECF0E6;
+    --c-tint-orange: #FAEDE6;
+    --c-tint-blue-border: #6A9BCC;
+    --c-tint-green-border: #788C5D;
+    --c-tint-orange-border: #D97757;
+  }
+  .callout {
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .callout-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .callout-body { font-size: 12px; color: #7A7870; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<h1>配色体系 — 克制点缀 + 左边框提示</h1>
+<p class="subtitle">辅助色只做小标签/色点/左边框，提示容器用纯色浅底</p>
+
+<!-- ============================================ -->
+<!-- 1. 辅助色三层使用模型 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>1. 辅助色三层使用模型</h2>
+
+<div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:12px;">
+  <div style="flex:1; min-width:220px; background:#F0EEE6; border-radius:10px; padding:16px 18px;">
+    <div style="font-size:11px; font-weight:700; color:#3B6D11; margin-bottom:6px;">✓ 放开用 · 图形层</div>
+    <div style="font-size:12px; color:#5E5D59; line-height:1.6;">数据图线条、SVG 涂鸦、流程图连接线、图标描边</div>
+    <div style="display:flex; gap:4px; margin-top:8px;">
+      <div style="width:20px; height:20px; border-radius:4px; background:#D97757;"></div>
+      <div style="width:20px; height:20px; border-radius:4px; background:#6A9BCC;"></div>
+      <div style="width:20px; height:20px; border-radius:4px; background:#788C5D;"></div>
+    </div>
+  </div>
+  <div style="flex:1; min-width:220px; background:#F0EEE6; border-radius:10px; padding:16px 18px;">
+    <div style="font-size:11px; font-weight:700; color:#854F0B; margin-bottom:6px;">△ 克制用 · 标签层</div>
+    <div style="font-size:12px; color:#5E5D59; line-height:1.6;">小标签底色、色点、编号圆、左边框、accent 文字色、提示容器纯色浅底</div>
+    <div style="display:flex; gap:6px; margin-top:8px; align-items:center;">
+      <span class="dot" style="background:#6A9BCC;"></span>
+      <span class="tag" style="background:#788C5D; font-size:9px; padding:2px 6px;">标签</span>
+      <span style="font-size:12px; color:#D97757; font-weight:600;">accent 文字</span>
+    </div>
+  </div>
+  <div style="flex:1; min-width:220px; background:#F0EEE6; border-radius:10px; padding:16px 18px;">
+    <div style="font-size:11px; font-weight:700; color:#A32D2D; margin-bottom:6px;">✗ 禁止 · 容器背景层</div>
+    <div style="font-size:12px; color:#5E5D59; line-height:1.6;">辅助色做大面积卡片背景、整块填充（提示容器用纯色浅底除外）</div>
+    <div style="margin-top:8px; background:#6A9BCC; border-radius:4px; padding:4px 8px; display:inline-block;">
+      <span style="font-size:9px; color:#FFF;">整块填充 ✗</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 2. 文字层级（保留好的部分） -->
+<!-- ============================================ -->
+<div class="section">
+<h2>2. 文字层级 — 中性色 + accent 点缀</h2>
+
+<div style="background:#FAF9F5; border:0.5px solid #D1CFC5; border-radius:12px; padding:28px 32px; margin-bottom:12px;">
+  <p style="font-size:22px; font-weight:700; color:#141413; margin-bottom:8px;">标题/主文 — #141413</p>
+  <p style="font-size:14px; color:#7A7870; margin-bottom:8px;">次要说明 — #7A7870 · 补充描述性文字</p>
+  <p style="font-size:12px; color:#9E9C94; margin-bottom:12px;">弱化标注 — #9E9C94 · 时间戳、来源、标签</p>
+  <p style="font-size:14px; color:#D97757; font-weight:600;">强调/CTA — #D97757 · 按钮、推荐标签、关键词高亮</p>
+</div>
+
+<div style="background:#191917; border-radius:12px; padding:28px 32px;">
+  <p style="font-size:22px; font-weight:700; color:#EBEAE4; margin-bottom:8px;">标题/主文 — #EBEAE4</p>
+  <p style="font-size:14px; color:#9E9C94; margin-bottom:8px;">次要说明 — #9E9C94</p>
+  <p style="font-size:12px; color:#666560; margin-bottom:12px;">弱化标注 — #666560</p>
+  <p style="font-size:14px; color:#EE6B3E; font-weight:600;">强调/CTA — #EE6B3E</p>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 3. 分类并列项 — 色点 + 小标签 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>3. 分类并列项 — 色点 + 小标签（代替整块容器）</h2>
+
+<div class="card">
+  <div class="card-title">内容格式对比</div>
+  <div class="card-subtitle">选择适合你内容的表达方式</div>
+
+  <div style="display:flex; align-items:center; gap:8px; padding:12px 0; border-bottom:0.5px solid #E8E6DC;">
+    <span class="dot" style="background:#6A9BCC;"></span>
+    <span style="font-size:14px; font-weight:600; color:#141413;">纯文本</span>
+    <span class="tag" style="background:#6A9BCC; margin-left:auto;">基础</span>
+  </div>
+  <div style="font-size:12px; color:#7A7870; padding:6px 0 12px 16px; border-bottom:0.5px solid #E8E6DC;">最简单的格式，适合纯文字叙述和线性阅读</div>
+
+  <div style="display:flex; align-items:center; gap:8px; padding:12px 0; border-bottom:0.5px solid #E8E6DC;">
+    <span class="dot" style="background:#788C5D;"></span>
+    <span style="font-size:14px; font-weight:600; color:#141413;">图文混排</span>
+    <span class="tag" style="background:#788C5D; margin-left:auto;">推荐</span>
+  </div>
+  <div style="font-size:12px; color:#7A7870; padding:6px 0 12px 16px; border-bottom:0.5px solid #E8E6DC;">文字搭配图片，信息密度高，适合教程和产品展示</div>
+
+  <div style="display:flex; align-items:center; gap:8px; padding:12px 0;">
+    <span class="dot" style="background:#D97757;"></span>
+    <span style="font-size:14px; font-weight:600; color:#141413;">交互式演示</span>
+    <span class="tag" style="background:#D97757; margin-left:auto;">高级</span>
+  </div>
+  <div style="font-size:12px; color:#7A7870; padding:6px 0 0 16px;">带动态效果和用户操作，适合深度讲解和实操演示</div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 4. 分类并列项 — 左侧色条 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>4. 分类并列项 — 左侧色条（更有层级感）</h2>
+
+<div class="card">
+  <div class="card-title">方案对比</div>
+  <div class="card-subtitle">根据需求和预算选择合适的方案</div>
+
+  <div style="border-left:3px solid #6A9BCC; border-radius:0 8px 8px 0; background:#FAF9F5; padding:12px 16px; margin-bottom:8px;">
+    <span style="font-size:14px; font-weight:600; color:#141413;">基础版</span>
+    <span class="tag" style="background:#6A9BCC; font-size:10px; padding:2px 8px; margin-left:8px;">入门首选</span>
+    <div style="font-size:12px; color:#7A7870; margin-top:4px;">覆盖核心功能，适合个人用户和小团队</div>
+  </div>
+
+  <div style="border-left:3px solid #788C5D; border-radius:0 8px 8px 0; background:#FAF9F5; padding:12px 16px; margin-bottom:8px;">
+    <span style="font-size:14px; font-weight:600; color:#141413;">专业版</span>
+    <span class="tag" style="background:#788C5D; font-size:10px; padding:2px 8px; margin-left:8px;">性价比最高</span>
+    <div style="font-size:12px; color:#7A7870; margin-top:4px;">完整功能 + 优先支持，适合成长型团队</div>
+  </div>
+
+  <div style="border-left:3px solid #D97757; border-radius:0 8px 8px 0; background:#FAF9F5; padding:12px 16px;">
+    <span style="font-size:14px; font-weight:600; color:#141413;">旗舰版</span>
+    <span class="tag" style="background:#D97757; font-size:10px; padding:2px 8px; margin-left:8px;">全功能</span>
+    <div style="font-size:12px; color:#7A7870; margin-top:4px;">无限额度 + 定制服务，适合大型企业</div>
+  </div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 5. 提示/警告 — 低透明底 + 左边框 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>5. 提示/警告 — 纯色浅底 + 左边框</h2>
+<p style="font-size:12px; color:#7A7870; margin-bottom:16px;">不透明纯色，可直接用于视频帧渲染</p>
+
+<!-- 色块预览 -->
+<div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px;">
+  <div style="flex:1; min-width:180px;">
+    <div style="background:var(--c-tint-blue); border-left:3px solid var(--c-tint-blue-border); border-radius:0 8px 8px 0; padding:14px 16px;">
+      <div style="font-size:11px; font-weight:600; color:#5E5D59; margin-bottom:4px;">--c-tint-blue</div>
+      <div style="font-size:12px; font-family:monospace; color:#7A7870;">#EBF2F8</div>
+      <div style="font-size:11px; color:#7A7870; margin-top:4px;">极浅蓝 · 提示</div>
+    </div>
+  </div>
+  <div style="flex:1; min-width:180px;">
+    <div style="background:var(--c-tint-green); border-left:3px solid var(--c-tint-green-border); border-radius:0 8px 8px 0; padding:14px 16px;">
+      <div style="font-size:11px; font-weight:600; color:#5E5D59; margin-bottom:4px;">--c-tint-green</div>
+      <div style="font-size:12px; font-family:monospace; color:#7A7870;">#ECF0E6</div>
+      <div style="font-size:11px; color:#7A7870; margin-top:4px;">纸感浅绿 · 最佳实践</div>
+    </div>
+  </div>
+  <div style="flex:1; min-width:180px;">
+    <div style="background:var(--c-tint-orange); border-left:3px solid var(--c-tint-orange-border); border-radius:0 8px 8px 0; padding:14px 16px;">
+      <div style="font-size:11px; font-weight:600; color:#5E5D59; margin-bottom:4px;">--c-tint-orange</div>
+      <div style="font-size:12px; font-family:monospace; color:#7A7870;">#FAEDE6</div>
+      <div style="font-size:11px; color:#7A7870; margin-top:4px;">贝壳橙 · 注意/警告</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">使用须知</div>
+
+  <div style="background:var(--c-tint-blue); border-left:3px solid var(--c-tint-blue-border); border-radius:0 8px 8px 0; padding:12px 16px; margin-bottom:10px;">
+    <div style="font-size:13px; font-weight:600; color:#141413;">提示</div>
+    <div style="font-size:12px; color:#7A7870; margin-top:4px;">建议先在测试环境验证，确认无误后再部署到生产环境</div>
+  </div>
+
+  <div style="background:var(--c-tint-green); border-left:3px solid var(--c-tint-green-border); border-radius:0 8px 8px 0; padding:12px 16px; margin-bottom:10px;">
+    <div style="font-size:13px; font-weight:600; color:#141413;">最佳实践</div>
+    <div style="font-size:12px; color:#7A7870; margin-top:4px;">定期备份数据，重要操作前先创建快照</div>
+  </div>
+
+  <div style="background:var(--c-tint-orange); border-left:3px solid var(--c-tint-orange-border); border-radius:0 8px 8px 0; padding:12px 16px;">
+    <div style="font-size:13px; font-weight:600; color:#141413;">注意</div>
+    <div style="font-size:12px; color:#7A7870; margin-top:4px;">敏感信息不要硬编码在源码中，使用环境变量或配置文件管理</div>
+  </div>
+</div>
+
+<!-- Oat 卡底上的提示 -->
+<div class="card-oat">
+  <div class="card-title">学习心得</div>
+
+  <div style="background:var(--c-tint-orange); border-left:3px solid var(--c-tint-orange-border); border-radius:0 8px 8px 0; padding:12px 16px; margin-bottom:10px;">
+    <div style="font-size:13px; font-weight:600; color:#141413;">核心感悟</div>
+    <div style="font-size:12px; color:#5E5D59; margin-top:4px; line-height:1.6;">最好的学习方式是边做边学，而不是学完再做</div>
+  </div>
+
+  <div style="background:#FAF9F5; border-left:3px solid var(--c-tint-blue-border); border-radius:0 8px 8px 0; padding:12px 16px;">
+    <div style="font-size:13px; font-weight:600; color:#141413;">经验</div>
+    <div style="font-size:12px; color:#5E5D59; margin-top:4px; line-height:1.6;">遇到问题先查文档，文档没有再搜索，搜索没有再提问</div>
+  </div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 6. 编号圆（彩色编号 + 中性底） -->
+<!-- ============================================ -->
+<div class="section">
+<h2>6. 编号圆 — 彩色圆 + 中性底</h2>
+
+<div class="card">
+  <div class="card-title">三个关键步骤</div>
+
+  <div style="display:flex; gap:14px; align-items:flex-start; margin-bottom:14px;">
+    <div style="width:30px; height:30px; border-radius:50%; background:#6A9BCC; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+      <span style="font-size:13px; font-weight:700; color:#FFF;">1</span>
+    </div>
+    <div>
+      <div style="font-size:14px; font-weight:600; color:#141413;">明确目标</div>
+      <div style="font-size:12px; color:#7A7870; margin-top:2px;">梳理需求，确定核心功能和优先级</div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:14px; align-items:flex-start; margin-bottom:14px;">
+    <div style="width:30px; height:30px; border-radius:50%; background:#788C5D; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+      <span style="font-size:13px; font-weight:700; color:#FFF;">2</span>
+    </div>
+    <div>
+      <div style="font-size:14px; font-weight:600; color:#141413;">快速验证</div>
+      <div style="font-size:12px; color:#7A7870; margin-top:2px;">用最小可行方案验证核心假设</div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:14px; align-items:flex-start;">
+    <div style="width:30px; height:30px; border-radius:50%; background:#D97757; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+      <span style="font-size:13px; font-weight:700; color:#FFF;">3</span>
+    </div>
+    <div>
+      <div style="font-size:14px; font-weight:600; color:#141413;">迭代优化</div>
+      <div style="font-size:12px; color:#7A7870; margin-top:2px;">根据反馈持续改进，打磨细节</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 7. 数据图 — 辅助色的主战场 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>7. 数据图 — 辅助色放开用</h2>
+
+<div class="card">
+  <div class="card-title">数据趋势对比</div>
+  <div class="card-subtitle">辅助色在图形层可以大胆使用，这是它们的主战场</div>
+
+  <svg viewBox="0 0 300 100" style="width:100%; height:100px;">
+    <line x1="40" y1="10" x2="40" y2="80" stroke="#D1CFC5" stroke-width="0.5"/>
+    <line x1="40" y1="80" x2="290" y2="80" stroke="#D1CFC5" stroke-width="0.5"/>
+    <polyline points="40,72 100,65 160,50 220,32 280,15" fill="none" stroke="#6A9BCC" stroke-width="2.5" stroke-linecap="round"/>
+    <polyline points="40,62 100,52 160,42 220,33 280,25" fill="none" stroke="#788C5D" stroke-width="2.5" stroke-linecap="round"/>
+    <polyline points="40,75 100,68 160,58 220,50 280,42" fill="none" stroke="#D97757" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="50" cy="92" r="3.5" fill="#6A9BCC"/>
+    <text x="57" y="95" font-size="8" fill="#7A7870">方案 A</text>
+    <circle cx="105" cy="92" r="3.5" fill="#788C5D"/>
+    <text x="112" y="95" font-size="8" fill="#7A7870">方案 B</text>
+    <circle cx="160" cy="92" r="3.5" fill="#D97757"/>
+    <text x="167" y="95" font-size="8" fill="#7A7870">方案 C</text>
+  </svg>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 8. Feature 暗卡 — 大字 + accent + 标签 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>8. Feature 暗卡 — 大字 + accent 文字 + 小标签</h2>
+
+<div style="display:flex; gap:20px; flex-wrap:wrap;">
+  <div style="flex:1; min-width:320px;">
+    <div style="background:#141413; border-radius:24px; padding:28px 32px;">
+      <div style="font-size:20px; font-weight:700; color:#FAF9F5; margin-bottom:8px;">核心结论</div>
+      <div style="font-size:14px; color:#B0AEA5; line-height:1.6; margin-bottom:12px;">
+        好的设计不是添加更多元素，而是去掉所有不必要的
+      </div>
+      <span class="tag" style="background:#D97757;">关键洞察</span>
+    </div>
+  </div>
+
+  <div style="flex:1; min-width:320px;">
+    <div style="background:#141413; border-radius:24px; padding:28px 32px;">
+      <div style="font-size:20px; font-weight:700; color:#FAF9F5; margin-bottom:8px;">行动指南</div>
+      <p style="font-size:15px; color:#FAF9F5; line-height:1.8; margin-bottom:6px;">
+        先完成，再完美
+      </p>
+      <p style="font-size:14px; color:#B0AEA5; line-height:1.6; margin-bottom:12px;">
+        与其花时间追求完美方案，不如先做出可用版本再迭代
+      </p>
+      <span class="tag" style="background:#788C5D;">执行准则</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 9. 叙事型 — Oat 底 + 大字 + accent 点缀 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>9. 叙事型 — Oat 底 + 大字 + accent 点缀</h2>
+
+<div class="card-oat">
+  <div class="card-title">写在前面</div>
+
+  <p style="font-size:15px; color:#141413; line-height:1.8; margin-bottom:12px;">
+    每个人在学习新事物时，都会经历一段从陌生到熟悉的过渡期。这个过程可能会让人感到不安，但正是这种不安推动着我们成长。
+  </p>
+
+  <p style="font-size:15px; color:#141413; line-height:1.8; margin-bottom:12px;">
+    不必急于求成，也不必和别人比较。找到自己的节奏，持续积累，时间会给你答案。
+  </p>
+
+  <p style="font-size:15px; color:#D97757; font-weight:600; line-height:1.8;">
+    慢慢来，比较快。
+  </p>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 10. 暗色页面 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>10. 暗色页面（SceneDark）</h2>
+
+<div style="background:#191917; border-radius:16px; padding:32px;">
+  <div style="font-family:'Georgia',serif; font-size:20px; font-weight:700; color:#EBEAE4; margin-bottom:8px;">核心要点</div>
+  <div style="font-size:13px; color:#9E9C94; margin-bottom:20px;">暗色页面上的色点 + 标签 + 左边框提示</div>
+
+  <!-- 色点 + 标签 -->
+  <div style="margin-bottom:20px;">
+    <div style="display:flex; align-items:center; gap:8px; padding:10px 0; border-bottom:0.5px solid rgba(158,156,148,0.15);">
+      <span class="dot" style="background:#81A9D4;"></span>
+      <span style="font-size:14px; font-weight:600; color:#EBEAE4;">基础概念</span>
+      <span class="tag" style="background:#81A9D4; font-size:10px; padding:2px 8px; margin-left:auto;">必读</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px; padding:10px 0; border-bottom:0.5px solid rgba(158,156,148,0.15);">
+      <span class="dot" style="background:#8DA173;"></span>
+      <span style="font-size:14px; font-weight:600; color:#EBEAE4;">进阶技巧</span>
+      <span class="tag" style="background:#8DA173; font-size:10px; padding:2px 8px; margin-left:auto;">推荐</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px; padding:10px 0;">
+      <span class="dot" style="background:#EE6B3E;"></span>
+      <span style="font-size:14px; font-weight:600; color:#EBEAE4;">高级实战</span>
+      <span class="tag" style="background:#EE6B3E; font-size:10px; padding:2px 8px; margin-left:auto;">挑战</span>
+    </div>
+  </div>
+
+  <!-- 左边框提示 -->
+  <div style="background:rgba(238,107,62,0.1); border-left:3px solid #EE6B3E; border-radius:0 8px 8px 0; padding:12px 16px;">
+    <div style="font-size:12px; color:#EBEAE4; line-height:1.6;">
+      暗色页面比例控制在 <span style="color:#EE6B3E; font-weight:600;">20-35%</span>，用于章节开场和核心结论的重音拍
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 11. 完整场景模拟 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>11. 完整场景模拟 — 一个场景的全部元素</h2>
+
+<div style="background:#FAF9F5; border:0.5px solid #D1CFC5; border-radius:16px; padding:36px 40px;">
+  <!-- 标题 -->
+  <div style="font-family:'Georgia',serif; font-size:22px; font-weight:700; color:#141413; margin-bottom:4px;">完整场景示例</div>
+  <div style="font-size:13px; color:#7A7870; margin-bottom:24px;">所有配色手法的综合运用 · <span style="color:#D97757; font-weight:600;">左边框 + 标签 + 提示</span></div>
+
+  <!-- 列表 — 左边框 -->
+  <div style="border-left:3px solid #6A9BCC; border-radius:0 8px 8px 0; background:#FAF9F5; padding:12px 16px; margin-bottom:8px;">
+    <span style="font-size:14px; font-weight:600; color:#141413;">第一步：明确目标</span>
+    <span class="tag" style="background:#6A9BCC; font-size:10px; padding:2px 8px; margin-left:8px;">基础</span>
+    <div style="font-size:12px; color:#7A7870; margin-top:4px;">梳理需求，确定核心功能和优先级</div>
+  </div>
+
+  <div style="border-left:3px solid #788C5D; border-radius:0 8px 8px 0; background:#FAF9F5; padding:12px 16px; margin-bottom:8px;">
+    <span style="font-size:14px; font-weight:600; color:#141413;">第二步：快速验证</span>
+    <span class="tag" style="background:#788C5D; font-size:10px; padding:2px 8px; margin-left:8px;">推荐</span>
+    <div style="font-size:12px; color:#7A7870; margin-top:4px;">用最小可行方案验证核心假设</div>
+  </div>
+
+  <div style="border-left:3px solid #D97757; border-radius:0 8px 8px 0; background:#FAF9F5; padding:12px 16px; margin-bottom:20px;">
+    <span style="font-size:14px; font-weight:600; color:#141413;">第三步：迭代优化</span>
+    <span class="tag" style="background:#D97757; font-size:10px; padding:2px 8px; margin-left:8px;">高级</span>
+    <div style="font-size:12px; color:#7A7870; margin-top:4px;">根据反馈持续改进，打磨细节</div>
+  </div>
+
+  <!-- 提示/警告 — 低透明 + 左边框 -->
+  <div style="display:flex; gap:12px; margin-bottom:20px;">
+    <div style="flex:1; background:var(--c-tint-blue); border-left:3px solid var(--c-tint-blue-border); border-radius:0 8px 8px 0; padding:12px 16px;">
+      <div style="font-size:12px; font-weight:600; color:#141413;">提示</div>
+      <div style="font-size:11px; color:#7A7870; margin-top:3px;">建议先在小范围测试，确认效果后再全面推广</div>
+    </div>
+    <div style="flex:1; background:var(--c-tint-orange); border-left:3px solid var(--c-tint-orange-border); border-radius:0 8px 8px 0; padding:12px 16px;">
+      <div style="font-size:12px; font-weight:600; color:#141413;">注意</div>
+      <div style="font-size:11px; color:#7A7870; margin-top:3px;">重要操作前请先备份，避免不可逆的损失</div>
+    </div>
+  </div>
+
+  <!-- Feature 暗卡 -->
+  <div style="background:#141413; border-radius:20px; padding:20px 24px;">
+    <div style="font-size:16px; font-weight:700; color:#FAF9F5; margin-bottom:6px;">核心结论</div>
+    <div style="font-size:13px; color:#B0AEA5; line-height:1.6; margin-bottom:10px;">
+      好的设计不是添加更多元素，而是去掉所有不必要的
+    </div>
+    <span class="tag" style="background:#D97757; font-size:10px; padding:2px 8px;">关键</span>
+  </div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 12. 速查表 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>12. 辅助色用法速查</h2>
+
+<table style="width:100%; border-collapse:collapse; font-size:12px;">
+  <thead>
+    <tr style="border-bottom:2px solid #D1CFC5;">
+      <th style="text-align:left; padding:8px 10px; color:#5E5D59;">层</th>
+      <th style="text-align:left; padding:8px 10px; color:#5E5D59;">用法</th>
+      <th style="text-align:left; padding:8px 10px; color:#5E5D59;">面积</th>
+      <th style="text-align:left; padding:8px 10px; color:#5E5D59;">示例</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom:1px solid #E8E6DC;">
+      <td style="padding:6px 10px; color:#3B6D11; font-weight:600;">图形层 ✓</td>
+      <td style="padding:6px 10px;">数据线、SVG 涂鸦、流程图</td>
+      <td style="padding:6px 10px;">不限</td>
+      <td style="padding:6px 10px;">三色同时出现没问题</td>
+    </tr>
+    <tr style="border-bottom:1px solid #E8E6DC;">
+      <td style="padding:6px 10px; color:#854F0B; font-weight:600;">标签层 △</td>
+      <td style="padding:6px 10px;">小标签、色点、编号圆、左边框</td>
+      <td style="padding:6px 10px;">同屏 ≤3 种</td>
+      <td style="padding:6px 10px;">
+        <span class="dot" style="background:#6A9BCC; vertical-align:middle;"></span>
+        <span class="tag" style="background:#788C5D; font-size:9px; padding:1px 6px; vertical-align:middle;">标签</span>
+        <span style="font-size:12px; color:#D97757; font-weight:600;">accent</span>
+      </td>
+    </tr>
+    <tr style="border-bottom:1px solid #E8E6DC;">
+      <td style="padding:6px 10px; color:#854F0B; font-weight:600;">提示容器 △</td>
+      <td style="padding:6px 10px;">纯色浅底 + 3px 实色左边框</td>
+      <td style="padding:6px 10px;">单个高度 ≤80px，同屏最多 2 个</td>
+      <td style="padding:6px 10px;">
+        <span style="display:inline-block; width:30px; height:14px; background:var(--c-tint-blue); border-left:3px solid var(--c-tint-blue-border); border-radius:0 4px 4px 0; vertical-align:middle;"></span>
+        <span style="display:inline-block; width:30px; height:14px; background:var(--c-tint-green); border-left:3px solid var(--c-tint-green-border); border-radius:0 4px 4px 0; vertical-align:middle; margin-left:4px;"></span>
+        <span style="display:inline-block; width:30px; height:14px; background:var(--c-tint-orange); border-left:3px solid var(--c-tint-orange-border); border-radius:0 4px 4px 0; vertical-align:middle; margin-left:4px;"></span>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:6px 10px; color:#A32D2D; font-weight:600;">容器背景 ✗</td>
+      <td style="padding:6px 10px;">整块填充</td>
+      <td style="padding:6px 10px;">—</td>
+      <td style="padding:6px 10px; color:#A32D2D;">禁止</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p style="font-size:11px; color:#9E9C94; margin-top:40px; text-align:center;">克制点缀 + 左边框提示 · remotion-factory</p>
+
+</body>
+</html>

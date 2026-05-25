@@ -1,10 +1,19 @@
-﻿---
+---
 name: remotion-factory
+version: 1.9.0
 description: |
   把一篇文章或口播稿，用 Remotion 做成可直接渲染 MP4 的视频。
-  流程：原始文章 → 口播稿 + outline → 用户对齐 → Remotion 开发 → 音频嵌入 → 渲染 MP4。
+  流程：原始文章 → 口播稿 → 音频合成 → Remotion 开发 → 渲染 MP4。
   适用场景：B 站 / YouTube / 视频号教程、产品演示、数据可视化视频、动态 PPT。
-  本 Skill 不绑定特定样式，设计系统由用户偏好驱动。
+  默认设计风格：Anthropic 暖调赤陶色人文极简。用户可自定义。
+changelog:
+  - 1.9.0: 辅助色三层使用模型（图形放开/标签克制/容器禁止）、提示容器纯色浅底+左边框、tint 色 token、分类并列项正确做法、Oat 卡色温约束
+  - 1.8.4: 明暗节奏从"章绑定"改为"频率驱动"、Feature 暗卡从"每章1个"改为"按需使用"、区分信息密集型与叙事型内容
+  - 1.8.3: 色阶选择指南重构（移到 CSS 块外、加暗色主题列）、accent 暗色说明、否定清单补 Oat、并行开发分工、分屏示例去硬编码、暗底比例统一 20-35%
+  - 1.8.1: 拆分场景节奏系统与卡片系统、Phase 1/2/3 执行细节补全、合并自检清单与质检流程
+  - 1.8.0: 四种卡片形态（标准/Oat/Feature/终端）+ 内容语义决策树 + 否定清单
+  - 1.7.0: 节奏驱动主题系统、三模式（Light/Dark/LightWithDarkCard）、暖灰色修正
+  - 1.6.0: 卡片系统初版（三种类型）、tokens.css 卡片变量
 ---
 
 # Remotion Video Presentation
@@ -25,47 +34,760 @@ description: |
 - 音频用 Audio + staticFile 内嵌时间轴
 - Remotion Studio 实时预览
 - npx remotion render 一键渲染
+- 支持设计参考图：操作员可放置草图/截图，Claude 识别后参考创作
 
 ---
 
 ## 工作流总览
 
-Phase 1: 内容编写
-  1.1 识别用户输入
-  1.2 一次产出 script.md + outline.md
-  → Checkpoint Plan: 必须停，一次对齐 5 件事
-
-Phase 2: Remotion 开发
-  2.1 脚手架 + 设计系统
-  2.2 第 1 章 = 主线程 + 完整版本（强制 anchor）
-  → 硬节点: 用户验收第 1 章，不可跳过
-  2.3 第 2~N 章（按选定模式）
-
-Phase 3: 音频嵌入 + 渲染
+```
+Phase 1   内容编写
+   1.1  识别用户输入
+   1.2  产出 script.md + outline.md
+   ▼
+[Checkpoint Plan]      ← 必须停。一次对齐 5 件事
+   ▼
+Phase 2   音频合成（先音频，后开发）
+   2.1  生成 audio-segments.json
+   2.2  合成音频（MiMo TTS）
+   2.3  测量帧数 → 确定每个场景时长
+   ▼
+[Checkpoint Audio]     ← 必须停。确认音频 OK
+   ▼
+Phase 3   Remotion 开发
+   3.1  脚手架 + 设计系统
+   3.2  第 1 章 = 主线程 + 完整版本（强制 anchor）
+        ▼
+        [硬节点] 用户验收第 1 章 ← 不可跳过
+        ▼
+   3.3  第 2~N 章（按选定模式）
+   ▼
+[Checkpoint Render]    ← 必须停。章节 + 音频全部就绪才可渲染
+   ▼
+Phase 4   渲染 MP4
+```
 
 ---
 
 ## 工作目录约定
 
+```
 my-video/
-  article.md              # 用户原文
-  script.md               # 口播稿
-  outline.md              # 开发计划
-  audio-segments.json     # 场景 → 音频映射 + 口播文本
-  src/
-    index.ts              # registerRoot
-    Root.tsx              # Composition 注册
-    Chapter1.tsx          # 章节总控（Sequence 编排）
-    styles/tokens.css     # 设计系统
-    styles/global.css     # 全局样式 + 字体
-    components/           # 共享组件
-    scenes/               # 每个场景一个文件
-  public/audio/           # wav 文件
-  scripts/synthesize-audio.mjs  # MiMo TTS 合成脚本
-  out/                    # 渲染输出的 MP4
+├── article.md              # 用户原文
+├── script.md               # 口播稿
+├── outline.md              # 开发计划
+├── audio-segments.json     # 场景 → 音频映射 + 口播文本
+├── references/             # 设计参考图目录（可选）
+│   ├── sketch-01.png       # 操作员放的草图/截图
+│   └── layout-idea.jpg     # Claude 识别后参考创作
+└── src/
+    ├── index.ts            # registerRoot
+    ├── Root.tsx             # Composition 注册
+    ├── Chapter1.tsx         # 章节总控（Sequence 编排）
+    ├── FullVideo.tsx        # 全片合并（Sequence 编排各 Chapter）
+    ├── styles/
+    │   ├── tokens.css       # 设计系统
+    │   └── global.css       # 全局样式 + 字体
+    ├── components/          # 共享组件
+    └── scenes/              # 每个场景一个文件
+├── public/
+│   └── audio/               # wav 文件
+├── scripts/
+│   └── synthesize-audio.mjs # MiMo TTS 合成脚本
+└── out/                     # 渲染输出的 MP4
+```
+
+**audio-segments.json 格式**：
+
+```json
+[
+  {
+    "chapter": "ch1",
+    "scene": "Scene0Title",
+    "audio": "ch1-0.wav",
+    "text": "Hello，大家好，今天我们来聊 LangChain 中最核心的部分，模型，Models。"
+  },
+  {
+    "chapter": "ch1",
+    "scene": "Scene1Emergence",
+    "audio": "ch1-1.wav",
+    "text": "在正式写代码之前，我们先搞清楚几个基本概念。"
+  }
+]
+```
+
+字段说明：
+- chapter: 章节标识（ch1, ch2, ...）
+- scene: 场景组件名（必须与 src/scenes/ 下的文件名对应）
+- audio: 音频文件名（输出到 public/audio/）
+- text: 口播文本（TTS 友好：已替换 _ 和 - 为空格）
+
+**references/ 目录说明**：
+- 用于放置设计参考图（草图、截图、灵感图）
+- Claude 会读取这些图片作为视觉参考
+- 操作员如果对布局/风格有具体想法但说不清楚，截图放这里最有效
+- 支持格式：png, jpg, jpeg, webp, gif
+- 可选目录，不需要时可以不创建
+
+**Skill 内置参考文档**：
+- `references/SKETCH-SVG.md` — 手绘涂鸦风 SVG 完整指南（Anthropic Humane Aesthetic）
+  - 三步生成法：不完美 Path → 粗糙滤镜 → 生长动画
+  - SVG 滤镜详解（feTurbulence + feDisplacementMap）
+  - Path 编写技巧（圆、矩形、箭头、下划线、气泡、图标、图表）
+  - Remotion 集成模板（React 组件 + 帧驱动动画）
+  - 调参速查表（颜色、粗细、时长）
+- `references/sketch-demo.html` — 涂鸦 SVG 交互式演示（88 个动画元素 + 提示词一键复制）
+  - 浏览器直接打开即可预览全部涂鸦效果
+  - 每个元素右上角 prompt 按钮 → 弹出 AI 生成提示词 → 一键复制
+- `references/color-preview.html` — 配色全景预览（tokens.css 全部颜色可视化）
+  - 四种卡片形态 + 亮暗主题对照 + 10 档中性色阶 + 品牌色/辅助色
+  - 实际页面模拟（亮色场景 / 暗色场景 / 亮色+暗卡片）
+- `references/surface-demo.html` — 辅助色应用体系演示
+  - 三层使用模型（图形层放开 / 标签层克制 / 容器背景禁止）
+  - 分类并列项的正确做法（色点+标签 / 左侧色条 / 编号圆）
+  - 提示/警告容器（纯色浅底 + 左边框）
+  - 完整场景模拟 + 速查表
+- `references/AUDIO.md` — 音频合成参考
+- `references/CHAPTER-CRAFT.md` — 场景开发指南 + 动画模式库
 
 ---
 
+
+## 设计风格
+
+### 默认风格：Anthropic "Intellectual Warmth"
+
+本 Skill 默认使用 Anthropic 视觉设计语言——"知识分子感、克制、优雅、带有人文温度的学术期刊质感"。
+
+**核心理念**：摒弃科技圈的"侵略性"（高饱和度深蓝、霓虹渐变、冷酷未来感），走"学术报刊感 + 人文主义关怀 + 克制的知识分子风"。
+
+用户可通过修改 tokens.css 自定义风格。
+
+### 配色方案
+
+低饱和度、偏向纸张和泥土的自然温暖色调：
+
+```css
+:root {
+  /* ── 底色 ── */
+  --c-bg: #FAF9F5;              /* 羊皮纸白 / 奶白色，模仿高质量印刷书籍的纸张质感 */
+  --c-bg-warm: #F3F1EC;          /* 暖灰，用于区分卡片板块 */
+  --c-surface: #FFFFFF;          /* 表面色 */
+
+  /* ── 文字 ── */
+  --c-text: #141413;             /* 深油墨黑（几乎不用纯黑 #000000，带暖意） */
+  --c-text-secondary: #7A7870;   /* 次文字（暖灰，避免偏冷） */
+  --c-text-muted: #9E9C94;       /* 弱文字 / 分割线（暖灰） */
+  --c-divider: #B0AEA5;          /* 中灰，用于次要文本、极细分割线 */
+
+  /* ── 核心品牌色 ── */
+  --c-accent: #D97757;           /* 暖调赤陶 / 铁锈红，最具辨识度的颜色 */
+  --c-accent-deep: #C2522D;      /* 深赤陶，用于按钮悬停、强调 */
+
+  /* ── 辅助色（图表、数据可视化） ── */
+  --c-chart-blue: #6A9BCC;       /* 莫兰迪青蓝，低饱和度 */
+  --c-chart-green: #788C5D;      /* 鼠尾草绿，低饱和度 */
+  --c-chart-gray: #E8E6DC;       /* 浅灰底色 */
+
+  /* ── 中性色阶（Anthropic 官方 10 档） ── */
+  --c-slate-medium: #3D3D3A;     /* 边框 / focus 环 */
+  --c-slate-light: #5E5D59;      /* 三级文字 / 说明 */
+  --c-cloud-dark: #87867F;       /* 次要文字 / 时间戳 */
+  --c-cloud-light: #D1CFC5;      /* 卡片细边框 / 分割线 */
+  --c-oat: #E3DACC;              /* 暖填充卡底色 */
+  --c-ivory-medium: #F0EEE6;     /* 二级面 / 导航背景 */
+
+  /* ── 终端（代码展示用） ── */
+  --c-terminal-bg: #1E1E2E;      /* 深色终端背景 */
+  --c-terminal-text: #CDD6F4;    /* 终端文字 */
+  --c-terminal-red: #F38BA8;     /* 终端强调色 */
+
+  /* ── 卡片系统 ── */
+  /* 默认卡片：与页面同色 + 细边框区分（Anthropic 官方做法） */
+  --c-card-bg: #FAF9F5;
+  --c-card-border: #D1CFC5;
+  --c-card-text: #141413;
+
+  /* 重点卡片：Oat 暖填充底，辅助色只做标签/色点/左边框 */
+  --c-card-oat-bg: #E3DACC;
+  --c-card-oat-text: #141413;
+
+  /* Feature 暗卡：近黑底，全章最重要的结论 */
+  --c-card-feature-bg: #141413;
+  --c-card-feature-text: #FAF9F5;       /* Ivory Light，暖白非纯白 */
+  --c-card-feature-secondary: #B0AEA5;  /* Cloud Medium，次要文字 */
+  --c-card-feature-accent: #D97757;     /* 标签底色/文字色/左边框，同一张暗卡内最多一种辅助色 */
+
+  /* 终端卡片：比页面略亮，浮起来（非凹陷） */
+  --c-card-terminal-bg: #1E1E2E;
+  --c-card-terminal-text: #CDD6F4;
+  --c-card-terminal-accent: #F38BA8;   /* 冷调 terminal-red，与字色同温 */
+
+  /* ── 提示/警告容器（纯色浅底 + 左边框） ── */
+  --c-tint-blue: #EBF2F8;
+  --c-tint-green: #ECF0E6;
+  --c-tint-orange: #FAEDE6;
+  --c-tint-blue-border: #6A9BCC;
+  --c-tint-green-border: #788C5D;
+  --c-tint-orange-border: #D97757;
+
+  /* ── 特殊底色 ── */
+  --c-surface: #FFFFFF;          /* 纯白浮层，仅用于模态框/弹出层/tooltip 等浮起元素，禁止做卡片背景 */
+  --c-bg-warm: #F3F1EC;          /* 暖灰底，用于代码区底色、输入框背景、需要微弱区分但不是卡片的区域 */
+
+  /* ── 提示/警告容器（纯色浅底 + 左边框） ── */
+  --c-tint-blue: #EBF2F8;        /* 极浅蓝，提示 */
+  --c-tint-green: #ECF0E6;       /* 纸感浅绿，最佳实践 */
+  --c-tint-orange: #FAEDE6;      /* 贝壳橙，注意/警告 */
+  --c-tint-blue-border: #6A9BCC; /* 蓝左边框 */
+  --c-tint-green-border: #788C5D;/* 绿左边框 */
+  --c-tint-orange-border: #D97757;/* 橙左边框 */
+
+  /* ── 字体 ── */
+  --font-display: 'Lora', Georgia, serif;          /* 大标题：衬线体，富有张力和经典印刷感 */
+  --font-sans: 'Poppins', Arial, sans-serif;       /* 正文：现代人文感无衬线体 */
+  --font-mono: 'JetBrains Mono', monospace;         /* 代码：等宽字体 */
+}
+```
+
+### 排版规则
+
+| 元素 | 规则 |
+|------|------|
+| 大标题 | Lora 衬线体，字重厚重（700），字距略微紧凑（-0.02em），展现权威感 |
+| 正文 | Poppins 无衬线体，留白宽绰，段落呼吸感极强（line-height: 1.7+） |
+| 数据/标注 | Poppins 400-500，字号适中，颜色用 --c-text-secondary |
+| 分割线 | 极细（1px），颜色 rgba(176,174,165,0.3)，像读一份排版考究的现代报纸 |
+
+### 布局规则
+
+- **极简网格 + 大留白**：不堆砌复杂卡片，依赖极细浅灰分割线划分板块
+- **复古几何**：简单圆形、极其克制的有色状态点（Blinking dot）、复古单色网格线
+- **拒绝 3D 与绚丽光效**：无赛博朋克 3D 渲染、无流体渐变、无极光特效
+- **2D 平面 + 微噪点**：所有图形偏 Flat Design，可带轻微噪点颗粒质感
+
+### 动效规则
+
+| 类型 | 规则 |
+|------|------|
+| 淡入 | 平滑、缓慢的线性淡入，不用弹跳 |
+| 推移 | 线性推移，像翻阅一本质感极佳的实体书 |
+| 代码闪烁 | 带有老式 CRT 或印刷机的沉稳节奏 |
+| 禁止 | 夸张弹跳、快速闪烁、大幅度变形 |
+| 曲线 | 多用 Ease In/Out，不用 Bounce/Elastic |
+
+### 视频后期质感
+
+- **调色**：低饱和度、低对比度，高光偏暖（#FAF9F5），阴影带暖灰或墨绿
+- **胶片颗粒**：叠加极微弱的 Film Grain 或纸张纹理，透明度 2%~5%
+- **画面整体**：偏暗、偏暖，具有"复古摄影"的调性
+
+### 声音设计指引
+
+| 类型 | 规则 |
+|------|------|
+| BGM | 极简环境音（Ambient）、低沉大提琴、轻缓钢琴、极简小提琴拉弦 |
+| 氛围 | 深夜独自思考、安静沉浸 |
+| 禁止 | 高燃电子乐、科技感合成器 |
+
+### 反面清单（坚决避免）
+
+- 高饱和度蓝色、霓虹渐变
+- 赛博朋克暗色（终端除外）
+- 紫色粉红渐变
+- emoji 当图标
+- SVG 画人
+- 3D 渲染、流体渐变、极光特效
+- 夸张弹跳动画
+- 高燃电子乐 BGM
+
+### 自定义风格
+
+用户可通过修改 tokens.css 定制：
+- 换主色：修改 --c-accent
+- 换字体：修改 --font-display / --font-sans / --font-mono
+- 换背景：修改 --c-bg
+- 暗色主题：将 --c-bg 改为深色，--c-text 改为浅色
+- 参考 Claude 官网 / Anthropic 官网的布局进行调整
+
+---
+
+
+
+## 场景节奏系统
+
+### 为什么需要明暗交替
+
+一成不变的白底会让 7 分钟的视频显得单调。通过"明暗交替"制造视觉节奏感：
+- 白底：承载报刊质感的正文、图表、卡片（主体内容，~60-70%）
+- 暗底：承载代码终端、章节首尾、核心结论（节奏重音，~20-35%）
+
+### 暗色主题变量
+
+```css
+.dark-theme {
+  /* 底色 */
+  --c-bg: #191917;              /* 深炭墨，带暖意的黑 */
+  --c-bg-warm: #242422;         /* 深炭灰 */
+  --c-surface: #2D2C2A;         /* 表面色 */
+
+  /* 文字（拒绝死白，保持暖意） */
+  --c-text: #EBEAE4;             /* 暖奶白 */
+  --c-text-secondary: #9E9C94;   /* 亚光浅灰 */
+  --c-text-muted: #666560;       /* 弱文字 */
+  --c-divider: rgba(158, 156, 148, 0.15);
+
+  /* 品牌色（暗底提亮对比度） */
+  --c-accent: #EE6B3E;           /* 亮赤陶橙，微弱发光感 */
+  --c-accent-deep: #E58565;      /* 柔和粉赤陶 */
+
+  /* 辅助色（略微提亮） */
+  --c-chart-blue: #81A9D4;
+  --c-chart-green: #8DA173;
+  --c-chart-gray: #3A3936;
+
+  /* 终端 */
+  --c-terminal-bg: #151521;
+  --c-terminal-text: #CDD6F4;
+  --c-terminal-red: #F38BA8;
+  --c-terminal-line: #2A2A3A;          /* 代码行间交替色 */
+  --c-terminal-highlight: rgba(238, 107, 62, 0.12); /* 高亮行背景 */
+
+  /* 卡片系统 */
+  --c-card-bg: #2D2C2A;                                    /* 默认卡片：深灰底 */
+  --c-card-border: rgba(158, 156, 148, 0.15);              /* 暗色细边框 */
+  --c-card-text: #EBEAE4;                                   /* 默认卡片：暖白字 */
+  --c-card-oat-bg: #3A3936;                            /* Oat 卡：暗色下用 chart-gray */
+  --c-card-oat-text: #EBEAE4;                          /* Oat 卡：暖白字 */
+
+  /* Feature 暗卡：暗色主题下与亮色一致（近黑底） */
+  --c-card-feature-bg: #141413;
+  --c-card-feature-text: #FAF9F5;
+  --c-card-feature-secondary: #B0AEA5;
+  --c-card-feature-accent: #EE6B3E;
+
+  --c-card-terminal-bg: #1E1E2E;                            /* 终端卡片：比页面略亮，浮起来 */
+  --c-card-terminal-text: #CDD6F4;                          /* 终端卡片：蓝白字 */
+  --c-card-terminal-accent: #F38BA8;                        /* 终端卡片：冷调，与字色同温 */
+
+  /* 提示/警告容器：暗色主题下暂用 rgba，后续可定义暗色 tint */
+}
+```
+
+**色阶选择指南**（开发每个元素时必须做一次选择）：
+
+**文字层级 → 对应色阶**（必须用 token，不硬编码）：
+
+| 信息层级 | 亮色页面（#FAF9F5） | Feature 暗卡（#141413） | 暗色页面（#191917） | 何时用 |
+|---------|-------------------|----------------------|-------------------|--------|
+| 标题/主文 | `var(--c-text)` #141413 | `var(--c-card-feature-text)` #FAF9F5 | `var(--c-text)` #EBEAE4 | 核心信息、段落首句 |
+| 次要说明 | `var(--c-text-secondary)` #7A7870 | `var(--c-card-feature-secondary)` #B0AEA5 | `var(--c-text-secondary)` #9E9C94 | 补充说明、描述、注释 |
+| 弱化标注 | `var(--c-text-muted)` #9E9C94 | `var(--c-cloud-dark)` #87867F | `var(--c-text-muted)` #666560 | 时间戳、来源、标签、括号内注释 |
+| 强调/CTA | `var(--c-accent)` #D97757 | `var(--c-card-feature-accent)` | `var(--c-accent)` #EE6B3E | 按钮、推荐标签、关键词高亮 |
+
+> **关键**：亮色页面和暗色页面的 `var(--c-text)` 自动解析到不同色值（#141413 vs #EBEAE4），因为 `.dark-theme` 覆盖了 CSS 变量。Feature 暗卡始终是 #141413 底，所以有独立的 token。写代码时只需选对 token，不需要手动判断当前是亮还是暗。
+
+**背景层级 → 对应色阶**：
+
+| 层级 | 亮色 | 暗色 | token | 何时用 |
+|------|------|------|-------|--------|
+| 页面底 | #FAF9F5 | #191917 | `var(--c-bg)` | 最底层，永远不改 |
+| 卡片底 | #FAF9F5 + 边框 | #2D2C2A + 边框 | `var(--c-card-bg)` + `var(--c-card-border)` | 标准内容卡 |
+| 暖填充底 | #E3DACC | #3A3936 | `var(--c-card-oat-bg)` | 重要内容、推荐项 |
+| 二级面 | #F0EEE6 | — | `var(--c-ivory-medium)` | 大块容器背景 |
+| 浮层/弹出 | #FFFFFF | #2D2C2A | `var(--c-surface)` | 模态框、tooltip、弹出菜单（**禁止做卡片背景**） |
+| 代码区底色 | #F3F1EC | #242422 | `var(--c-bg-warm)` | 代码片段底色、输入框背景（**不是卡片**） |
+| 暗色底 | #141413 | #141413 | `var(--c-card-feature-bg)` | 核心结论（始终近黑） |
+| 终端底 | #1E1E2E | #1E1E2E | `var(--c-card-terminal-bg)` | 代码块（始终深色） |
+
+**边框/分割线 → 对应色阶**：
+
+| 用途 | 亮色 | 暗色 | token |
+|------|------|------|-------|
+| 卡片边框 | #D1CFC5 | rgba(158,156,148,0.15) | `var(--c-card-border)` |
+| 内部分割线 | #B0AEA5 半透明 | rgba(158,156,148,0.15) | `var(--c-divider)` |
+
+**决策规则**：写每一行文字时，先判断"这行文字的信息层级是什么"，再选对应色阶。不要所有文字都用 `var(--c-text)`。
+
+### 场景模式
+
+| 模式 | 背景 | 用途 |
+|------|------|------|
+| **SceneLight** | `var(--c-bg)` 羊皮纸白 | 正文、图表、流程步骤 |
+| **SceneDark** | 深炭墨 `#191917` | 开场标题、核心结论（重音拍） |
+
+---
+
+## 卡片系统
+
+### 四种卡片形态（按内容语义选择）
+
+| 形态 | 背景 | 边框 | 圆角 | 语义 |
+|------|------|------|------|------|
+| ① 标准卡 | `#FAF9F5`（与页面同色） | `0.5px solid #D1CFC5` | 8px | 信息陈列，平等对待每条内容 |
+| ② Oat 暖填充卡 | `#E3DACC` | 无 | 8px | 内容有分量但不是最高潮，给观众一个"停顿" |
+| ③ Feature 暗卡 | `#141413` | 无 | 24px | 全章最重要的结论，不容错过 |
+| ④ 终端卡 | `#1E1E2E` | 无 | 24px | 代码/技术内容 |
+
+**Feature 暗卡 vs 终端卡**：两者背景色不同（`#141413` vs `#1E1E2E`），文字色不同（暖白 `#FAF9F5` vs 冷蓝白 `#CDD6F4`），语义不同（核心结论 vs 代码展示）。
+
+#### 圆角规范（三档）
+
+| 场景 | border-radius | 说明 |
+|------|---------------|------|
+| 普通卡片（标准、Oat） | 8px | 大多数内容卡片 |
+| 面板 / 大块区域 | 16px | 多卡片容器、代码对比区 |
+| Feature 大卡 / 终端卡 | 24px | 核心结论、代码展示 |
+
+```tsx
+// ① 标准卡
+<div style={{
+  background: 'var(--c-card-bg)',
+  border: '0.5px solid var(--c-card-border)',
+  borderRadius: 8,
+  color: 'var(--c-card-text)',
+}}>普通内容</div>
+
+// ② Oat 暖填充卡
+<div style={{
+  background: 'var(--c-card-oat-bg)',
+  borderRadius: 8,
+  color: 'var(--c-card-oat-text)',
+}}>重要但不是高潮的内容</div>
+
+// ③ Feature 暗卡
+<div style={{
+  background: 'var(--c-card-feature-bg)',
+  borderRadius: 24,
+  color: 'var(--c-card-feature-text)',
+}}>
+  <p style={{ color: 'var(--c-card-feature-secondary)' }}>FEATURED</p>
+  <h3>全章最重要的结论</h3>
+  <span style={{ color: 'var(--c-card-feature-accent)' }}>了解更多 →</span>
+</div>
+
+// ④ 终端卡
+<div style={{
+  background: 'var(--c-card-terminal-bg)',
+  borderRadius: 24,
+  color: 'var(--c-card-terminal-text)',
+}}>$ echo "code here"</div>
+```
+
+#### 卡片形态决策树（Claude 必须遵守）
+
+开发每个场景的卡片时，问自己三个问题：
+
+**Q1：这块内容，如果去掉，观众会错过什么核心认知？**
+- 「去掉也没大碍」→ 标准卡 ①
+- 「会少一个关键点」→ Oat 卡 ②
+- 「整段内容的灵魂」→ Feature 暗卡 ③
+
+**Q2：这章里，已经用过暗卡了吗？**
+- 「没用过」→ 当前内容若是核心结论，可以用暗卡
+- 「已经用过一次」→ 强制降级为 Oat 卡，暗卡每章最多 1 次
+
+**Q3：这块内容是「一条」还是「多条并列」？**
+- 「多条并列，需要对比」→ 强制标准卡 ①，暗卡不能容纳列表
+- 「一句话 / 一个观点」→ 可考虑暗卡或 Oat 卡
+
+#### 内容类型 → 卡片形态映射
+
+| 内容类型 | 卡片形态 | 原因 |
+|---------|---------|------|
+| 功能列举 / 步骤拆解 / 多概念并排 | 标准卡 ① | 平等陈列 |
+| 数据表格 / 对比方案 / 引用来源 | 标准卡 ① | 需要扫读 |
+| 重要背景知识 / 关键定义 | Oat 卡 ② | 值得停顿 |
+| 小节小结 / 观点推进前的铺垫 | Oat 卡 ② | 有分量但非高潮 |
+| 全章核心结论（一句话） | Feature 暗卡 ③ | 不容错过 |
+| 反转性观点 / 最终答案 | Feature 暗卡 ③ | 让观众停下来想 |
+| 代码 / 终端输出 / 技术内容 | 终端卡 ④（亮色场景下用 SceneLightWithDarkCard 包裹，不切整页） | 代码天然深色 |
+
+#### 硬性约束
+
+| 约束 | 说明 |
+|------|------|
+| Feature 暗卡按需使用 | 判断标准：这段内容如果错过，观众会损失关键信息吗？是 → 用。否 → 不用 |
+| 同一章内 Feature 暗卡不超过 2 个 | 超过 2 个就失去"最重要"的含义，多余的降级为 Oat |
+| 列表/多条内容不进暗卡 | 暗卡只放单句核心结论 |
+| 连续两个 Oat 卡禁止 | Oat 后必须接标准卡（节奏落下来） |
+| 信息密集型章节至少 1 个 Oat | 叙事型章节可以不用（纯大字排版即可） |
+| 同一场景内非标准卡最多 1 种 | 其余全用标准卡 |
+| accent 只用于标签层 | 不做整块容器背景填充 |
+| Feature 暗卡内多种辅助色标签 | 暗卡已是最强视觉元素，多色稀释分量 | 同一张暗卡内最多一种辅助色 |
+
+#### 辅助色三层使用模型
+
+辅助色（蓝 #6A9BCC、绿 #788C5D、橙 #D97757、粉 #F38BA8）按使用层级分三档：
+
+| 层级 | 规则 | 示例 |
+|------|------|------|
+| **图形层** ✓ 放开用 | 数据图线条、SVG 涂鸦、流程图连接线 | 三色同时出现没问题 |
+| **标签层** △ 克制用 | 小标签底色、色点、编号圆、左边框、accent 文字 | 同屏最多 3 种，面积总和 < 屏幕 5% |
+| **容器背景层** ✗ 禁止 | 大面积卡片背景、Surface 容器填充 | 不管面积多小，整块填充都破坏暖调基调 |
+
+> 详细示例见 `references/surface-demo.html`
+
+#### accent 使用规范
+
+**accent 赤陶色（`#D97757`）的用法**：
+- **文字色**：CTA 文字、关键词高亮、强调句（直接 `color: var(--c-accent)`）
+- **标签底色**：小标签/药丸的容器背景（白字，`background: var(--c-accent)`）
+- **左边框**：左侧 3px 实色边框（`border-left: 3px solid var(--c-accent)`）
+- **图形色**：数据图线条、SVG 涂鸦描边
+
+**accent 不用于**：大面积容器背景填充
+
+**每个版块最多 1~2 处 accent 元素**，默认状态下整页接近无彩色。
+
+> **暗色主题下 accent 自动提亮**：亮色主题 accent = `#D97757`，暗色主题 accent = `#EE6B3E`。代码中统一用 `var(--c-accent)` 引用，`.dark-theme` 自动切换。Feature 暗卡 accent 同理，用 `var(--c-card-feature-accent)`。
+
+**Feature 暗卡内部规范**：
+- 标题：`var(--c-card-feature-text)` → `#FAF9F5` Ivory Light（暖白，非纯白）
+- 次要：`var(--c-card-feature-secondary)` → `#B0AEA5` Cloud Medium
+- accent：`var(--c-card-feature-accent)`（标签底色或文字色，同一张暗卡内最多一种辅助色）
+
+#### 分类并列项的正确做法
+
+卡片内多个并列项（如三种方案对比），不要用不同辅助色做整块容器背景。正确做法：
+
+1. **色点 + 小标签**（推荐）：8px 圆点 + 小 tag，辅助色面积最小化
+2. **左侧色条**：3px 左边框，辅助色只占一条线
+3. **编号圆**：彩色圆形编号（30px），色彩集中在小区域
+4. **数据图**：辅助色做线条，图形层放开用
+
+> 示意图见 `references/surface-demo.html` 第 3-7 节
+
+#### 提示/警告容器
+
+提示、警告、最佳实践等 callout 容器，用**纯色浅底 + 左侧 3px 实色边框**：
+
+```css
+/* 提示/警告容器背景（不透明，可直接用于视频帧） */
+--c-tint-blue:   #EBF2F8;   /* 极浅蓝，提示 */
+--c-tint-green:  #ECF0E6;   /* 纸感浅绿，最佳实践 */
+--c-tint-orange: #FAEDE6;   /* 贝壳橙，注意/警告 */
+
+/* 配套边框（左侧 3px 实色） */
+--c-tint-blue-border:   #6A9BCC;
+--c-tint-green-border:  #788C5D;
+--c-tint-orange-border: #D97757;
+```
+
+约束：单个 callout 高度 ≤ 80px，同屏最多 2 个，不做卡片主体背景。
+
+> **Oat 卡上的 callout**：只用 tint-orange 和 tint-green（暖调），不用 tint-blue（冷蓝白与暖黄棕色温冲突）。如需蓝色 callout 叠在 Oat 上，改用 `#FAF9F5` 底 + 蓝左边框。
+
+#### 否定清单（禁止的模式）
+
+| 禁止 | 原因 | 正确做法 |
+|------|------|---------|
+| Oat 卡有 border / boxShadow | Oat 靠颜色区分，不需要边框 | 无边框无阴影 |
+| Oat 卡用绿/蓝/红文字 | 卡片文字只用中性色阶 | 用 `var(--c-card-oat-text)` 或 `var(--c-accent)` 文字色 |
+| 辅助色做整块容器背景 | 高饱和填充破坏暖调基调 | 辅助色只做标签/色点/左边框，不做整块背景 |
+| Oat 卡上叠 tint-blue callout | 冷蓝白与暖黄棕色温冲突 | Oat 卡内只用 tint-orange / tint-green，或用 #FAF9F5 底+蓝边框 |
+| Feature 暗卡用绿/蓝/红文字 | 暗卡文字用 Ivory Light / Cloud Medium | 用 `var(--c-card-feature-text)` / `var(--c-card-feature-secondary)` |
+| 标准卡无边框 | 与页面同色，没有边框就看不见 | 必须有 `border: 0.5px solid var(--c-card-border)` |
+| 列表/多条内容放进暗卡 | 暗卡只放单句核心结论 | 列表用标准卡 |
+| 信息密集型章节没有 Feature 暗卡 | 教程/数据类内容需要信息重音 | 每章核心结论用暗卡 |
+| 叙事型章节强行塞 Feature 暗卡 | 感性叙事不需要信息重音，硬塞反而刻意 | 按需添加，不强制 |
+| 一章超过 2 个 Feature 暗卡 | 暗卡太多失去"最重要"含义 | 多余的降级为 Oat |
+| 连续两个 Oat 卡 | 节奏没有落下来 | Oat 后必须接标准卡 |
+| 信息密集型章节全用标准卡 | 太平淡，无节奏 | 至少 1 个 Oat |
+| 信息密集型章节没有 Oat 卡 | 缺少节奏缓冲 | 每章至少 1 个 Oat 卡 |
+| 卡片内硬编码颜色 | 应该用 tokens.css 变量 | 用 `var(--c-card-*)` 系列 |
+
+### 节奏驱动决策规则（替代内容驱动）
+
+**旧规则（已弃用）**：内容类型 → 固定主题（代码=暗、图表=亮…）
+- 问题：主题可预测，观众提前知道下一个颜色，节奏感消失
+
+**新规则**：频率驱动，暗色按间隔插入，内容适配主题
+
+暗色是「重音拍」，按频率插入（不依赖"章"的概念）：
+1. 全片第 0 场景必须暗色（开场重音）
+2. 此后每出现 3~4 个连续亮色场景，插入 1 个暗色场景
+3. 有章节时，章节首场景天然适合作为暗色位置（但不强制）
+4. 全片最后一个场景可以暗色（收尾重音，可选）
+
+**内容适配主题**：
+- 代码终端在亮色场景 → 用 SceneLightWithDarkCard（卡片暗色，不切整页）
+- 结论在亮色场景 → 用大字 + 赤陶色强调，不换暗底
+- 开场在暗色 → 大字白色 + 赤陶 accent，无需任何卡片
+
+#### 节奏约束
+
+```
+连续暗色场景：最多 1 个
+连续亮色场景：最多 4 个（含 LightWithDarkCard，体感不同）
+暗色场景比例：20%~35%
+```
+
+**示例 A**：有章节（6 个场景的章节）
+```
+场景 0: SceneDark                ← 开场，重音拍 #1
+场景 1: SceneLight               ← 正文
+场景 2: SceneLight               ← 图表
+场景 3: SceneLightWithDarkCard   ← 代码（不切整页！）
+场景 4: SceneLight               ← 流程步骤
+场景 5: SceneDark                ← 3 个亮之后，重音拍 #2
+```
+
+**示例 B**：无章节（15 个场景一条线排下来）
+```
+场景 0:  SceneDark               ← 开场，重音拍 #1
+场景 1:  SceneLight
+场景 2:  SceneLight
+场景 3:  SceneLight
+场景 4:  SceneDark               ← 3 个亮之后，重音拍 #2
+场景 5:  SceneLight
+场景 6:  SceneLight
+场景 7:  SceneLight
+场景 8:  SceneLight
+场景 9:  SceneDark               ← 4 个亮之后，重音拍 #3
+场景 10: SceneLight
+场景 11: SceneLight
+场景 12: SceneLight
+场景 13: SceneDark               ← 3 个亮之后，重音拍 #4
+场景 14: SceneDark               ← 收尾（可选，与上一场景连续暗色也可）
+```
+
+**示例 C**：叙事型（信件/回忆录，情感流动，暗色较少）
+```
+场景 0: SceneDark                ← 开场
+场景 1: SceneLight               ← 共鸣段落
+场景 2: SceneLight               ← 故事开始
+场景 3: SceneLight               ← 转折
+场景 4: SceneDark                ← 核心金句（重音拍）
+场景 5: SceneLight               ← 展开
+场景 6: SceneLight               ← 收获
+场景 7: SceneLight               ← 方法
+场景 8: SceneLight               ← 寄语
+场景 9: SceneDark                ← 结尾重音
+```
+
+### 动画过渡规则
+
+**场景间切换**：硬切（直接换组件，无过渡动画）
+- 暗→亮、亮→暗的切换是整场景组件级的替换
+- 不需要 interpolateColor 做场景间的渐变
+- Anthropic 官网风格：零渐变、零阴影柔化，硬边切换
+
+**场景内元素出现**：18~24 帧 easeOut
+- 比原来 5 帧慢 3~5 倍，像「翻书」而非「闪烁」
+- 淡入 + 轻微上滑配合使用
+
+```tsx
+const FAST = 18; // 场景内动画时长
+const opacity = interpolate(frame, [delay, delay + FAST], [0, 1], {
+  extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+  easing: Easing.out(Easing.cubic),
+});
+const y = interpolate(frame, [delay, delay + FAST], [24, 0], {
+  extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+  easing: Easing.out(Easing.cubic),
+});
+```
+
+**仅在单场景内需要局部切换时**才用 `interpolateColor`（18 帧 easeInOut），多数情况直接换场景组件。
+
+### 实现方式
+
+#### 整场景暗色（推荐方式）
+
+在场景组件的根 AbsoluteFill 上加 className="dark-theme"。
+CSS 变量通过 global.css 的 .dark-theme 规则生效，子元素用 var(--c-xxx) 引用。
+
+```tsx
+// SceneDark.tsx
+import React from 'react';
+import { AbsoluteFill, useCurrentFrame } from 'remotion';
+
+export const SceneDark: React.FC = () => {
+  const frame = useCurrentFrame();
+
+  return (
+    <AbsoluteFill className="dark-theme" style={{ padding: 100 }}>
+      <h1 style={{ fontFamily: 'var(--font-display)', color: 'var(--c-text)' }}>标题</h1>
+      <p style={{ color: 'var(--c-accent)' }}>强调文字</p>
+    </AbsoluteFill>
+  );
+};
+```
+
+Chapter 编排中无需额外处理，主题已在场景组件内部决定：
+
+```tsx
+// Chapter1.tsx
+<Sequence from={S0} durationInFrames={S0_DUR} name="Title">
+  <Scene0Title />  {/* 组件内部已设置 dark-theme */}
+</Sequence>
+<Sequence from={S1} durationInFrames={S1_DUR} name="Content">
+  <Scene1Content />  {/* 无 dark-theme，默认亮色 */}
+</Sequence>
+```
+
+#### 分屏对比（左右明暗）
+
+同一帧内渲染两套主题，用内联 style：
+
+```tsx
+<div style={{ display: 'flex', width: '100%', height: '100%' }}>
+  <div style={{ width: '50%', background: 'var(--c-bg)', color: 'var(--c-text)' }}>
+    {/* 左：亮色 */}
+  </div>
+  <div className="dark-theme" style={{ width: '50%' }}>
+    {/* 右：暗色，className 自动切换 CSS 变量 */}
+  </div>
+</div>
+```
+
+### 开发流程中的应用
+
+**Phase 3 开发场景时**，Claude 必须按以下顺序执行：
+
+**步骤一：场景模式标注**
+按节奏驱动规则为每个场景标注模式（SceneDark / SceneLight），检查节奏约束。
+
+**步骤二：卡片形态标注（强制，不可跳过）**
+对每个场景中的每张卡片，按决策树标注形态：
+
+```
+场景 X：场景名称
+  - 卡片 A（标题/内容摘要）→ 标准卡 ①
+  - 卡片 B（标题/内容摘要）→ Oat 卡 ②（推荐/重要但非高潮）
+  - 底部总结（一句话）→ Feature 暗卡 ③（内容重要才用，不强制每章都有）
+```
+
+**检查清单**（每章完成后核对）：
+- [ ] Feature 暗卡按需使用：这段内容错过会损失关键信息吗？是 → 用。否 → 不用
+- [ ] 同一章内 Feature 暗卡不超过 2 个
+- [ ] Feature 暗卡内用 `var(--c-card-feature-text)` / `var(--c-card-feature-secondary)`，不用绿/蓝/红
+- [ ] Oat 卡无边框、无 boxShadow、无彩色点缀，纯靠 `#E3DACC` 背景区分
+- [ ] 标准卡有 `border: 0.5px solid var(--c-card-border)`
+- [ ] 列表/多条并列内容不进暗卡
+- [ ] 不连续出现 Oat 卡
+- [ ] 信息密集型章节至少 1 个 Oat（叙事型章节可不用）
+
+**步骤三：编码实现**
+按标注结果实现卡片，不要在编码阶段临时决定卡片形态。
+
+**outline.md 标注示例**：
+
+```markdown
+## Chapter 1: 模型基础（~90s）
+- Scene 0: 开场标题（3.8s, ch1-0.wav）【SceneDark — 重音拍 #1】
+- Scene 1: LLM 概念 + 涌现曲线（16s, ch1-1.wav）【SceneLight】
+  - 涌现曲线图 → 标准卡 ①
+  - 底部总结"LLM 的核心能力是涌现" → Feature 暗卡 ③
+- Scene 2: 三种模型类型（30s, ch1-2.wav）【SceneLight】
+  - LLM 卡 → 标准卡 ①
+  - Chat Model 卡（推荐）→ Oat 卡 ②
+  - Embedding 卡 → 标准卡 ①
+  - 底部总结"LangChain 主要使用 Chat Model" → 本章已有暗卡，此处用 Oat
+```
+
+---
 ## Phase 1 — 内容编写
 
 ### 1.1 识别用户输入
@@ -89,49 +811,188 @@ script.md: B 站 / YouTube 风格口播稿，口语化、有节奏感。
 
 outline.md: 章节切分 + 每步内容 + 信息池。
 
-outline 必须写：章节切分 / 每章 scene 数 / 估时 / 每步屏幕内容 / 章节级信息池
+outline 必须写：章节切分 / 每章 scene 数 / 估时 / 每步屏幕内容 / 章节级信息池 / **每张卡片的形态标注（标准卡① / Oat卡② / Feature暗卡③ / 终端卡④）**
 outline 不要写：具体动画类型 / CSS 实现细节 / 时长数值
 
-Remotion 特有：outline 里要标注每步的音频段落映射。
+**检查 references/ 目录**：如果存在设计参考图，识别图片内容，在 outline 中注明参考了哪些视觉元素。
 
 ---
 
 ## Checkpoint Plan
 
 script.md + outline.md 写完后必须停下来，一次对齐 5 件事：
-1. 稿子要不要改？
-2. 开发计划要不要改？
-3. 选哪个设计风格？
-4. 素材怎么准备？
-5. 开发模式选哪个？（A 逐章确认 / B 顺序开发 / C 并行开发 Agent Teams）
+
+1. 稿子 (script.md) 要不要改？
+2. 开发计划 (outline.md) 要不要改？
+3. 设计风格确认（默认 Anthropic 暖调赤陶，还是自定义？）
+4. 素材怎么准备？（参考图是否已放入 references/）
+5. 开发模式选哪个？
+   - A) 逐章确认（推荐）
+   - B) 顺序开发
+   - C) 并行开发（Agent Teams，最大并行度 3）
+      - 章节分配：每个 Agent 拿 1~2 章，互不依赖的章节并行
+      - 共享资源：tokens.css / components/ / global.css 由主 Agent 预先创建，子 Agent 只读引用
+      - 合并规则：子 Agent 完成后由主 Agent 合并到 ChapterX.tsx，检查命名冲突
+      - 限制：同一章的多个场景必须由同一个 Agent 完成（保证卡片节奏一致性）
 
 ---
 
-## Phase 2 — Remotion 开发
+## Phase 2 — 音频合成（先音频，后开发）
 
-### 2.0 版本锁定（重要）
+> **核心原则：先合成音频，确定每个场景的真实时长，再开发动画。**
 
-Remotion 生态版本敏感，以下组合已验证可用：
-- remotion: 4.0.301
-- @remotion/cli: 4.0.301
-- @remotion/media-utils: 4.0.301
-- react: ^18.3.1
-- typescript: ^5.6.3
+### 2.1 生成 audio-segments.json
 
-### 2.1 脚手架
+从 script.md 提取口播文本，按场景切分。
 
-mkdir my-video && cd my-video
-mkdir -p src/{styles,components,scenes} public/audio out scripts
+**内容保真原则**：
+- text 字段来自 script.md，不要再次精简
+- 保持 script.md 的信息密度
+- 对照 article.md 检查完整性
 
-### 2.2 第 1 章 — 主线程 + 强制验收
+**文本清理规则（TTS 友好）**：
+- -（连字符）→ 空格（max-retries → max retries）
+- _（下划线）→ 空格（init_chat_model → init chat model）
+- 保留中文标点
 
-核心：第 1 章 = 完整版本一次到位（节奏 + 视觉 + 音频时长对齐）。
+### 2.2 合成音频
 
-帧数必须从实际 WAV 文件测量，不要估算！
+> **⚠️ 必须使用 MiMo TTS，不要使用 hyperframes tts。**
 
-做完第 1 章后必须停下来等用户验收。
+API 配置：
+  Model: mimo-v2.5-tts
+  API: https://token-plan-cn.xiaomimimo.com/v1/chat/completions（POST）
+  认证: 请求头 api-key（非 Authorization: Bearer）
+  Voice: 苏打
+  Format: WAV
+  请求间隔: 500ms
 
-### 2.3 第 2~N 章
+运行：
+  node scripts/synthesize-audio.mjs           # 合成全部（跳过已存在）
+  node scripts/synthesize-audio.mjs --force   # 强制重新合成全部
+
+**只重新生成单个文件**（不要用 --force 全部重新生成）：
+  1. 临时把 audio-segments.json 只保留要重新生成的条目
+  2. 运行合成脚本（--force）
+  3. 恢复完整的 audio-segments.json
+  4. 测量新帧数，更新 ChapterX.tsx 常量
+  5. 更新 subtitle-timings.json
+
+### 2.3 测量帧数
+
+合成完成后，从 WAV header 计算每个文件的真实帧数。
+
+**铁律：帧数 = 秒数 × 30，向上取整。必须从 WAV header 读取，不能估算。**
+
+**通用测量脚本**（自动读取 audio-segments.json，无需手动枚举文件名）：
+
+```bash
+node -e "
+const fs = require('fs');
+const segs = JSON.parse(fs.readFileSync('audio-segments.json', 'utf8'));
+const seen = new Set();
+segs.forEach(s => {
+  if (seen.has(s.audio)) return;
+  seen.add(s.audio);
+  const p = 'public/audio/' + s.audio;
+  if (!fs.existsSync(p)) { console.log(s.audio + ': 文件不存在'); return; }
+  const buf = fs.readFileSync(p);
+  const byteRate = buf.readUInt32LE(28);
+  const dataSize = buf.readUInt32LE(40);
+  const secs = dataSize / byteRate;
+  const frames = Math.ceil(secs * 30);
+  console.log(s.audio + ': ' + secs.toFixed(2) + 's (' + frames + ' frames)');
+});
+"
+```
+
+**误差检查**：测量结果与 `ChapterX.tsx` 中已声明的帧数常量相差超过 **2 帧**，必须重新测量并更新常量，不可忽略。
+
+---
+
+## Checkpoint Audio
+
+音频合成完成后必须停下来：
+
+```
+音频合成完成：
+  ✅ ch1-0.wav  3.84s (116 frames)
+  ✅ ch1-1.wav  16.16s (485 frames)
+  ...
+
+确认：
+  □ 每个音频都能正常播放？
+  □ TTS 有没有读出符号（下划线/连字符）？如果有，修改 text 重新生成
+  □ 语速/语气是否合适？不合适的单独重新生成（不要 --force 全部）
+  □ 帧数是否已写入 ChapterX.tsx？
+
+问题告诉我，我针对性修复。OK 了告诉我"继续"。
+```
+
+---
+
+## Phase 3 — Remotion 开发
+
+### 3.1 脚手架 + 设计系统
+
+版本锁定（重要，不要随意升级）：
+  remotion: 4.0.301
+  @remotion/cli: 4.0.301
+  @remotion/media-utils: 4.0.301
+  react: ^18.3.1
+  typescript: ^5.6.3
+
+脚手架：
+  mkdir src/{styles,components,scenes} public/audio out scripts references
+
+字体加载：在 global.css 中用 @import 导入 Google Fonts（Lora, Poppins, JetBrains Mono），否则会静默回退到 Georgia/Arial/monospace。
+
+tokens.css 使用默认 Anthropic 暖调赤陶风格（见上方"设计风格"章节），用户可自定义。
+
+### 3.2 第 1 章 — 主线程 + 强制验收
+
+核心：第 1 章 = 完整版本一次到位。
+帧数已从 Phase 2 确定，直接使用。
+
+Chapter1.tsx 模板：
+```tsx
+import React from 'react';
+import { AbsoluteFill, Audio, Sequence, staticFile } from 'remotion';
+
+// 帧数从 Phase 2 测量结果获取
+const SCENE0_AUDIO = 116;
+const SCENE1_AUDIO = 485;
+
+const S0_START = 0;
+const S1_START = S0_START + SCENE0_AUDIO;
+const TOTAL_FRAMES = S1_START + SCENE1_AUDIO;
+
+export { TOTAL_FRAMES };
+
+export const Chapter1: React.FC = () => (
+  <AbsoluteFill style={{ background: 'var(--c-bg)' }}>
+    <Sequence from={S0_START} durationInFrames={SCENE0_AUDIO} name="Scene 0">
+      <Audio src={staticFile('audio/ch1-0.wav')} volume={1} />
+      <Scene0 />
+    </Sequence>
+  </AbsoluteFill>
+);
+```
+
+做完第 1 章后必须停下来等用户验收。验收清单：
+
+```
+第 1 章开发完成，请验收：
+  □ 音画同步（口播和画面出现时机一致）
+  □ 卡片形态是否按 outline 标注实现（标准/Oat/Feature/终端）
+  □ 明暗节奏是否符合规则（20~35% 暗色）
+  □ 所有字体 >= 24px，颜色来自 tokens.css
+  □ Studio 预览无报错
+
+确认 OK 后回复「继续」。
+```
+
+### 3.3 第 2~N 章
 
 三种模式：
 - A) 逐章确认：每章做完验收
@@ -140,67 +1001,85 @@ mkdir -p src/{styles,components,scenes} public/audio out scripts
 
 ---
 
-## Phase 3 — 音频嵌入 + 渲染
+## Checkpoint Render
 
-### 音频合成（MiMo TTS）
+所有章节开发完成 + 音频就绪后，渲染前必须确认并选择：
 
-⚠️ 重要：必须使用 MiMo TTS，不要使用 hyperframes tts。
-hyperframes 使用的是 Kokoro 本地模型，与 MiMo TTS 完全不同。
-本项目的音频合成只走 scripts/synthesize-audio.mjs。
+### 渲染前检查
 
-API 配置：
-  Model: mimo-v2.5-tts
-  API: https://token-plan-cn.xiaomimimo.com/v1
-  认证: 请求头 api-key（非 Authorization: Bearer）
-  Voice: 苏打
-  Format: WAV
-  请求间隔: 500ms
+  - 所有章节开发完成？
+  - 所有音频文件就绪？
+  - Studio 预览确认无问题？
+  - 帧数与音频时长匹配？
 
-运行：
-  node scripts/synthesize-audio.mjs           # 合成全部
-  node scripts/synthesize-audio.mjs --force   # 强制重新合成
+### 渲染前选择
 
-### audio-segments.json 编写规范
+确认通过后，询问用户以下选项：
 
-**内容保真原则**：
-- text 字段的内容来自 script.md，不是对 script.md 的再次精简
-- 保持 script.md 的信息密度：要点数量、数据、案例、技术细节都要保留
-- 可以微调语气使其更适合 TTS 朗读（比如断句、停顿），但不要删减内容
-- 对照 article.md 检查：如果 article 有 7 个要点，script 有 7 个，audio-segments 也应该是 7 个
+**1. 配音选择**（在 Checkpoint Audio 阶段已确认，此处再次确认）：
+  - 使用配置的配音（默认，MiMo TTS 苏打音色）
+  - 不加配音（纯视觉，无音频）
 
-**文本清理规则（TTS 友好）**：
-- 将 -（连字符）替换为空格，否则 TTS 会读出来
-- 将 _（下划线）替换为空格，否则 TTS 会读出来
-- 代码标识符如 init_chat_model → 口播时说 "init chat model"
-- 参数名如 max-retries → 口播时说 "max retries"
-- 保留中文标点
+**2. 字幕选择**：
+  - 加字幕（使用 subtitle-timings.json 逐句显示）
+  - 不加字幕（纯视觉，底部无文字）
 
-示例：
-  { "chapter": "ch2", "scene": "Scene2_1CodeTerminal", "audio": "ch2-1.wav",
-    "text": "这里面有七个参数，我们一个一个说。model 和 model provider 是最基本的。" }
+如果不加字幕，跳过字幕相关渲染。如果加字幕，确认 subtitle-timings.json 已生成。
 
-注意：deepseek-v4-pro → deepseek v4 pro，init_chat_model → init chat model
+**3. 渲染范围**：
+  - A) 仅渲染各章节（Chapter1-5 分别输出）
+  - B) 仅渲染完整视频（FullVideo 一个文件）
+  - C) 两者都渲染（章节 + 完整视频）
 
-### 帧数计算（必须从 WAV 文件测量）
+**渲染 MP4 必须在章节 + 音频全部就绪且用户确认后才能执行。任何阶段不得自动渲染。**
 
-node -e "
-const fs = require('fs');
-['ch1-0','ch1-1'].forEach(f => {
-  const buf = fs.readFileSync('public/audio/' + f + '.wav');
-  const byteRate = buf.readUInt32LE(28);
-  const dataSize = buf.readUInt32LE(40);
-  console.log(f + ': ' + (dataSize/byteRate).toFixed(2) + 's (' + Math.ceil(dataSize/byteRate*30) + ' frames)');
-});"
 
-铁律：帧数必须从 WAV 文件 header 计算，不要凭感觉估算。
+## Phase 4 — 渲染 MP4
 
-### 渲染
+根据 Checkpoint Render 的选择执行渲染。
 
-npm start                    # Studio 预览
-npm run build                # 渲染默认章节
-npx remotion render src/index.ts Chapter2 out/ch2.mp4
+### 渲染命令
 
----
+国内网络需要指定本地 Chrome：
+  --browser-executable="C:\Program Files\Google\Chrome\Application\chrome.exe"
+
+**选项 A：仅渲染各章节**
+```bash
+npx remotion render src/index.ts Chapter1 out/chapter1.mp4
+npx remotion render src/index.ts Chapter2 out/chapter2.mp4
+npx remotion render src/index.ts Chapter3 out/chapter3.mp4
+npx remotion render src/index.ts Chapter4 out/chapter4.mp4
+npx remotion render src/index.ts Chapter5 out/chapter5.mp4
+```
+
+**选项 B：仅渲染完整视频**
+```bash
+npx remotion render src/index.ts FullVideo out/full-video.mp4
+```
+
+**选项 C：两者都渲染**
+```bash
+# 先渲染各章节
+npx remotion render src/index.ts Chapter1 out/chapter1.mp4
+npx remotion render src/index.ts Chapter2 out/chapter2.mp4
+npx remotion render src/index.ts Chapter3 out/chapter3.mp4
+npx remotion render src/index.ts Chapter4 out/chapter4.mp4
+npx remotion render src/index.ts Chapter5 out/chapter5.mp4
+
+# 再渲染完整视频
+npx remotion render src/index.ts FullVideo out/full-video.mp4
+```
+
+### 不加字幕时
+
+如果用户选择不加字幕，需要临时注释或移除场景组件中的 `<Subtitle>` 组件，渲染完成后再恢复。或者通过 Composition 的 defaultProps 控制。
+
+**重要**：即使不加字幕，布局仍然必须在 y=930 以上留白。用户发布视频时可能外挂字幕（B站/YouTube 自动字幕或手动添加），底部空间是字幕的永久预留区域。
+
+### 渲染完成
+
+输出文件在 out/ 目录下。告知用户文件路径和大小。
+
 
 ## 动画系统
 
@@ -210,23 +1089,68 @@ npx remotion render src/index.ts Chapter2 out/ch2.mp4
 2. 确定性：同一帧数永远产生同一画面
 3. 所有 interpolate 必须有 extrapolateLeft/Right: 'clamp'
 
+### 动画导入
+
+```tsx
+import { useCurrentFrame, interpolate, Easing } from 'remotion';
+```
+
 ### 动画节奏：延迟对齐 + 快速动画
 
-动画速度保持快（~15 帧 ≈ 0.5s），只调整开始帧来对齐音频。
+动画速度保持快（~18 帧 ≈ 0.6s），只调整开始帧来对齐音频。
 
-const FAST = 15;
+```tsx
+const FAST = 18;
 const BULLET_FRAMES = [252, 375, 470]; // 音频提到要点的时刻
 
 const bulletOp = (i) => interpolate(
   frame, [BULLET_FRAMES[i], BULLET_FRAMES[i] + FAST], [0, 1],
   { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic) }
 );
+```
 
-不要把动画拉慢来"对齐"音频，那样看起来会很拖沓。
+不要把动画拉慢来"对齐"音频。
 
 ### "出现就留下"模式
 
 元素出现后保持可见，不加退出动画：const exitOp = 1;
+
+
+### 字幕系统
+
+教学视频必须加字幕。字幕按句子逐行显示，跟随音频节奏。
+
+**组件**：src/components/Subtitle.tsx
+**数据**：subtitle-timings.json（每句的 start/end 帧号）
+
+**句子拆分规则**（重要）：
+- 只按句末标点断句：。！？
+- 超过 50 字的句子才按 ；： 再拆
+- 相邻短句（<12字）自动合并
+- 禁止按逗号 ，, 拆分（会碎片化，如 "LLM，" 变成独立一句）
+
+**时间戳生成**：
+- 根据每句字符数占总文本的比例分配帧数（长句多分，短句少分）
+- 不要均分时间（每句一样长会和音频不同步）
+- 生成脚本：node /tmp/gen-subtitle-timings.js
+
+**字幕样式**：
+- 底部居中，bottom: 40px
+- 半透明深色背景 rgba(20,20,19,0.85)
+- 白色文字 #EBEAE4，28px
+- 8 帧淡入 + 6 帧淡出
+
+**集成方式**：
+```tsx
+import { Subtitle } from '../components/Subtitle';
+import subtitleTimings from '../../subtitle-timings.json';
+
+// 在根 AbsoluteFill 的最后
+<Subtitle timings={subtitleTimings.SceneName} />
+```
+
+**重新生成音频后**：必须同步更新 subtitle-timings.json（帧数变了，时间戳要重算）。
+
 
 ### 代码高亮规则
 
@@ -249,52 +1173,85 @@ const bulletOp = (i) => interpolate(
 
 ### 内容边界
 
-- 所有内容在 y=930 以上（给字幕留空间）
+- 所有内容在 y=930 以上（永远遵守，即使不加字幕——用户发布时可能外挂字幕）
 - 字体 >= 24px
 - 每屏 1-2 个核心信息点
 
+### 布局间距规则（重要）
+
+字号提升后（如 14px → 24px），容器尺寸必须同步调整，否则会重叠。
+
+**标题-内容间距**：
+- 标题区（top:50 + 40px h2 + 24px 副标题 + 间距）约 120-140px
+- 内容起始位置：150-170px（留 10-30px 呼吸空间）
+- 不要让内容紧贴标题下方
+
+**卡片间距**：
+- gap: 18 → gap: 22（字号提升后）
+- 卡片 padding: 18px 24px → 24px 28px
+- 列表项 marginBottom: 14 → 18
+
+**行高**：
+- 代码块 lineHeight: 1.7（不要 1.8，会溢出）
+- 正文 lineHeight: 1.6
+
+**卡片样式**：按上方"四种卡片形态"表格实现（标准卡有边框，Oat/Feature/终端无边框）。禁止使用 `var(--c-surface)` 做卡片背景，只用 `var(--c-card-*)` 系列。
+
 ---
 
-## 设计系统
+## 质检流程
 
-  --c-accent: #D97757
-  --c-bg: #FAF9F5
-  --c-surface: #FFFFFF
-  --c-text: #141413
-  --c-terminal-bg: #1E1E2E
-  --c-terminal-text: #CDD6F4
-  --font-display: 'Inter', sans-serif
-  --font-sans: 'Inter', sans-serif
-  --font-mono: 'JetBrains Mono', monospace
+每个 Phase 完成后，使用 Agent Teams 创建两个独立 Agent 进行质检：
 
-反 AI 味检查：
-- 不要紫色粉红渐变
-- 不要 emoji 当图标
-- 不要赛博朋克暗色（终端深色除外）
-- 不要 SVG 画人
+### Phase 1 完成后
+- Agent 1：内容质检（script.md 与 article.md 的信息密度对比）
+- Agent 2：结构质检（outline.md 的章节划分合理性）
 
----
+### Phase 2 完成后
+- Agent 1：音频质检（TTS 输出是否正常，有无符号读出）
+- Agent 2：帧数质检（WAV 帧数计算是否正确）
 
-## 自检清单
+### Phase 3 完成后（含自检清单）
 
-- [ ] 每个场景都有入场动画
+双 Agent 质检 + 自检清单合并，逐条核对：
+
+**Agent 1：代码质检**
+- [ ] 所有 interpolate 有 extrapolateLeft/Right: clamp
+- [ ] 无 Date.now / Math.random
+- [ ] 暗色场景用 AbsoluteFill className="dark-theme"（不要 div 包裹 Sequence）
+- [ ] interpolateColor 用 3 参数形式
+- [ ] 字体 >= 24px（grep 所有 fontSize < 24）
+- [ ] 无 emoji 当图标
+- [ ] 动画时长 >= 18 帧（FAST 常量 + 内联范围）
+- [ ] 无 `var(--c-surface)` 或 `var(--c-card-featured-*)` 残留
+
+**Agent 2：视觉质检**
+- [ ] 标题-内容间距 >= 30px（检查 top 值差）
+- [ ] 连续场景布局不重复
+- [ ] 暗色场景比例 20-35%
+- [ ] 所有内容 y < 930
+- [ ] 标准卡有 `border: 0.5px solid var(--c-card-border)`
+- [ ] Oat 卡无 border、无 boxShadow（纯靠 #E3DACC 背景区分）
+- [ ] Feature 暗卡按需使用（信息重音点才用，叙事型章节可不用），同章不超过 2 个
+- [ ] 卡片文字不用绿/蓝/红（用中性色阶或 accent 文字色）
+- [ ] 辅助色不做整块容器背景（只做标签/色点/左边框）
+- [ ] Feature 暗卡内同一种辅助色（不混用蓝+橙等多色标签）
+- [ ] 提示/警告用纯色浅底 + 左边框（不用整块高饱和填充）
+- [ ] 每个场景都有入场动画（无跳切）
 - [ ] 音频和画面严格同步
-- [ ] 字体 >= 24px
-- [ ] 颜色来自 tokens.css
-- [ ] 无 Date.now() / Math.random()
-- [ ] 所有内容在 y=930 以上
-- [ ] 代码高亮只跟随当前参数
+- [ ] 颜色来自 tokens.css（无硬编码 hex/rgba）
+- [ ] 明暗节奏合理（20-35% 暗色）
 - [ ] Studio 预览无报错
-- [ ] 渲染成功
 
----
+### Phase 4 渲染后
+- Agent 1：同步质检
+  - 字幕与音频是否对齐
+  - 动画切换是否在音频提到内容时发生
+- Agent 2：成品质检
+  - 完整播放无报错
+  - 暗色场景视觉效果正确
+  - 字幕不遮挡主内容
 
-## 常见问题
 
-| 问题 | 解决 |
-|------|------|
-| 音频没声音 | Audio 必须在 Sequence 内部 |
-| 空白帧 | 帧数从 WAV header 计算，不要估算 |
-| TTS 读出符号 | text 中把 _ 和 - 替换为空格 |
-| hyperframes 干扰 | 明确使用 MiMo TTS |
-| 重新生成音频后错位 | 重新测量 WAV 帧数，更新常量 |
+
+

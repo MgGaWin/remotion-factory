@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Remotion Factory — 配色全景预览</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Poppins', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #E8E6DC;
+    color: #141413;
+    padding: 40px;
+  }
+  h1 { font-family: 'Georgia', serif; font-size: 28px; margin-bottom: 8px; }
+  h2 { font-size: 18px; font-weight: 600; margin: 40px 0 16px; color: #5E5D59; }
+  h3 { font-size: 14px; font-weight: 600; margin: 24px 0 10px; color: #7A7870; }
+  .subtitle { font-size: 13px; color: #7A7870; margin-bottom: 32px; }
+
+  /* === Section containers === */
+  .section { margin-bottom: 48px; }
+  .row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+  .col { flex: 1; min-width: 200px; }
+
+  /* === Swatch === */
+  .swatch {
+    border-radius: 10px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 72px;
+  }
+  .swatch-label { font-size: 11px; font-weight: 600; letter-spacing: 0.3px; }
+  .swatch-hex { font-size: 12px; font-family: 'JetBrains Mono', monospace; opacity: 0.8; }
+  .swatch-desc { font-size: 11px; opacity: 0.65; margin-top: 2px; }
+
+  /* === Card demos === */
+  .card-demo {
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+  }
+  .card-demo.feature { border-radius: 24px; }
+  .card-demo.terminal { border-radius: 24px; }
+  .card-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .card-body { font-size: 13px; line-height: 1.6; }
+  .card-accent { font-weight: 600; }
+  .card-muted { font-size: 12px; }
+
+  /* === Scale bar === */
+  .scale-row { display: flex; gap: 2px; margin-bottom: 6px; }
+  .scale-cell {
+    flex: 1;
+    height: 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .scale-name { font-size: 10px; font-weight: 600; margin-bottom: 2px; }
+
+  /* === Page simulation === */
+  .page-sim {
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+  .page-sim-title { font-family: 'Georgia', serif; font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+  .page-sim-subtitle { font-size: 13px; margin-bottom: 16px; }
+  .page-sim-cards { display: flex; gap: 12px; flex-wrap: wrap; }
+  .page-sim-card {
+    flex: 1;
+    min-width: 180px;
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .page-sim-card-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .page-sim-card-body { font-size: 12px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<h1>Remotion Factory — 配色全景预览</h1>
+<p class="subtitle">tokens.css 全部颜色 + 四种卡片形态 + 明暗主题对照 + 10 档中性色阶</p>
+
+<!-- ============================================ -->
+<!-- 1. 亮色主题 · 底色 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>1. 亮色主题 · 底色层级</h2>
+<div class="row">
+  <div class="col">
+    <div class="swatch" style="background:#FAF9F5; border: 0.5px solid #D1CFC5;">
+      <span class="swatch-label">--c-bg</span>
+      <span class="swatch-hex">#FAF9F5</span>
+      <span class="swatch-desc">羊皮纸白 · 页面最底层</span>
+    </div>
+  </div>
+  <div class="col">
+    <div class="swatch" style="background:#F3F1EC; border: 0.5px solid #D1CFC5;">
+      <span class="swatch-label">--c-bg-warm</span>
+      <span class="swatch-hex">#F3F1EC</span>
+      <span class="swatch-desc">暖灰 · 代码区底色、输入框背景</span>
+    </div>
+  </div>
+  <div class="col">
+    <div class="swatch" style="background:#FFFFFF; border: 0.5px solid #D1CFC5;">
+      <span class="swatch-label">--c-surface</span>
+      <span class="swatch-hex">#FFFFFF</span>
+      <span class="swatch-desc">纯白 · 浮层/弹出/tooltip（禁止做卡片背景）</span>
+    </div>
+  </div>
+  <div class="col">
+    <div class="swatch" style="background:#F0EEE6; border: 0.5px solid #D1CFC5;">
+      <span class="swatch-label">--c-ivory-medium</span>
+      <span class="swatch-hex">#F0EEE6</span>
+      <span class="swatch-desc">二级面 · 大块容器背景</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 2. 亮色主题 · 文字层级 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>2. 亮色主题 · 文字层级（在 #FAF9F5 底上）</h2>
+<div style="background:#FAF9F5; border-radius:12px; padding:24px 28px; border:0.5px solid #D1CFC5;">
+  <p style="font-size:20px; font-weight:700; color:#141413; margin-bottom:8px;">标题/主文 — var(--c-text) #141413</p>
+  <p style="font-size:14px; color:#7A7870; margin-bottom:8px;">次要说明 — var(--c-text-secondary) #7A7870 · 这是一段补充描述文字</p>
+  <p style="font-size:12px; color:#9E9C94; margin-bottom:8px;">弱化标注 — var(--c-text-muted) #9E9C94 · 时间戳、来源、标签</p>
+  <p style="font-size:12px; color:#B0AEA5; margin-bottom:8px;">分割线/辅助 — var(--c-divider) #B0AEA5</p>
+  <p style="font-size:14px; color:#D97757; font-weight:600;">强调/CTA — var(--c-accent) #D97757</p>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 3. 四种卡片 · 亮色场景 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>3. 四种卡片形态 · 亮色场景下</h2>
+
+<h3>① 标准卡</h3>
+<div class="card-demo" style="background:#FAF9F5; border:0.5px solid #D1CFC5; border-radius:8px;">
+  <div class="card-title" style="color:#141413;">标准卡 ① — background: var(--c-card-bg)</div>
+  <div class="card-body" style="color:#141413;">与页面同色 + 细边框区分。信息陈列，平等对待每条内容。</div>
+  <div class="card-muted" style="color:#9E9C94; margin-top:6px;">border: 0.5px solid var(--c-card-border) · borderRadius: 8px</div>
+</div>
+
+<h3>② Oat 暖填充卡</h3>
+<div class="card-demo" style="background:#E3DACC; border-radius:8px;">
+  <div class="card-title" style="color:#141413;">Oat 卡 ② — background: var(--c-card-oat-bg)</div>
+  <div class="card-body" style="color:#141413;">无边框，纯靠 #E3DACC 背景区分。内容有分量但不是最高潮。</div>
+  <div class="card-muted" style="color:#7A7870; margin-top:6px;">无边框无阴影 · borderRadius: 8px</div>
+</div>
+
+<h3>③ Feature 暗卡</h3>
+<div class="card-demo feature" style="background:#141413; border-radius:24px;">
+  <div class="card-title" style="color:#FAF9F5;">Feature 暗卡 ③ — background: var(--c-card-feature-bg)</div>
+  <div class="card-body" style="color:#B0AEA5;">近黑底，全章最重要的结论。标题用 <span style="color:#FAF9F5;">Ivory Light #FAF9F5</span>，次要用 <span style="color:#B0AEA5;">Cloud Medium #B0AEA5</span></div>
+  <div class="card-muted" style="margin-top:6px;"><span style="color:#D97757; font-weight:600;">accent 标签</span> <span style="color:#87867F;">#87867F 弱化标注</span></div>
+</div>
+
+<h3>④ 终端卡</h3>
+<div class="card-demo terminal" style="background:#1E1E2E; border-radius:24px;">
+  <div style="display:flex; gap:6px; margin-bottom:12px;">
+    <span style="width:10px;height:10px;border-radius:50%;background:#FF5F57;"></span>
+    <span style="width:10px;height:10px;border-radius:50%;background:#FEBC2E;"></span>
+    <span style="width:10px;height:10px;border-radius:50%;background:#28C840;"></span>
+  </div>
+  <div class="card-title" style="color:#CDD6F4;">终端卡 ④ — background: var(--c-card-terminal-bg)</div>
+  <div class="card-body" style="color:#CDD6F4;">代码展示用。文字色 <span style="color:#CDD6F4;">#CDD6F4</span>，强调色 <span style="color:#F38BA8;">#F38BA8</span></div>
+  <div class="card-muted" style="color:#87867F; margin-top:6px;">borderRadius: 24px</div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 4. 暗色主题 · 底色 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>4. 暗色主题 · 底色层级</h2>
+<div class="row">
+  <div class="col">
+    <div class="swatch" style="background:#191917; color:#EBEAE4;">
+      <span class="swatch-label">--c-bg</span>
+      <span class="swatch-hex">#191917</span>
+      <span class="swatch-desc">深炭墨 · 暗色页面最底层</span>
+    </div>
+  </div>
+  <div class="col">
+    <div class="swatch" style="background:#242422; color:#EBEAE4;">
+      <span class="swatch-label">--c-bg-warm</span>
+      <span class="swatch-hex">#242422</span>
+      <span class="swatch-desc">深炭灰 · 暗色代码区底色</span>
+    </div>
+  </div>
+  <div class="col">
+    <div class="swatch" style="background:#2D2C2A; color:#EBEAE4;">
+      <span class="swatch-label">--c-surface</span>
+      <span class="swatch-hex">#2D2C2A</span>
+      <span class="swatch-desc">暗色表面 · 浮层/弹出</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 5. 暗色主题 · 文字层级 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>5. 暗色主题 · 文字层级（在 #191917 底上）</h2>
+<div style="background:#191917; border-radius:12px; padding:24px 28px;">
+  <p style="font-size:20px; font-weight:700; color:#EBEAE4; margin-bottom:8px;">标题/主文 — var(--c-text) #EBEAE4</p>
+  <p style="font-size:14px; color:#9E9C94; margin-bottom:8px;">次要说明 — var(--c-text-secondary) #9E9C94</p>
+  <p style="font-size:12px; color:#666560; margin-bottom:8px;">弱化标注 — var(--c-text-muted) #666560</p>
+  <p style="font-size:12px; color:rgba(158,156,148,0.15); border-bottom:1px solid rgba(158,156,148,0.15); padding-bottom:8px; margin-bottom:8px;">分割线 — var(--c-divider) rgba(158,156,148,0.15)</p>
+  <p style="font-size:14px; color:#EE6B3E; font-weight:600;">强调/CTA — var(--c-accent) #EE6B3E（暗色提亮版）</p>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 6. 四种卡片 · 暗色场景 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>6. 四种卡片形态 · 暗色场景下</h2>
+
+<h3>① 标准卡（暗色）</h3>
+<div class="card-demo" style="background:#2D2C2A; border:0.5px solid rgba(158,156,148,0.15); border-radius:8px;">
+  <div class="card-title" style="color:#EBEAE4;">标准卡 ① — background: var(--c-card-bg) #2D2C2A</div>
+  <div class="card-body" style="color:#EBEAE4;">暗色下标准卡用深灰底 + 极淡边框。</div>
+  <div class="card-muted" style="color:#666560; margin-top:6px;">border: 0.5px solid rgba(158,156,148,0.15)</div>
+</div>
+
+<h3>② Oat 卡（暗色）</h3>
+<div class="card-demo" style="background:#3A3936; border-radius:8px;">
+  <div class="card-title" style="color:#EBEAE4;">Oat 卡 ② — background: var(--c-card-oat-bg) #3A3936</div>
+  <div class="card-body" style="color:#EBEAE4;">暗色下 Oat 用 chart-gray #3A3936，比页面底略亮。</div>
+  <div class="card-muted" style="color:#9E9C94; margin-top:6px;">无边框无阴影</div>
+</div>
+
+<h3>③ Feature 暗卡（暗色 — 与亮色一致）</h3>
+<div class="card-demo feature" style="background:#141413; border-radius:24px;">
+  <div class="card-title" style="color:#FAF9F5;">Feature 暗卡 ③ — 始终 #141413 底</div>
+  <div class="card-body" style="color:#B0AEA5;">暗色主题下 Feature 暗卡不变，始终近黑底。</div>
+  <div class="card-muted" style="margin-top:6px;"><span style="color:#EE6B3E; font-weight:600;">accent #EE6B3E</span> <span style="color:#87867F;">（暗色提亮版）</span></div>
+</div>
+
+<h3>④ 终端卡（暗色 — 与亮色一致）</h3>
+<div class="card-demo terminal" style="background:#1E1E2E; border-radius:24px;">
+  <div style="display:flex; gap:6px; margin-bottom:12px;">
+    <span style="width:10px;height:10px;border-radius:50%;background:#FF5F57;"></span>
+    <span style="width:10px;height:10px;border-radius:50%;background:#FEBC2E;"></span>
+    <span style="width:10px;height:10px;border-radius:50%;background:#28C840;"></span>
+  </div>
+  <div class="card-title" style="color:#CDD6F4;">终端卡 ④ — 始终 #1E1E2E 底</div>
+  <div class="card-body" style="color:#CDD6F4;">终端卡片亮暗一致，不随主题切换。</div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 7. 10 档中性色阶 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>7. Anthropic 10 档中性色阶</h2>
+<div class="scale-row">
+  <div class="scale-cell" style="background:#141413; color:#FAF9F5;">
+    <span class="scale-name">Ink</span>#141413
+  </div>
+  <div class="scale-cell" style="background:#3D3D3A; color:#FAF9F5;">
+    <span class="scale-name">Slate M</span>#3D3D3A
+  </div>
+  <div class="scale-cell" style="background:#5E5D59; color:#FAF9F5;">
+    <span class="scale-name">Slate L</span>#5E5D59
+  </div>
+  <div class="scale-cell" style="background:#7A7870; color:#FAF9F5;">
+    <span class="scale-name">Warm Gray</span>#7A7870
+  </div>
+  <div class="scale-cell" style="background:#87867F; color:#FAF9F5;">
+    <span class="scale-name">Cloud D</span>#87867F
+  </div>
+  <div class="scale-cell" style="background:#9E9C94; color:#141413;">
+    <span class="scale-name">Muted</span>#9E9C94
+  </div>
+  <div class="scale-cell" style="background:#B0AEA5; color:#141413;">
+    <span class="scale-name">Divider</span>#B0AEA5
+  </div>
+  <div class="scale-cell" style="background:#D1CFC5; color:#141413;">
+    <span class="scale-name">Cloud L</span>#D1CFC5
+  </div>
+  <div class="scale-cell" style="background:#E3DACC; color:#141413;">
+    <span class="scale-name">Oat</span>#E3DACC
+  </div>
+  <div class="scale-cell" style="background:#F0EEE6; color:#141413;">
+    <span class="scale-name">Ivory M</span>#F0EEE6
+  </div>
+</div>
+<p style="font-size:11px; color:#7A7870; margin-top:4px;">从深到暖：Ink → Slate → Cloud → Oat → Ivory · 文字色阶对应：primary / secondary / muted / accent</p>
+</div>
+
+<!-- ============================================ -->
+<!-- 8. 品牌色 & 辅助色 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>8. 品牌色 & 辅助色</h2>
+<div class="row">
+  <div class="col">
+    <div class="swatch" style="background:#D97757; color:#FFFFFF;">
+      <span class="swatch-label">--c-accent (亮色)</span>
+      <span class="swatch-hex">#D97757</span>
+      <span class="swatch-desc">赤陶色 · CTA/标签/强调文字</span>
+    </div>
+  </div>
+  <div class="col">
+    <div class="swatch" style="background:#C2522D; color:#FFFFFF;">
+      <span class="swatch-label">--c-accent-deep (亮色)</span>
+      <span class="swatch-hex">#C2522D</span>
+      <span class="swatch-desc">深赤陶 · 按钮悬停</span>
+    </div>
+  </div>
+  <div class="col">
+    <div class="swatch" style="background:#EE6B3E; color:#FFFFFF;">
+      <span class="swatch-label">--c-accent (暗色)</span>
+      <span class="swatch-hex">#EE6B3E</span>
+      <span class="swatch-desc">亮赤陶 · 暗底提亮版</span>
+    </div>
+  </div>
+  <div class="col">
+    <div class="swatch" style="background:#E58565; color:#FFFFFF;">
+      <span class="swatch-label">--c-accent-deep (暗色)</span>
+      <span class="swatch-hex">#E58565</span>
+      <span class="swatch-desc">柔和粉赤陶</span>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <div class="swatch" style="background:#6A9BCC; color:#FFFFFF;">
+      <span class="swatch-label">--c-chart-blue (亮色)</span>
+      <span class="swatch-hex">#6A9BCC</span>
+      <span class="swatch-desc">莫兰迪青蓝</span>
+    </div>
+  </div>
+  <div class="col">
+    <div class="swatch" style="background:#81A9D4; color:#FFFFFF;">
+      <span class="swatch-label">--c-chart-blue (暗色)</span>
+      <span class="swatch-hex">#81A9D4</span>
+      <span class="swatch-desc">暗色提亮蓝</span>
+    </div>
+  </div>
+  <div class="col">
+    <div class="swatch" style="background:#788C5D; color:#FFFFFF;">
+      <span class="swatch-label">--c-chart-green (亮色)</span>
+      <span class="swatch-hex">#788C5D</span>
+      <span class="swatch-desc">鼠尾草绿</span>
+    </div>
+  </div>
+  <div class="col">
+    <div class="swatch" style="background:#8DA173; color:#FFFFFF;">
+      <span class="swatch-label">--c-chart-green (暗色)</span>
+      <span class="swatch-hex">#8DA173</span>
+      <span class="swatch-desc">暗色提亮绿</span>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <div class="swatch" style="background:#E8E6DC; color:#141413;">
+      <span class="swatch-label">--c-chart-gray (亮色)</span>
+      <span class="swatch-hex">#E8E6DC</span>
+      <span class="swatch-desc">浅灰底色</span>
+    </div>
+  </div>
+  <div class="col">
+    <div class="swatch" style="background:#3A3936; color:#EBEAE4;">
+      <span class="swatch-label">--c-chart-gray (暗色)</span>
+      <span class="swatch-hex">#3A3936</span>
+      <span class="swatch-desc">暗色 Oat 底色</span>
+    </div>
+  </div>
+  <div class="col">
+    <div class="swatch" style="background:#F38BA8; color:#141413;">
+      <span class="swatch-label">--c-terminal-red</span>
+      <span class="swatch-hex">#F38BA8</span>
+      <span class="swatch-desc">终端强调色（亮暗一致）</span>
+    </div>
+  </div>
+  <div class="col">
+    <div class="swatch" style="background:#CDD6F4; color:#141413;">
+      <span class="swatch-label">--c-terminal-text</span>
+      <span class="swatch-hex">#CDD6F4</span>
+      <span class="swatch-desc">终端文字色（亮暗一致）</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 9. 实际页面模拟 · 亮色场景 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>9. 实际页面模拟 · 亮色场景（SceneLight）</h2>
+<div class="page-sim" style="background:#FAF9F5;">
+  <div class="page-sim-title" style="color:#141413;">Chapter 2: 三种模型类型</div>
+  <div class="page-sim-subtitle" style="color:#7A7870;">LangChain 支持多种模型接口，选择适合你的场景</div>
+
+  <div class="page-sim-cards">
+    <div class="page-sim-card" style="background:#FAF9F5; border:0.5px solid #D1CFC5;">
+      <div class="page-sim-card-title" style="color:#141413;">LLM</div>
+      <div class="page-sim-card-body" style="color:#7A7870;">文本输入 → 文本输出<br>最基础的模型接口</div>
+    </div>
+    <div class="page-sim-card" style="background:#E3DACC;">
+      <div class="page-sim-card-title" style="color:#141413;">Chat Model <span style="color:#D97757; font-size:11px; font-weight:700;">推荐</span></div>
+      <div class="page-sim-card-body" style="color:#141413;">消息列表 → 消息输出<br>支持系统提示、多轮对话</div>
+    </div>
+    <div class="page-sim-card" style="background:#FAF9F5; border:0.5px solid #D1CFC5;">
+      <div class="page-sim-card-title" style="color:#141413;">Embedding</div>
+      <div class="page-sim-card-body" style="color:#7A7870;">文本 → 向量<br>用于语义搜索、相似度计算</div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px; background:#141413; border-radius:24px; padding:18px 24px;">
+    <div style="color:#FAF9F5; font-size:15px; font-weight:600;">LangChain 主要使用 Chat Model 作为核心接口</div>
+    <div style="color:#B0AEA5; font-size:12px; margin-top:4px;">这是全章最重要的结论</div>
+  </div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 10. 实际页面模拟 · 暗色场景 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>10. 实际页面模拟 · 暗色场景（SceneDark）</h2>
+<div class="page-sim" style="background:#191917;">
+  <div class="page-sim-title" style="color:#EBEAE4;">模型基础</div>
+  <div class="page-sim-subtitle" style="color:#9E9C94;">理解 LLM 的核心概念与涌现能力</div>
+
+  <div style="margin-top:16px;">
+    <p style="font-size:28px; font-weight:700; color:#FAF9F5; line-height:1.4; margin-bottom:12px;">
+      涌现能力是 LLM 最令人兴奋的特质
+    </p>
+    <p style="font-size:16px; color:#9E9C94; line-height:1.6;">
+      当模型参数量达到某个临界点时，会突然表现出训练时没有明确教过的能力
+    </p>
+    <p style="font-size:14px; color:#EE6B3E; font-weight:600; margin-top:12px;">
+      参数量是关键变量
+    </p>
+  </div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 11. 终端场景模拟 · SceneLightWithDarkCard -->
+<!-- ============================================ -->
+<div class="section">
+<h2>11. 实际页面模拟 · 亮色场景 + 暗卡片（SceneLightWithDarkCard）</h2>
+<div class="page-sim" style="background:#FAF9F5;">
+  <div class="page-sim-title" style="color:#141413;">代码实现</div>
+  <div class="page-sim-subtitle" style="color:#7A7870;">使用 ChatOpenAI 调用模型</div>
+
+  <div style="background:#1E1E2E; border-radius:24px; padding:20px 24px; margin-top:12px;">
+    <div style="display:flex; gap:6px; margin-bottom:14px;">
+      <span style="width:10px;height:10px;border-radius:50%;background:#FF5F57;"></span>
+      <span style="width:10px;height:10px;border-radius:50%;background:#FEBC2E;"></span>
+      <span style="width:10px;height:10px;border-radius:50%;background:#28C840;"></span>
+    </div>
+    <pre style="font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.7; color:#CDD6F4;"><span style="color:#F38BA8;">from</span> langchain.chat_models <span style="color:#F38BA8;">import</span> ChatOpenAI
+
+llm = ChatOpenAI(
+    model=<span style="color:#A6E3A1;">"gpt-4"</span>,
+    temperature=<span style="color:#89B4FA;">0.7</span>
+)
+result = llm.invoke(<span style="color:#A6E3A1;">"Hello!"</span>)</pre>
+  </div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- 12. 亮暗对照总表 -->
+<!-- ============================================ -->
+<div class="section">
+<h2>12. 亮暗主题对照总表</h2>
+<table style="width:100%; border-collapse:collapse; font-size:12px;">
+  <thead>
+    <tr style="border-bottom:2px solid #D1CFC5;">
+      <th style="text-align:left; padding:8px 12px; color:#5E5D59;">Token</th>
+      <th style="text-align:left; padding:8px 12px; color:#5E5D59;">亮色值</th>
+      <th style="text-align:center; padding:8px 12px; width:60px;"></th>
+      <th style="text-align:left; padding:8px 12px; color:#5E5D59;">暗色值</th>
+      <th style="text-align:left; padding:8px 12px; color:#5E5D59;">说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom:1px solid #E8E6DC;">
+      <td style="padding:6px 12px; font-family:monospace;">--c-bg</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#FAF9F5;border:0.5px solid #D1CFC5;vertical-align:middle;"></span> #FAF9F5</td>
+      <td style="padding:6px 12px; text-align:center;">→</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#191917;border:0.5px solid #3A3936;vertical-align:middle;"></span> #191917</td>
+      <td style="padding:6px 12px; color:#7A7870;">页面底色</td>
+    </tr>
+    <tr style="border-bottom:1px solid #E8E6DC;">
+      <td style="padding:6px 12px; font-family:monospace;">--c-text</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#141413;vertical-align:middle;"></span> #141413</td>
+      <td style="padding:6px 12px; text-align:center;">→</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#EBEAE4;vertical-align:middle;"></span> #EBEAE4</td>
+      <td style="padding:6px 12px; color:#7A7870;">主文字</td>
+    </tr>
+    <tr style="border-bottom:1px solid #E8E6DC;">
+      <td style="padding:6px 12px; font-family:monospace;">--c-text-secondary</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#7A7870;vertical-align:middle;"></span> #7A7870</td>
+      <td style="padding:6px 12px; text-align:center;">→</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#9E9C94;vertical-align:middle;"></span> #9E9C94</td>
+      <td style="padding:6px 12px; color:#7A7870;">次文字</td>
+    </tr>
+    <tr style="border-bottom:1px solid #E8E6DC;">
+      <td style="padding:6px 12px; font-family:monospace;">--c-text-muted</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#9E9C94;vertical-align:middle;"></span> #9E9C94</td>
+      <td style="padding:6px 12px; text-align:center;">→</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#666560;vertical-align:middle;"></span> #666560</td>
+      <td style="padding:6px 12px; color:#7A7870;">弱文字</td>
+    </tr>
+    <tr style="border-bottom:1px solid #E8E6DC;">
+      <td style="padding:6px 12px; font-family:monospace;">--c-accent</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#D97757;vertical-align:middle;"></span> #D97757</td>
+      <td style="padding:6px 12px; text-align:center;">→</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#EE6B3E;vertical-align:middle;"></span> #EE6B3E</td>
+      <td style="padding:6px 12px; color:#7A7870;">赤陶强调</td>
+    </tr>
+    <tr style="border-bottom:1px solid #E8E6DC;">
+      <td style="padding:6px 12px; font-family:monospace;">--c-card-bg</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#FAF9F5;border:0.5px solid #D1CFC5;vertical-align:middle;"></span> #FAF9F5</td>
+      <td style="padding:6px 12px; text-align:center;">→</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#2D2C2A;vertical-align:middle;"></span> #2D2C2A</td>
+      <td style="padding:6px 12px; color:#7A7870;">标准卡底</td>
+    </tr>
+    <tr style="border-bottom:1px solid #E8E6DC;">
+      <td style="padding:6px 12px; font-family:monospace;">--c-card-oat-bg</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#E3DACC;vertical-align:middle;"></span> #E3DACC</td>
+      <td style="padding:6px 12px; text-align:center;">→</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#3A3936;vertical-align:middle;"></span> #3A3936</td>
+      <td style="padding:6px 12px; color:#7A7870;">Oat 卡底</td>
+    </tr>
+    <tr style="border-bottom:1px solid #E8E6DC;">
+      <td style="padding:6px 12px; font-family:monospace;">--c-card-feature-bg</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#141413;vertical-align:middle;"></span> #141413</td>
+      <td style="padding:6px 12px; text-align:center;">=</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#141413;vertical-align:middle;"></span> #141413</td>
+      <td style="padding:6px 12px; color:#7A7870;">Feature 暗卡（亮暗一致）</td>
+    </tr>
+    <tr style="border-bottom:1px solid #E8E6DC;">
+      <td style="padding:6px 12px; font-family:monospace;">--c-card-terminal-bg</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#1E1E2E;vertical-align:middle;"></span> #1E1E2E</td>
+      <td style="padding:6px 12px; text-align:center;">=</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#1E1E2E;vertical-align:middle;"></span> #1E1E2E</td>
+      <td style="padding:6px 12px; color:#7A7870;">终端卡（亮暗一致）</td>
+    </tr>
+    <tr>
+      <td style="padding:6px 12px; font-family:monospace;">--c-divider</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#B0AEA5;vertical-align:middle;"></span> #B0AEA5</td>
+      <td style="padding:6px 12px; text-align:center;">→</td>
+      <td style="padding:6px 12px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:rgba(158,156,148,0.15);border:0.5px solid #3A3936;vertical-align:middle;"></span> rgba(…,0.15)</td>
+      <td style="padding:6px 12px; color:#7A7870;">分割线</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p style="font-size:11px; color:#9E9C94; margin-top:40px; text-align:center;">Generated by remotion-factory v1.8.4 · Anthropic Intellectual Warmth</p>
+
+</body>
+</html>
