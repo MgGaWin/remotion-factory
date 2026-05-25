@@ -2,6 +2,15 @@
 
 把文章或口播稿用 Remotion 做成 MP4 视频。
 
+## 安装
+
+```bash
+# 克隆到 Claude Code 技能目录
+git clone https://github.com/MgGaWin/remotion-factory.git ~/.claude/skills/remotion-factory
+```
+
+或下载 [ZIP 压缩包](https://github.com/MgGaWin/remotion-factory/archive/refs/heads/main.zip)，解压到 `~/.claude/skills/remotion-factory/`。
+
 ## 功能
 
 - 输入文章或口播稿 -> 输出 Remotion 项目

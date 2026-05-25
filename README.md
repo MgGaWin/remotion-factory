@@ -2,6 +2,15 @@
 
 Turn articles or scripts into MP4 videos using Remotion.
 
+## Install
+
+```bash
+# Clone into Claude Code skills directory
+git clone https://github.com/MgGaWin/remotion-factory.git ~/.claude/skills/remotion-factory
+```
+
+Or download the [ZIP](https://github.com/MgGaWin/remotion-factory/archive/refs/heads/main.zip) and extract to `~/.claude/skills/remotion-factory/`.
+
 ## What it does
 
 - Takes an article or narration script as input
