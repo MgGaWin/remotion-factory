@@ -51,16 +51,28 @@ Turn articles or scripts into MP4 videos using Remotion.
 ## Structure
 
 ```
-SKILL.md                          # Main skill document
-manifest.json                     # Skill metadata
-references/
-  CHAPTER-CRAFT.md                # Scene development guide + animation patterns
-  AUDIO.md                        # Audio synthesis + frame alignment
-  SKETCH-SVG.md                   # Hand-drawn SVG guide (Anthropic Humane Aesthetic)
-  sketch-demo.html                # Interactive SVG demo (88 animated elements)
-  color-preview.html              # Full color palette visualization (tokens + cards)
-  surface-demo.html               # Color application rules (three-layer model)
+remotion-factory/                   # Skill directory (~/.claude/skills/)
+├── SKILL.md                        # Main skill document
+├── manifest.json                   # Skill metadata
+└── references/                     # Skill built-in docs (ships with skill)
+    ├── CHAPTER-CRAFT.md            # Scene development guide + animation patterns
+    ├── AUDIO.md                    # Audio synthesis + frame alignment
+    ├── SKETCH-SVG.md               # Hand-drawn SVG guide (Anthropic Humane Aesthetic)
+    ├── sketch-demo.html            # Interactive SVG demo (88 animated elements)
+    ├── color-preview.html          # Full color palette visualization
+    └── surface-demo.html           # Color application rules (three-layer model)
+
+my-video/                           # User project directory (separate)
+├── article.md                      # User's original article
+├── script.md                       # Narration script
+├── references/                     # User's design reference images (optional)
+│   └── sketch-01.png               # Operator drops sketches here
+└── src/                            # Remotion source code
 ```
+
+**Note**: Two `references/` directories serve different purposes:
+- **Skill's `references/`** = built-in documentation and demos (always available)
+- **Project's `references/`** = operator-provided design sketches (per-project, optional)
 
 ## Reference HTML files
 

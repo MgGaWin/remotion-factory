@@ -50,16 +50,28 @@
 ## 文件结构
 
 ```
-SKILL.md                          # 主文件
-manifest.json                     # 技能元数据
-references/
-  CHAPTER-CRAFT.md                # 场景开发指南 + 动画模式库
-  AUDIO.md                        # 音频合成 + 帧对齐
-  SKETCH-SVG.md                   # 手绘涂鸦 SVG 指南
-  sketch-demo.html                # 涂鸦交互式演示（88 个动画元素）
-  color-preview.html              # 配色全景预览（全部 token 可视化）
-  surface-demo.html               # 辅助色应用体系演示（三层模型）
+remotion-factory/                   # 技能目录（~/.claude/skills/）
+├── SKILL.md                        # 主文件
+├── manifest.json                   # 技能元数据
+└── references/                     # 技能内置文档（随技能分发）
+    ├── CHAPTER-CRAFT.md            # 场景开发指南 + 动画模式库
+    ├── AUDIO.md                    # 音频合成 + 帧对齐
+    ├── SKETCH-SVG.md               # 手绘涂鸦 SVG 指南
+    ├── sketch-demo.html            # 涂鸦交互式演示（88 个动画元素）
+    ├── color-preview.html          # 配色全景预览（全部 token 可视化）
+    └── surface-demo.html           # 辅助色应用体系演示（三层模型）
+
+my-video/                           # 用户项目目录（独立于技能）
+├── article.md                      # 用户原文
+├── script.md                       # 口播稿
+├── references/                     # 用户的设计参考图（可选）
+│   └── sketch-01.png               # 操作员放的草图/截图
+└── src/                            # Remotion 源码
 ```
+
+**注意**：两层 `references/` 用途不同：
+- **技能的 `references/`** = 内置文档和演示（始终可用）
+- **项目的 `references/`** = 操作员提供的设计参考图（按项目，可选）
 
 ## 参考 HTML 文件
 
