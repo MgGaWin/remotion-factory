@@ -1,24 +1,21 @@
 ---
 name: remotion-factory
-version: 1.9.0
 description: |
   把一篇文章或口播稿，用 Remotion 做成可直接渲染 MP4 的视频。
   流程：原始文章 → 口播稿 → 音频合成 → Remotion 开发 → 渲染 MP4。
   适用场景：B 站 / YouTube / 视频号教程、产品演示、数据可视化视频、动态 PPT。
   默认设计风格：Anthropic 暖调赤陶色人文极简。用户可自定义。
-changelog:
-  - 1.9.0: 辅助色三层使用模型（图形放开/标签克制/容器禁止）、提示容器纯色浅底+左边框、tint 色 token、分类并列项正确做法、Oat 卡色温约束
-  - 1.8.4: 明暗节奏从"章绑定"改为"频率驱动"、Feature 暗卡从"每章1个"改为"按需使用"、区分信息密集型与叙事型内容
-  - 1.8.3: 色阶选择指南重构（移到 CSS 块外、加暗色主题列）、accent 暗色说明、否定清单补 Oat、并行开发分工、分屏示例去硬编码、暗底比例统一 20-35%
-  - 1.8.1: 拆分场景节奏系统与卡片系统、Phase 1/2/3 执行细节补全、合并自检清单与质检流程
-  - 1.8.0: 四种卡片形态（标准/Oat/Feature/终端）+ 内容语义决策树 + 否定清单
-  - 1.7.0: 节奏驱动主题系统、三模式（Light/Dark/LightWithDarkCard）、暖灰色修正
-  - 1.6.0: 卡片系统初版（三种类型）、tokens.css 卡片变量
 ---
 
 # Remotion Video Presentation
 
 把一篇文章或口播稿，用 Remotion 做成可直接渲染 MP4 的视频。产出物 = Remotion 项目 + 按章节切分的音频 + 最终 MP4。
+
+## 版本记录
+
+- 1.12.0: 工程化补强——新增 scripts/lint-remotion-scenes.mjs 静态质检脚本、STYLE-ADAPTATION.md 风格迁移指南；主文档参考索引瘦身，Phase 3 增加 lint 闸门
+- 1.11.0: 创作判断层补全——新增 CREATIVE-GAP-PLAYBOOK.md/creative-gap-playbook.html，补齐简洁帧选择、视觉重音、观众留存、色彩用量、好坏对比审稿；Phase 3 增加场景规划闸门和观众任务标注
+- 1.10.1: 质检全面修复——工作流补全（subtitle-timings.json/FullVideo.tsx/Root.tsx 步骤）、Feature 暗卡规则统一、错误恢复指引、跨平台兼容、CJK 字体/渲染配置/BGM 指引、CSS 变量去重、术语统一
 
 ## 适用场景
 
@@ -43,28 +40,31 @@ changelog:
 ```
 Phase 1   内容编写
    1.1  识别用户输入
-   1.2  产出 script.md + outline.md
+   1.2  内容类型判断
+   1.3  产出 script.md + outline.md
    ▼
-[Checkpoint Plan]      ← 必须停。一次对齐 5 件事
+[Checkpoint Plan]      ← 必须停。含质检（内容+结构）。一次对齐 5 件事
    ▼
 Phase 2   音频合成（先音频，后开发）
    2.1  生成 audio-segments.json
-   2.2  合成音频（MiMo TTS）
+   2.2  合成音频（MiMo TTS）+ 错误处理
    2.3  测量帧数 → 确定每个场景时长
+   2.4  生成 subtitle-timings.json（字幕时间戳）
    ▼
-[Checkpoint Audio]     ← 必须停。确认音频 OK
+[Checkpoint Audio]     ← 必须停。含质检（音频+帧数）。确认音频 OK
    ▼
 Phase 3   Remotion 开发
-   3.1  脚手架 + 设计系统
+   3.1  项目初始化 + 脚手架 + 设计系统
    3.2  第 1 章 = 主线程 + 完整版本（强制 anchor）
         ▼
         [硬节点] 用户验收第 1 章 ← 不可跳过
         ▼
    3.3  第 2~N 章（按选定模式）
+   3.4  创建 FullVideo.tsx（全片合并）
    ▼
-[Checkpoint Render]    ← 必须停。章节 + 音频全部就绪才可渲染
+[Checkpoint Render]    ← 必须停。含质检（代码+视觉）。章节 + 音频全部就绪才可渲染
    ▼
-Phase 4   渲染 MP4
+Phase 4   渲染 MP4 + 故障排查
 ```
 
 ---
@@ -129,26 +129,15 @@ my-video/
 - 支持格式：png, jpg, jpeg, webp, gif
 - 可选目录，不需要时可以不创建
 
-**Skill 内置参考文档**：
-- `references/SKETCH-SVG.md` — 手绘涂鸦风 SVG 完整指南（Anthropic Humane Aesthetic）
-  - 三步生成法：不完美 Path → 粗糙滤镜 → 生长动画
-  - SVG 滤镜详解（feTurbulence + feDisplacementMap）
-  - Path 编写技巧（圆、矩形、箭头、下划线、气泡、图标、图表）
-  - Remotion 集成模板（React 组件 + 帧驱动动画）
-  - 调参速查表（颜色、粗细、时长）
-- `references/sketch-demo.html` — 涂鸦 SVG 交互式演示（88 个动画元素 + 提示词一键复制）
-  - 浏览器直接打开即可预览全部涂鸦效果
-  - 每个元素右上角 prompt 按钮 → 弹出 AI 生成提示词 → 一键复制
-- `references/color-preview.html` — 配色全景预览（tokens.css 全部颜色可视化）
-  - 四种卡片形态 + 亮暗主题对照 + 10 档中性色阶 + 品牌色/辅助色
-  - 实际页面模拟（亮色场景 / 暗色场景 / 亮色+暗卡片）
-- `references/surface-demo.html` — 辅助色应用体系演示
-  - 三层使用模型（图形层放开 / 标签层克制 / 容器背景禁止）
-  - 分类并列项的正确做法（色点+标签 / 左侧色条 / 编号圆）
-  - 提示/警告容器（纯色浅底 + 左边框）
-  - 完整场景模拟 + 速查表
-- `references/AUDIO.md` — 音频合成参考
-- `references/CHAPTER-CRAFT.md` — 场景开发指南 + 动画模式库
+**Skill 内置参考路由**：
+- 音频合成/帧数：`references/audio.md`
+- 场景开发/动效/构图：`references/CHAPTER-CRAFT.md`
+- 创作判断/留存/重音：`references/CREATIVE-GAP-PLAYBOOK.md`，可视化页 `references/creative-gap-playbook.html`
+- 风格迁移/token 映射：`references/STYLE-ADAPTATION.md`
+- 布局模板：`references/layout-gallery.html`
+- 配色预览：`references/color-preview.html`，辅助色规则：`references/surface-demo.html`
+- 手绘 SVG：`references/SKETCH-SVG.md`，可视化页 `references/sketch-demo.html`
+- 静态质检脚本：`scripts/lint-remotion-scenes.mjs`
 
 ---
 
@@ -233,15 +222,6 @@ my-video/
 
   /* ── 特殊底色 ── */
   --c-surface: #FFFFFF;          /* 纯白浮层，仅用于模态框/弹出层/tooltip 等浮起元素，禁止做卡片背景 */
-  --c-bg-warm: #F3F1EC;          /* 暖灰底，用于代码区底色、输入框背景、需要微弱区分但不是卡片的区域 */
-
-  /* ── 提示/警告容器（纯色浅底 + 左边框） ── */
-  --c-tint-blue: #EBF2F8;        /* 极浅蓝，提示 */
-  --c-tint-green: #ECF0E6;       /* 纸感浅绿，最佳实践 */
-  --c-tint-orange: #FAEDE6;      /* 贝壳橙，注意/警告 */
-  --c-tint-blue-border: #6A9BCC; /* 蓝左边框 */
-  --c-tint-green-border: #788C5D;/* 绿左边框 */
-  --c-tint-orange-border: #D97757;/* 橙左边框 */
 
   /* ── 字体 ── */
   --font-display: 'Lora', Georgia, serif;          /* 大标题：衬线体，富有张力和经典印刷感 */
@@ -289,6 +269,12 @@ my-video/
 | BGM | 极简环境音（Ambient）、低沉大提琴、轻缓钢琴、极简小提琴拉弦 |
 | 氛围 | 深夜独自思考、安静沉浸 |
 | 禁止 | 高燃电子乐、科技感合成器 |
+
+**BGM 集成**（可选）：
+- BGM 文件放在 `public/audio/bgm/` 目录
+- 在 Chapter 组件中添加第二个 `<Audio>` 轨道，volume 设为 0.15~0.25（不压过配音）
+- BGM 跨章节连续播放：在 FullVideo.tsx 中用一个 `<Audio>` 播放全片 BGM，不在各 Chapter 中重复
+- 如果用户未提供 BGM，跳过此步骤，不自动添加
 
 ### 反面清单（坚决避免）
 
@@ -370,7 +356,7 @@ my-video/
   --c-card-terminal-text: #CDD6F4;                          /* 终端卡片：蓝白字 */
   --c-card-terminal-accent: #F38BA8;                        /* 终端卡片：冷调，与字色同温 */
 
-  /* 提示/警告容器：暗色主题下暂用 rgba，后续可定义暗色 tint */
+  /* 提示/警告容器：暗色主题下复用现有卡片/边框 token，不新增暗色 tint 色相 */
 }
 ```
 
@@ -415,6 +401,7 @@ my-video/
 |------|------|------|
 | **SceneLight** | `var(--c-bg)` 羊皮纸白 | 正文、图表、流程步骤 |
 | **SceneDark** | 深炭墨 `#191917` | 开场标题、核心结论（重音拍） |
+| **SceneLightWithDarkCard** | `var(--c-bg)` 羊皮纸白 | 亮色场景中嵌入暗色卡片（代码终端、终端输出），不切整页 |
 
 ---
 
@@ -485,7 +472,8 @@ my-video/
 
 **Q2：这章里，已经用过暗卡了吗？**
 - 「没用过」→ 当前内容若是核心结论，可以用暗卡
-- 「已经用过一次」→ 强制降级为 Oat 卡，暗卡每章最多 1 次
+- 「已用过一个」→ 如果确实是本章最核心的结论，可以用第二个
+- 「已用过两个」→ 强制降级为 Oat 卡，暗卡每章不超过 2 个
 
 **Q3：这块内容是「一条」还是「多条并列」？**
 - 「多条并列，需要对比」→ 强制标准卡 ①，暗卡不能容纳列表
@@ -514,7 +502,7 @@ my-video/
 | 信息密集型章节至少 1 个 Oat | 叙事型章节可以不用（纯大字排版即可） |
 | 同一场景内非标准卡最多 1 种 | 其余全用标准卡 |
 | accent 只用于标签层 | 不做整块容器背景填充 |
-| Feature 暗卡内多种辅助色标签 | 暗卡已是最强视觉元素，多色稀释分量 | 同一张暗卡内最多一种辅助色 |
+| Feature 暗卡内多种辅助色标签 | 暗卡已是最强视觉元素，多色稀释分量。同一张暗卡内最多一种辅助色 |
 
 #### 辅助色三层使用模型
 
@@ -589,7 +577,7 @@ my-video/
 | Feature 暗卡用绿/蓝/红文字 | 暗卡文字用 Ivory Light / Cloud Medium | 用 `var(--c-card-feature-text)` / `var(--c-card-feature-secondary)` |
 | 标准卡无边框 | 与页面同色，没有边框就看不见 | 必须有 `border: 0.5px solid var(--c-card-border)` |
 | 列表/多条内容放进暗卡 | 暗卡只放单句核心结论 | 列表用标准卡 |
-| 信息密集型章节没有 Feature 暗卡 | 教程/数据类内容需要信息重音 | 每章核心结论用暗卡 |
+| 信息密集型章节没有 Feature 暗卡但核心结论缺少视觉重音 | 教程/数据类内容需要信息重音 | 核心结论用暗卡，按需使用 |
 | 叙事型章节强行塞 Feature 暗卡 | 感性叙事不需要信息重音，硬塞反而刻意 | 按需添加，不强制 |
 | 一章超过 2 个 Feature 暗卡 | 暗卡太多失去"最重要"含义 | 多余的降级为 Oat |
 | 连续两个 Oat 卡 | 节奏没有落下来 | Oat 后必须接标准卡 |
@@ -676,9 +664,11 @@ my-video/
 **场景内元素出现**：18~24 帧 easeOut
 - 比原来 5 帧慢 3~5 倍，像「翻书」而非「闪烁」
 - 淡入 + 轻微上滑配合使用
+- 18 帧用于普通元素淡入，24 帧用于重要元素（如核心金句、Feature 暗卡标题）的强调入场
 
 ```tsx
-const FAST = 18; // 场景内动画时长
+const FAST = 18; // 普通元素动画时长
+const SLOW = 24; // 重要元素动画时长
 const opacity = interpolate(frame, [delay, delay + FAST], [0, 1], {
   extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
   easing: Easing.out(Easing.cubic),
@@ -746,6 +736,21 @@ Chapter 编排中无需额外处理，主题已在场景组件内部决定：
 
 **Phase 3 开发场景时**，Claude 必须按以下顺序执行：
 
+**步骤零：场景规划闸门（强制，不可跳过）**
+编码任何 Scene 前，先为每个场景补齐创作判断。详细规则见 `references/CREATIVE-GAP-PLAYBOOK.md`。
+
+```markdown
+场景 X：场景名称
+  - 帧型：简洁帧 / 密集帧 D1-D6
+  - 观众任务：这一屏让观众看懂/记住/判断什么
+  - 视觉重音：Level 1-5（词级/项级/区块级/帧级/节奏级）
+  - 留存节拍：Hook / Map / Reveal / Contrast / Payoff
+  - 色彩策略：中性色为主，accent/辅助色用途
+  - 字幕安全：核心内容 y < 930，底部留 160px
+```
+
+**硬规则**：不要在编码阶段临时决定帧型、重音和卡片形态。先规划，再实现。
+
 **步骤一：场景模式标注**
 按节奏驱动规则为每个场景标注模式（SceneDark / SceneLight），检查节奏约束。
 
@@ -798,7 +803,64 @@ Chapter 编排中无需额外处理，主题已在场景组件内部决定：
 | 直接口播稿 | 落盘成 script.md，产出 outline.md |
 | 啥都没有 | 反问：先给素材或大纲 |
 
-### 1.2 产出 script.md + outline.md
+**边界条件处理**：
+- 超短内容（<500 字）→ 建议用户补充素材，或明确视频时长目标（如"就做 1 分钟的预告"）
+- 超长内容（>5000 字）→ 建议分集或压缩策略，让用户选择
+- 多篇文章 → 问用户是否合并为一期，还是分多期
+
+### 1.2 内容类型判断
+
+拿到原文后，先判断内容类型，决定口播稿的处理策略。
+
+**忠实类（不擅自扩展）**
+
+论文/学术类：
+- 保留原文所有论点、数据、案例、结论，不删减实质性内容
+- 语言可以口语化，但信息密度不能降低
+- 原文有7个要点，口播稿里也应该是7个
+- 如果原文某个论点只有一句话没有展开，不要自作主张补充，先问用户
+- 原文的引用、数据来源、研究方法等细节保留，不要用"研究发现"一笔带过
+
+抒情/散文类：
+- 保留原文的情感基调、意象、修辞风格
+- 口语化改写时注意：不要把有诗意的表达改成大白话
+- 原文的留白和节奏感要保留，不要为了"信息密度"填满每个停顿
+- 如果原文有意境但表达不够清晰，先问用户要不要调整，不要直接改
+
+**扩展类（主动增强）**
+
+信息类/科普类：
+- 原文的核心信息保留，但要判断信息是否完整
+- 如果原文只说了"是什么"，补充"为什么"和"怎么做"
+- 如果原文有观点但没有数据支撑，补充相关数据或案例
+- 如果原文概念之间缺少联系，建立逻辑链条
+- 如果原文停留在理论，补充实际应用场景
+- 扩展的内容要和原文风格一致，不要突兀
+
+教程类：
+- 原文的步骤保留，但要检查是否每个步骤都足够清晰
+- 如果某个步骤只说了"做X"但没说"怎么做X"，补充具体操作方法
+- 如果原文没有说明"为什么要做这一步"，补充原因（观众需要理解意图）
+- 如果原文缺少"怎么判断做对了"，补充验证方法
+- 不要机械地在每个步骤后面加"常见错误"，要根据内容判断哪里真的容易出错
+
+**意图判断类（先问用户）**
+
+商业/产品类：
+- 先问用户：是想精炼卖点，还是深度对比，还是讲故事
+- 精炼卖点模式：保留核心优势，删减冗余描述
+- 深度对比模式：补充竞品对比、使用场景、用户反馈
+- 讲故事模式：保留品牌故事，增强情感连接
+- 不要擅自添加"用户好评"或"行业数据"，除非原文有提及
+
+故事/叙事类：
+- 保留原文的情节、人物、冲突、结局
+- 可以增强叙事节奏：适当的地方放慢、适当的地方加速
+- 可以增加画面感：用更具体的描述替代抽象概括
+- 不要改变人物性格、事件走向、故事主题
+- 如果原文叙事平淡，可以建议增加转折点，但要问用户
+
+### 1.3 产出 script.md + outline.md
 
 script.md: B 站 / YouTube 风格口播稿，口语化、有节奏感。
 
@@ -860,7 +922,7 @@ script.md + outline.md 写完后必须停下来，一次对齐 5 件事：
 > **⚠️ 必须使用 MiMo TTS，不要使用 hyperframes tts。**
 
 API 配置：
-  Model: mimo-v2.5-tts
+  Model: mimo-v2.5-tts（专用 TTS 模型，非聊天模型 mimo-v2.5）
   API: https://token-plan-cn.xiaomimimo.com/v1/chat/completions（POST）
   认证: 请求头 api-key（非 Authorization: Bearer）
   Voice: 苏打
@@ -870,6 +932,16 @@ API 配置：
 运行：
   node scripts/synthesize-audio.mjs           # 合成全部（跳过已存在）
   node scripts/synthesize-audio.mjs --force   # 强制重新合成全部
+
+**synthesize-audio.mjs 脚本来源**：由 Claude 根据上方 API 配置编写，首次合成时自动创建。如已有脚本，核对 API 配置是否匹配。
+
+**错误处理**：
+- API 返回 401/403 → 检查 api-key 是否正确、是否过期
+- API 返回 429 → 请求间隔太短，增大到 1000ms
+- 网络超时 → 检查网络连通性，必要时使用代理
+- 单个片段质量差 → 修改 audio-segments.json 的 text 字段后单独重新生成（只重新生成单个文件，步骤见下方）
+- WAV 文件异常（0 字节） → 检查 API 返回格式，重新运行合成脚本
+- TTS 服务完全不可用 → 用户可选择 (a) 等待服务恢复，(b) 跳过音频进入纯视觉模式
 
 **只重新生成单个文件**（不要用 --force 全部重新生成）：
   1. 临时把 audio-segments.json 只保留要重新生成的条目
@@ -908,6 +980,25 @@ segs.forEach(s => {
 
 **误差检查**：测量结果与 `ChapterX.tsx` 中已声明的帧数常量相差超过 **2 帧**，必须重新测量并更新常量，不可忽略。
 
+### 2.4 生成字幕时间戳
+
+音频帧数测量完成后，生成 subtitle-timings.json，为后续字幕集成做准备。
+
+**生成方式**：
+```bash
+node scripts/gen-subtitle-timings.mjs
+```
+
+脚本读取 audio-segments.json 的 text 字段和 2.3 步骤测量出的帧数，按句子拆分规则生成每句的 start/end 帧号。
+
+**句子拆分规则**（与字幕系统章节一致）：
+- 只按句末标点断句：。！？
+- 超过 50 字的句子才按 ；： 再拆
+- 相邻短句（<12 字）自动合并
+- 禁止按逗号 ，, 拆分
+
+**时间戳分配**：根据每句字符数占总文本的比例分配帧数（长句多分，短句少分），不要均分。
+
 ---
 
 ## Checkpoint Audio
@@ -933,7 +1024,13 @@ segs.forEach(s => {
 
 ## Phase 3 — Remotion 开发
 
-### 3.1 脚手架 + 设计系统
+### 3.1 项目初始化 + 脚手架 + 设计系统
+
+**项目初始化**（从零开始时）：
+```bash
+npm init -y
+npm install remotion@4.0.301 @remotion/cli@4.0.301 @remotion/media-utils@4.0.301 react@^18.3.1 typescript@^5.6.3
+```
 
 版本锁定（重要，不要随意升级）：
   remotion: 4.0.301
@@ -945,7 +1042,20 @@ segs.forEach(s => {
 脚手架：
   mkdir src/{styles,components,scenes} public/audio out scripts references
 
+**必须创建的入口文件**：
+- `src/index.ts`：`import { registerRoot } from 'remotion'; import { Root } from './Root'; registerRoot(Root);`
+- `src/Root.tsx`：注册所有 Composition（每个 Chapter + FullVideo），设置默认 FPS=30, width=1920, height=1080
+
 字体加载：在 global.css 中用 @import 导入 Google Fonts（Lora, Poppins, JetBrains Mono），否则会静默回退到 Georgia/Arial/monospace。
+
+**CJK 字体（中文内容必加）**：Remotion 使用 headless Chromium 渲染，如果没有中文字体会回退到系统默认字体或方块。在 global.css 中追加：
+```css
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+```
+然后在 font-family 中添加 `'Noto Sans SC'` 作为第一个 fallback：
+```css
+--font-sans: 'Poppins', 'Noto Sans SC', Arial, sans-serif;
+```
 
 tokens.css 使用默认 Anthropic 暖调赤陶风格（见上方"设计风格"章节），用户可自定义。
 
@@ -999,6 +1109,36 @@ export const Chapter1: React.FC = () => (
 - B) 顺序开发：全部做完统一验收
 - C) 并行开发：Agent Teams 并行（推荐最大并行度 3）
 
+### 3.4 创建 FullVideo.tsx
+
+所有章节开发完成后，创建 `src/FullVideo.tsx` 将各 Chapter 组合成完整视频：
+
+```tsx
+import React from 'react';
+import { AbsoluteFill, Sequence } from 'remotion';
+import { Chapter1, TOTAL_FRAMES as CH1_FRAMES } from './Chapter1';
+import { Chapter2, TOTAL_FRAMES as CH2_FRAMES } from './Chapter2';
+// ...
+
+const C1_START = 0;
+const C2_START = C1_START + CH1_FRAMES;
+// ...
+
+export const FullVideo: React.FC = () => (
+  <AbsoluteFill>
+    <Sequence from={C1_START} durationInFrames={CH1_FRAMES} name="Chapter 1">
+      <Chapter1 />
+    </Sequence>
+    <Sequence from={C2_START} durationInFrames={CH2_FRAMES} name="Chapter 2">
+      <Chapter2 />
+    </Sequence>
+    {/* ...更多章节 */}
+  </AbsoluteFill>
+);
+```
+
+确保 Root.tsx 中已注册 `FullVideo` Composition（总帧数 = 所有章节帧数之和）。
+
 ---
 
 ## Checkpoint Render
@@ -1038,10 +1178,33 @@ export const Chapter1: React.FC = () => (
 
 根据 Checkpoint Render 的选择执行渲染。
 
+### 渲染配置
+
+默认配置（在 Root.tsx 的 Composition 中设置）：
+- 分辨率：1920×1080（16:9）
+- 帧率：30fps
+- 编码：h264（默认）
+
+如需自定义，在渲染命令中添加参数：
+```bash
+--fps=60                        # 帧率
+--width=1080 --height=1920      # 竖屏 9:16
+--codec=h264                    # 编码格式
+```
+
 ### 渲染命令
 
-国内网络需要指定本地 Chrome：
-  --browser-executable="C:\Program Files\Google\Chrome\Application\chrome.exe"
+国内网络需要指定本地 Chrome（跨平台路径）：
+```bash
+# Windows
+--browser-executable="C:\Program Files\Google\Chrome\Application\chrome.exe"
+# macOS
+--browser-executable="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+# Linux
+--browser-executable="/usr/bin/google-chrome"
+# 或使用 Remotion 自动下载 Chromium（推荐，无需手动指定）
+npx remotion browser ensure
+```
 
 **选项 A：仅渲染各章节**
 ```bash
@@ -1079,6 +1242,18 @@ npx remotion render src/index.ts FullVideo out/full-video.mp4
 ### 渲染完成
 
 输出文件在 out/ 目录下。告知用户文件路径和大小。
+
+### 渲染故障排查
+
+| 问题 | 原因 | 解决方案 |
+|------|------|---------|
+| Chrome 路径错误 | 路径不匹配或未安装 | 运行 `npx remotion browser ensure` 自动下载 Chromium |
+| 内存不足（OOM） | 长视频渲染占用大量内存 | 分段渲染各章节，再用 FFmpeg 合并 |
+| TypeScript 编译失败 | 组件有语法错误 | 在 Studio 预览中定位错误，先修复再渲染 |
+| 音频文件缺失 | public/audio/ 下文件不全 | 检查 audio-segments.json 与实际文件是否匹配 |
+| 组件运行时异常 | interpolate 越界、未定义变量 | 在 Studio 中逐场景预览，定位报错场景 |
+
+**重要**：渲染前务必先在 Remotion Studio 中预览确认无报错。
 
 
 ## 动画系统
@@ -1132,13 +1307,15 @@ const bulletOp = (i) => interpolate(
 **时间戳生成**：
 - 根据每句字符数占总文本的比例分配帧数（长句多分，短句少分）
 - 不要均分时间（每句一样长会和音频不同步）
-- 生成脚本：node /tmp/gen-subtitle-timings.js
+- 生成脚本：node scripts/gen-subtitle-timings.mjs
 
 **字幕样式**：
 - 底部居中，bottom: 40px
 - 半透明深色背景 rgba(20,20,19,0.85)
 - 白色文字 #EBEAE4，28px
 - 8 帧淡入 + 6 帧淡出
+
+**字幕策略说明**：当前方案为硬字幕（烧入视频），适合 B 站/YouTube/视频号等平台。如需软字幕（SRT/ASS），可在渲染后用 FFmpeg 提取 subtitle-timings.json 生成 SRT 文件。硬字幕优点：所有平台可见、样式统一；软字幕优点：观众可开关/调整大小。
 
 **集成方式**：
 ```tsx
@@ -1160,24 +1337,142 @@ import subtitleTimings from '../../subtitle-timings.json';
 
 ## 视觉多样性
 
-禁止连续 2 个场景使用相同布局。每个章节至少使用 2-3 种视觉形式：
+### 术语定义
 
-| 视觉形式 | 适用场景 |
-|----------|---------|
-| 数据可视化 | SVG 曲线、柱状图 |
-| 对比布局 | 左右分栏 |
-| 终端/代码 | 终端窗口 |
-| 卡片网格 | 列表/分类 |
-| 时间线 | 流程/步骤 |
-| 大标题 | 核心观点 |
+在本 Skill 中，以下术语有明确区分：
+- **场景（Scene）**：一个 Sequence 单元，对应一段音频、一个场景组件文件（如 Scene0Title.tsx）
+- **帧型（Frame Type）**：场景的视觉构图模式，分"简洁帧"和"密集帧"两种
+- 一个场景可以是简洁帧或密集帧，两者是构图方式，不是场景的分类
+
+### 两种帧型（核心概念）
+
+视频帧分两种，必须交替使用：
+
+**简洁帧（氛围感，40%）**
+- 大字标题（48-72px）、大面积留白（40%+）、不对称偏置
+- 用于：章节开场、概念预告、核心结论
+- 模板：大字独白、偏置构图、标题在下、底部信息栏
+
+**密集帧（信息量，60%）**
+- 有数据表/对比/解释、多层级排版、底部有结论
+- 用于：特性详解、性能对比、架构图解、代码+运行结果
+- 6 种模板（见 layout-gallery.html Part 4）：
+  - **D1 数据表格**：6-8 行数据表+表头+高亮行+注释行+底部结论条。适合性能对比、参数对比
+  - **D2 左文右数据**：左 55% 文字+5标签+4子卡片 / 右 45% 6个数据卡+总结条。适合概念配指标
+  - **D3 编号列表**：6 步编号列表，每步有编号圆+标题+英文标注+说明+右侧状态标签。适合步骤拆解
+  - **D4 左解释+右代码**：左 42% 描述+参数表+陷阱提示 / 右 58% 15行完整代码。适合 API 演示
+  - **D5 网格卡片**：3×2 六卡片网格，一张 Oat 标记推荐。适合方案对比、工具选型
+  - **D6 问题-改进对比**：左右各 5 个痛点/改进 + 进度条对比。适合痛点分析、前后对比
+
+### 帧型选择决策器
+
+| 口播信号 | 优先帧型 | 画面任务 |
+|---------|----------|----------|
+| "先记住一句话"、"真正的问题是" | 简洁帧 | 制造停顿、建立预期、强化关键词 |
+| "有三个原因"、"分成四步" | 密集帧 | 让结构完整可见，逐项揭示 |
+| "对比一下"、"改进前后" | 密集帧 | 把差异放在同一视野内 |
+| "这里很反直觉"、"注意这个细节" | 简洁帧 → 密集帧 | 先打断，再解释 |
+| "到这里可以得出结论" | 简洁帧 / Feature 暗卡 | 回收信息，让观众能复述 |
+
+**简洁帧负责改变观众状态，密集帧负责交付信息。** 简洁帧不能只是空，必须承担悬念、转折、总结、喘息中的一个任务。
+
+### 视觉重音体系
+
+同一帧最多一个主重音。重音强度要匹配口播强度：
+- **Level 1 词级**：关键词、参数名、术语。用 accent 文本、下划线、色点。
+- **Level 2 项级**：当前正在讲的列表项/代码行。用左边框、编号圆点、当前行高亮。
+- **Level 3 区块级**：一个区域比其他区域重要。用 Oat 卡、浅 tint 提示、细边框。
+- **Level 4 帧级**：核心结论、章节转折。用简洁帧、暗色主题、Feature 暗卡。
+- **Level 5 节奏级**：情绪变化、段落换挡。用明暗切换、留白、短暂停顿。
+
+禁止所有项同时高亮、之前项永久高亮、同章反复使用 Feature 暗卡、用高饱和整块背景制造重音。
+
+### 观众留存节拍
+
+每个场景至少标注一个节拍：
+- **Hook**：用问题、反差、代价或结果让观众进入。
+- **Map**：告诉观众这段有几个部分，但不提前铺满细节。
+- **Reveal**：逐项交付信息，口播说到哪里，画面出现到哪里。
+- **Contrast**：用前后、好坏、左右、旧新制造判断感。
+- **Payoff**：把解释压成一句可复述的结论。
+
+时间规则：
+- 开场 8 秒内直接给问题、反差或承诺，不先铺背景。
+- 每 20-35 秒至少一次轻转折（简洁帧、暗色帧、对比帧、代码运行结果、结论条）。
+- 每 60-90 秒一句结构回收：刚解决了什么，下一段为什么重要。
+- 结尾 12 秒给压缩版答案，最后一帧应像可截图的结论。
+
+### 色彩用量
+
+颜色是语法，不是装饰。默认比例：
+- 80% 中性色承载阅读（Ivory / Ink / Slate / Cloud）
+- 15% Oat、浅 tint、细分割线组织区域
+- 5% accent 和辅助色负责真正注意力
+
+同帧最多两种辅助色：一个主 accent，一个语义辅助色。Feature 暗卡内通常只保留 accent。颜色只使用当前颜色库里的既有 token，不新增 chart-yellow/purple 或 tint-yellow/purple。
+
+### 逐层深入模式
+
+同一知识点，用"放大镜"方式逐层展开：
+```
+概览（简洁帧）→ 详解（密集帧）→ 深挖 A（密集帧）→ 深挖 B（密集帧）
+```
+示例：RDD 五大特性 → 概览（简洁·五个标签）→ 详解（密集·每项一行解释）→ 深挖（密集·分区机制+代码+图）
+
+### 章节节奏公式
+
+```
+章节开场（简洁·暗色）→ 概念预告（简洁）→ 详解（密集）→ 深挖（密集，可选）→ 下一概念（简洁）→ ...
+```
+
+**约束**：
+- 不能连续 2 帧都是简洁帧（观众觉得空洞）
+- 不能连续 3 帧都是密集帧（观众疲劳）
+- 每屏布局不重复（连续场景结构不同）
+
+### 构图参考
+
+项目的 `references/layout-gallery.html` 包含完整构图示例：
+- Part 1：8 种简洁帧模板（大字独白、偏置构图、标题在下...）
+- Part 2：简洁 vs 密集对比（同一内容两种处理）
+- Part 3：逐层深入模式（概览→详解→深挖）
+- Part 4：6 种密集帧模板（数据表格、左文右数据、编号列表、左代码右解释、2×2 网格、问题-改进对比）
+
+开发新场景前先浏览该文件确定构图方式。
+
+详细规则见 `references/CHAPTER-CRAFT.md` Part 4: 布局构图规则。
+创作判断见 `references/CREATIVE-GAP-PLAYBOOK.md`；可视化参考见 `references/creative-gap-playbook.html`。
 
 ### 内容边界
 
 - 所有内容在 y=930 以上（永远遵守，即使不加字幕——用户发布时可能外挂字幕）
+- 底部 padding >= 160px（为字幕留空间）
 - 字体 >= 24px
 - 每屏 1-2 个核心信息点
 
-### 布局间距规则（重要）
+### 字号系统（1920×1080）
+
+| 层级 | 字号 | 字重 | 用途 |
+|------|------|------|------|
+| 超大标题 | 80-100px | 700 | 章节开场、核心金句 |
+| 大标题 | 48-60px | 700 | 场景主题 |
+| 小标题 | 32-36px | 600 | 卡片标题 |
+| 正文 | 24-28px | 400 | 说明文字 |
+| 标注 | 20-22px | 400 | 数据来源、时间戳 |
+| 大数字 | 80-120px | 700 | 数据焦点 |
+| 代码 | 22-24px | 400 | 终端/代码块 |
+
+### 留白规范（按布局类型）
+
+| 布局 | padding | 说明 |
+|------|---------|------|
+| 大字独白 | 上下 160px 左右 200px | 极简呼吸感 |
+| 标题+内容 | 上 80px 下 160px 左右 100px | 标准时长 |
+| 双栏对比 | 上下 80px 左右 100px | 信息密集 |
+| 数据表格 | 上 60px 下 160px 左右 80px | 最大化内容区 |
+| 深挖帧 | 上 60px 下 160px 左右 80px | 最大化内容区 |
+
+### 布局间距规则
 
 字号提升后（如 14px → 24px），容器尺寸必须同步调整，否则会重叠。
 
@@ -1216,6 +1511,7 @@ import subtitleTimings from '../../subtitle-timings.json';
 双 Agent 质检 + 自检清单合并，逐条核对：
 
 **Agent 1：代码质检**
+- [ ] 已运行 `node <skill>/scripts/lint-remotion-scenes.mjs <project>`（或项目内同名脚本），无 error
 - [ ] 所有 interpolate 有 extrapolateLeft/Right: clamp
 - [ ] 无 Date.now / Math.random
 - [ ] 暗色场景用 AbsoluteFill className="dark-theme"（不要 div 包裹 Sequence）
@@ -1227,6 +1523,8 @@ import subtitleTimings from '../../subtitle-timings.json';
 
 **Agent 2：视觉质检**
 - [ ] 标题-内容间距 >= 30px（检查 top 值差）
+- [ ] 每个场景都有观众任务标注（看懂/记住/判断什么）
+- [ ] 每个场景只有一个主视觉焦点，1 秒内能判断先看哪里
 - [ ] 连续场景布局不重复
 - [ ] 暗色场景比例 20-35%
 - [ ] 所有内容 y < 930
@@ -1236,12 +1534,23 @@ import subtitleTimings from '../../subtitle-timings.json';
 - [ ] 卡片文字不用绿/蓝/红（用中性色阶或 accent 文字色）
 - [ ] 辅助色不做整块容器背景（只做标签/色点/左边框）
 - [ ] Feature 暗卡内同一种辅助色（不混用蓝+橙等多色标签）
+- [ ] 同帧最多两种辅助色，且辅助色有语义用途
 - [ ] 提示/警告用纯色浅底 + 左边框（不用整块高饱和填充）
+- [ ] 视觉重音与口播重音一致，当前项高亮随口播切换
+- [ ] 每 20-35 秒有轻转折，每 60-90 秒有结构回收
+- [ ] 每个密集帧有底部结论条或可复述的收束句
 - [ ] 每个场景都有入场动画（无跳切）
 - [ ] 音频和画面严格同步
 - [ ] 颜色来自 tokens.css（无硬编码 hex/rgba）
 - [ ] 明暗节奏合理（20-35% 暗色）
 - [ ] Studio 预览无报错
+
+**静态质检命令**：
+```bash
+node <remotion-factory>/scripts/lint-remotion-scenes.mjs .
+```
+
+将 `<remotion-factory>` 替换为当前 skill 安装路径。该脚本只做静态扫描，不能替代 Studio 预览和成片播放检查。
 
 ### Phase 4 渲染后
 - Agent 1：同步质检
@@ -1251,6 +1560,22 @@ import subtitleTimings from '../../subtitle-timings.json';
   - 完整播放无报错
   - 暗色场景视觉效果正确
   - 字幕不遮挡主内容
+
+---
+
+## 回退与修改
+
+实际开发中常需要回头修改前面 Phase 的内容。以下是修改影响范围：
+
+| 修改内容 | 需要同步更新 |
+|---------|------------|
+| script.md 文本 | 重新合成对应音频 → 重新测量帧数 → 更新 ChapterX.tsx 常量 → 更新 subtitle-timings.json |
+| audio-segments.json 增删场景 | 重新合成音频 → 重新测量帧数 → 更新 ChapterX.tsx Sequence 编排 → 更新 subtitle-timings.json |
+| outline.md 场景增减 | 更新 ChapterX.tsx Sequence 编排 → 更新 FullVideo.tsx |
+| tokens.css 颜色 | Studio 预览检查所有场景，无需重新合成音频 |
+| 单个场景组件修改 | Studio 预览确认，无需重新合成音频 |
+
+**原则**：改了 text → 必须重新合成音频。改了结构 → 必须更新 Sequence 编排。改了样式 → 只需预览。
 
 
 

@@ -1,8 +1,8 @@
-﻿{
+{
   "name": "remotion-factory",
-  "version": "1.9.0",
+  "version": "1.12.0",
   "category": "Video / Presentation",
-  "description": "Turn articles or scripts into MP4 videos using Remotion. Audio-first workflow, content-faithful narration via MiMo TTS, Anthropic warm terracotta default style, reference images support, and Agent Teams quality checks.",
+  "description": "Turn articles or scripts into MP4 videos using Remotion. Audio-first workflow, content-faithful narration via MiMo TTS, creative scene planning, style adaptation, static scene linting, reference images support, and Agent Teams quality checks.",
   "homepage": "https://github.com/MgGaWin/remotion-factory",
   "compat": ["claude-code", "claude-ai", "cursor"]
 }

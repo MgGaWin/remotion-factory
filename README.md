@@ -35,11 +35,14 @@ Or download the [ZIP](https://github.com/MgGaWin/remotion-factory/archive/refs/h
 - Content fidelity: audio-segments.json text matches script.md faithfully
 - TTS-safe text: automatically replaces _ and - with spaces
 - Default style: Anthropic warm terracotta (customizable via tokens.css)
+- Style adaptation: use STYLE-ADAPTATION.md to change visual tone without breaking the workflow
 - **Color system**: three-layer model (graphic / tag / container) with tint callout tokens
 - Visual diversity: enforced layout variety across scenes
+- Creative planning layer: frame selection, visual accent, retention beats, color dosage, good/bad review standards
 - Appear and stay: elements stay visible once animated in
 - Reference images: drop sketches in references/ directory
 - Agent Teams quality checks at every phase
+- Static scene linting: catches small fonts, missing clamps, hard-coded colors, unsafe positions, randomness, and other common issues
 - Render guard: MP4 rendering only after full verification
 - Version-locked: Remotion 4.0.301 + React 18.3 + TypeScript 5.6
 
@@ -63,13 +66,18 @@ Or download the [ZIP](https://github.com/MgGaWin/remotion-factory/archive/refs/h
 remotion-factory/                   # Skill directory (~/.claude/skills/)
 ├── SKILL.md                        # Main skill document
 ├── manifest.json                   # Skill metadata
+├── scripts/
+│   └── lint-remotion-scenes.mjs     # Static Remotion scene quality checker
 └── references/                     # Skill built-in docs (ships with skill)
     ├── CHAPTER-CRAFT.md            # Scene development guide + animation patterns
-    ├── AUDIO.md                    # Audio synthesis + frame alignment
+    ├── CREATIVE-GAP-PLAYBOOK.md    # Creative planning guide (frames/accent/retention/color/review)
+    ├── STYLE-ADAPTATION.md         # Style adaptation and token mapping guide
+    ├── audio.md                    # Audio synthesis + frame alignment
     ├── SKETCH-SVG.md               # Hand-drawn SVG guide (Anthropic Humane Aesthetic)
     ├── sketch-demo.html            # Interactive SVG demo (88 animated elements)
     ├── color-preview.html          # Full color palette visualization
-    └── surface-demo.html           # Color application rules (three-layer model)
+    ├── surface-demo.html           # Color application rules (three-layer model)
+    └── creative-gap-playbook.html  # Visual creative-gap playbook
 
 my-video/                           # User project directory (separate)
 ├── article.md                      # User's original article
@@ -92,3 +100,4 @@ Open these in your browser to preview the design system:
 | `color-preview.html` | All tokens, 4 card types, light/dark theme, 10-step neutral scale |
 | `surface-demo.html` | Three-layer color model, correct tag/dot/border patterns, tint callouts |
 | `sketch-demo.html` | 88 hand-drawn SVG elements with copyable AI prompts |
+| `creative-gap-playbook.html` | Visual workspace for frame selection, accents, retention, color, and good/bad review |
