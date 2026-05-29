@@ -13,6 +13,7 @@ description: |
 
 ## 版本记录
 
+- 1.13.0: Agent Teams 自动质检——每个 Phase 完成后自动并行派出两个独立 Agent 质检，含详细 prompt 模板、PASS/FAIL 闸门、失败重试循环
 - 1.12.0: 工程化补强——新增 scripts/lint-remotion-scenes.mjs 静态质检脚本、STYLE-ADAPTATION.md 风格迁移指南；主文档参考索引瘦身，Phase 3 增加 lint 闸门
 - 1.11.0: 创作判断层补全——新增 CREATIVE-GAP-PLAYBOOK.md/creative-gap-playbook.html，补齐简洁帧选择、视觉重音、观众留存、色彩用量、好坏对比审稿；Phase 3 增加场景规划闸门和观众任务标注
 - 1.10.1: 质检全面修复——工作流补全（subtitle-timings.json/FullVideo.tsx/Root.tsx 步骤）、Feature 暗卡规则统一、错误恢复指引、跨平台兼容、CJK 字体/渲染配置/BGM 指引、CSS 变量去重、术语统一
@@ -43,7 +44,7 @@ Phase 1   内容编写
    1.2  内容类型判断
    1.3  产出 script.md + outline.md
    ▼
-[Checkpoint Plan]      ← 必须停。含质检（内容+结构）。一次对齐 5 件事
+[Checkpoint Plan]      ← 自动派 2 Agent 质检（内容+结构）。PASS 后继续
    ▼
 Phase 2   音频合成（先音频，后开发）
    2.1  生成 audio-segments.json
@@ -51,7 +52,7 @@ Phase 2   音频合成（先音频，后开发）
    2.3  测量帧数 → 确定每个场景时长
    2.4  生成 subtitle-timings.json（字幕时间戳）
    ▼
-[Checkpoint Audio]     ← 必须停。含质检（音频+帧数）。确认音频 OK
+[Checkpoint Audio]     ← 自动派 2 Agent 质检（音频+帧数）。PASS 后继续
    ▼
 Phase 3   Remotion 开发
    3.1  项目初始化 + 脚手架 + 设计系统
@@ -62,9 +63,11 @@ Phase 3   Remotion 开发
    3.3  第 2~N 章（按选定模式）
    3.4  创建 FullVideo.tsx（全片合并）
    ▼
-[Checkpoint Render]    ← 必须停。含质检（代码+视觉）。章节 + 音频全部就绪才可渲染
+[Checkpoint Render]    ← 自动派 2 Agent 质检（代码+视觉）。PASS 后继续
    ▼
 Phase 4   渲染 MP4 + 故障排查
+   ▼
+[Checkpoint Final]     ← 自动派 2 Agent 质检（同步+成品）。PASS 后交付
 ```
 
 ---
@@ -929,6 +932,24 @@ API 配置：
   Format: WAV
   请求间隔: 500ms
 
+**请求体格式（关键）**：
+```json
+{
+  "model": "mimo-v2.5-tts",
+  "messages": [
+    { "role": "user", "content": "要合成的文本" },
+    { "role": "assistant", "content": "要合成的文本" }
+  ],
+  "voice": "苏打",
+  "response_format": "wav"
+}
+```
+
+> **⚠️ 易错点**：
+> - assistant 消息的 content 必须和 user 消息一致（不能留空），否则 TTS 输出极短或无声
+> - voice 和 response_format 在请求体顶层，**不要**嵌套在 audio 对象里
+> - Voice 值为中文名（"苏打"），不是 "v_soda"
+
 运行：
   node scripts/synthesize-audio.mjs           # 合成全部（跳过已存在）
   node scripts/synthesize-audio.mjs --force   # 强制重新合成全部
@@ -1494,56 +1515,106 @@ import subtitleTimings from '../../subtitle-timings.json';
 
 ---
 
-## 质检流程
+## 质检流程（Agent Teams 自动触发）
 
-每个 Phase 完成后，使用 Agent Teams 创建两个独立 Agent 进行质检：
+**核心规则**：每个 Phase 完成后，**必须并行派出两个独立 Agent** 进行质检。两个 Agent 全部 PASS 后才能进入下一个 Phase。任何一个 Agent 报 FAIL，必须修复后重新质检。
 
-### Phase 1 完成后
-- Agent 1：内容质检（script.md 与 article.md 的信息密度对比）
-- Agent 2：结构质检（outline.md 的章节划分合理性）
+### 执行方式
 
-### Phase 2 完成后
-- Agent 1：音频质检（TTS 输出是否正常，有无符号读出）
-- Agent 2：帧数质检（WAV 帧数计算是否正确）
+每个 Checkpoint 通过单条消息并行派出两个 Agent（使用 Agent tool，两条调用写在同一消息中）：
 
-### Phase 3 完成后（含自检清单）
+```
+Agent 1: description="质检 Phase N - 角色A", prompt="...", subagent_type="reviewer"
+Agent 2: description="质检 Phase N - 角色B", prompt="...", subagent_type="reviewer"
+```
+
+两个 Agent 互不可见、互不依赖，各自独立读取项目文件并输出报告。
+
+### Phase 1 完成后 → Checkpoint Plan 质检
+
+**Agent 1：内容质检**
+- 读取 `<project>/article.md` 和 `<project>/script.md`
+- 逐节对比：文章的每个知识点是否在口播稿中有覆盖
+- 检查口播稿是否有文章中不存在的错误知识
+- 检查口播语句是否自然（非书面语、无过长句子）
+- 输出：PASS / FAIL + 缺失知识点列表
+
+**Agent 2：结构质检**
+- 读取 `<project>/script.md` 和 `<project>/outline.md`
+- 检查场景数与口播段落数是否匹配
+- 检查帧类型比例（简洁帧 30-45%，密集帧 55-70%）
+- 检查暗色场景比例（20-35%）
+- 检查连续简洁帧不超过 2 个
+- 检查每章是否有章节标题场景
+- 输出：PASS / FAIL + 结构问题列表
+
+### Phase 2 完成后 → Checkpoint Audio 质检
+
+**Agent 1：音频质检**
+- 读取 `<project>/audio-segments.json`
+- 检查每个 segment 的 text 字段是否与 script.md 对应段落一致
+- 检查 text 中是否有 TTS 不友好的字符（下划线、连字符、特殊符号）
+- 检查 audio 文件名是否按 chapter-scene 规则命名
+- 输出：PASS / FAIL + 文本不一致列表
+
+**Agent 2：帧数质检**
+- 读取 `<project>/public/audio/` 下所有 WAV 文件
+- 读取 WAV 头部计算时长，转换为帧数（×30fps + 15 帧缓冲）
+- 与 ChapterX.tsx 中的 durationInFrames 常量对比
+- 与 FullVideo.tsx 中的总帧数对比
+- 检查各 Chapter 帧数之和是否等于 FullVideo 总帧数
+- 输出：PASS / FAIL + 帧数不匹配列表
+
+### Phase 3 完成后 → Checkpoint Render 质检
 
 双 Agent 质检 + 自检清单合并，逐条核对：
 
 **Agent 1：代码质检**
-- [ ] 已运行 `node <skill>/scripts/lint-remotion-scenes.mjs <project>`（或项目内同名脚本），无 error
-- [ ] 所有 interpolate 有 extrapolateLeft/Right: clamp
-- [ ] 无 Date.now / Math.random
-- [ ] 暗色场景用 AbsoluteFill className="dark-theme"（不要 div 包裹 Sequence）
-- [ ] interpolateColor 用 3 参数形式
-- [ ] 字体 >= 24px（grep 所有 fontSize < 24）
-- [ ] 无 emoji 当图标
-- [ ] 动画时长 >= 18 帧（FAST 常量 + 内联范围）
-- [ ] 无 `var(--c-surface)` 或 `var(--c-card-featured-*)` 残留
+- 读取 `<project>/src/` 下所有 .tsx 文件
+- 运行静态质检脚本（如存在）：`node <skill>/scripts/lint-remotion-scenes.mjs <project>`
+- 检查清单：
+  - [ ] 已运行 `node <skill>/scripts/lint-remotion-scenes.mjs <project>`（或项目内同名脚本），无 error
+  - [ ] 所有 interpolate 有 extrapolateLeft/Right: clamp
+  - [ ] 无 Date.now / Math.random
+  - [ ] 暗色场景用 AbsoluteFill className="dark-theme"（不要 div 包裹 Sequence）
+  - [ ] 暗色场景的 AbsoluteFill style 中必须显式设置 `background: 'var(--c-bg)'`（否则父级亮色背景会透出，因为 CSS 变量作用域问题）
+  - [ ] interpolateColor 用 3 参数形式
+  - [ ] 字体 >= 24px（grep 所有 fontSize < 24）
+  - [ ] 无 emoji 当图标
+  - [ ] 动画时长 >= 18 帧（FAST 常量 + 内联范围）
+  - [ ] 无 `var(--c-surface)` 或 `var(--c-card-featured-*)` 残留
+- 输出：PASS / FAIL + 代码问题列表（含文件名和行号）
 
 **Agent 2：视觉质检**
-- [ ] 标题-内容间距 >= 30px（检查 top 值差）
-- [ ] 每个场景都有观众任务标注（看懂/记住/判断什么）
-- [ ] 每个场景只有一个主视觉焦点，1 秒内能判断先看哪里
-- [ ] 连续场景布局不重复
-- [ ] 暗色场景比例 20-35%
-- [ ] 所有内容 y < 930
-- [ ] 标准卡有 `border: 0.5px solid var(--c-card-border)`
-- [ ] Oat 卡无 border、无 boxShadow（纯靠 #E3DACC 背景区分）
-- [ ] Feature 暗卡按需使用（信息重音点才用，叙事型章节可不用），同章不超过 2 个
-- [ ] 卡片文字不用绿/蓝/红（用中性色阶或 accent 文字色）
-- [ ] 辅助色不做整块容器背景（只做标签/色点/左边框）
-- [ ] Feature 暗卡内同一种辅助色（不混用蓝+橙等多色标签）
-- [ ] 同帧最多两种辅助色，且辅助色有语义用途
-- [ ] 提示/警告用纯色浅底 + 左边框（不用整块高饱和填充）
-- [ ] 视觉重音与口播重音一致，当前项高亮随口播切换
-- [ ] 每 20-35 秒有轻转折，每 60-90 秒有结构回收
-- [ ] 每个密集帧有底部结论条或可复述的收束句
-- [ ] 每个场景都有入场动画（无跳切）
-- [ ] 音频和画面严格同步
-- [ ] 颜色来自 tokens.css（无硬编码 hex/rgba）
-- [ ] 明暗节奏合理（20-35% 暗色）
-- [ ] Studio 预览无报错
+- 读取 `<project>/src/scenes/` 下所有场景文件
+- 读取 `<project>/outline.md` 获取场景规划
+- 检查清单：
+  - [ ] 标题-内容间距 >= 30px（检查 top 值差）
+  - [ ] 每个场景都有观众任务标注（看懂/记住/判断什么）
+  - [ ] 每个场景只有一个主视觉焦点，1 秒内能判断先看哪里
+  - [ ] 连续场景布局不重复（特别是章节标题场景——每章的构图方式必须不同：左对齐/右对齐/幽灵数字/底部锚定等，不能全是居中对齐）
+  - [ ] accent 色克制使用：每场景最多 1-2 处 accent（装饰线、关键词高亮），副标题/标签等次要元素不要用 accent
+  - [ ] 简洁帧的入场动画核心元素用 SLOW(24)，装饰元素用 FAST(18)，多元素需有 stagger 先后顺序
+  - [ ] Feature 暗卡标题字号 >= 52px（建议 56px），确保视觉冲击力
+  - [ ] 暗色场景比例 20-35%
+  - [ ] 所有内容 y < 930
+  - [ ] 标准卡有 `border: 0.5px solid var(--c-card-border)`
+  - [ ] Oat 卡无 border、无 boxShadow（纯靠 #E3DACC 背景区分）
+  - [ ] Feature 暗卡按需使用（信息重音点才用，叙事型章节可不用），同章不超过 2 个
+  - [ ] 卡片文字不用绿/蓝/红（用中性色阶或 accent 文字色）
+  - [ ] 辅助色不做整块容器背景（只做标签/色点/左边框）
+  - [ ] Feature 暗卡内同一种辅助色（不混用蓝+橙等多色标签）
+  - [ ] 同帧最多两种辅助色，且辅助色有语义用途
+  - [ ] 提示/警告用纯色浅底 + 左边框（不用整块高饱和填充）
+  - [ ] 视觉重音与口播重音一致，当前项高亮随口播切换
+  - [ ] 每 20-35 秒有轻转折，每 60-90 秒有结构回收
+  - [ ] 每个密集帧有底部结论条或可复述的收束句
+  - [ ] 每个场景都有入场动画（无跳切）
+  - [ ] 音频和画面严格同步
+  - [ ] 颜色来自 tokens.css（无硬编码 hex/rgba）
+  - [ ] 明暗节奏合理（20-35% 暗色）
+  - [ ] Studio 预览无报错
+- 输出：PASS / FAIL + 视觉问题列表（含场景名）
 
 **静态质检命令**：
 ```bash
@@ -1552,14 +1623,32 @@ node <remotion-factory>/scripts/lint-remotion-scenes.mjs .
 
 将 `<remotion-factory>` 替换为当前 skill 安装路径。该脚本只做静态扫描，不能替代 Studio 预览和成片播放检查。
 
-### Phase 4 渲染后
-- Agent 1：同步质检
-  - 字幕与音频是否对齐
-  - 动画切换是否在音频提到内容时发生
-- Agent 2：成品质检
-  - 完整播放无报错
-  - 暗色场景视觉效果正确
-  - 字幕不遮挡主内容
+### Phase 4 渲染后 → 成品质质检
+
+**Agent 1：同步质检**
+- 读取 `<project>/subtitle-timings.json` 和 `<project>/audio-segments.json`
+- 检查字幕时间戳是否与音频时长匹配
+- 检查字幕是否有重叠或间隙
+- 字幕与音频是否对齐
+- 动画切换是否在音频提到内容时发生
+- 输出：PASS / FAIL + 同步问题列表
+
+**Agent 2：成品质质检**
+- 读取渲染输出文件大小（应 > 10MB）
+- 检查 FullVideo.tsx 的总帧数是否覆盖所有章节
+- 检查 Root.tsx 中 FullVideo 的 durationInFrames 是否正确
+- 完整播放无报错
+- 暗色场景视觉效果正确
+- 字幕不遮挡主内容
+- 输出：PASS / FAIL + 成品问题列表
+
+### 失败处理
+
+任一 Agent 报 FAIL 时：
+1. 收集两个 Agent 的所有 FAIL 项
+2. 按优先级修复（代码问题 > 结构问题 > 内容问题）
+3. 修复后**重新派出两个 Agent 质检**（使用相同 prompt）
+4. 循环直到两个 Agent 都 PASS
 
 ---
 
