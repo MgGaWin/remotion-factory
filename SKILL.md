@@ -1584,12 +1584,12 @@ import subtitleTimings from '../../subtitle-timings.json';
 | S2 | 标题+副标题 | 简洁帧 | 章节转场、概念引入 |
 | S3 | 引用卡 | 简洁帧 | 名言、核心结论 |
 | S4 | 数据高亮 | 简洁帧 | 关键数字、统计 |
-| D1 | 卡片网格 | 密集帧 | 列表、分类、对比 |
-| D2 | 左右对比 | 密集帧 | Before/After、对比 |
-| D3 | 时间线 | 密集帧 | 流程、步骤、历史 |
-| D4 | 终端窗口 | 密集帧 | 代码、命令行 |
-| D5 | 代码对比 | 密集帧 | 代码比较 |
-| D6 | 有序列表 | 密集帧 | 要点罗列 |
+| D1 | 数据表格 | 密集帧 | 6-8 行数据表、参数对比、性能对比 |
+| D2 | 左文右数据 | 密集帧 | 左 55% 文字+标签 / 右 45% 数据卡，概念配指标 |
+| D3 | 编号列表 | 密集帧 | 6 步编号列表，步骤拆解、流程展示 |
+| D4 | 左解释+右代码 | 密集帧 | 左侧文字解释 + 右侧代码展示 |
+| D5 | 网格卡片 | 密集帧 | 多卡片并列，分类、特性列举 |
+| D6 | 问题-改进对比 | 密集帧 | 问题与改进方案对比、Before/After |
 | F | Feature 暗卡 | 特殊帧 | 全章最重要的结论（每章最多 2 个） |
 | T | Terminal | 特殊帧 | 终端/代码展示 |
 | CC | CodeComparison | 全屏组件 | 左右代码对比 |
@@ -1868,7 +1868,7 @@ node <remotion-factory>/scripts/lint-remotion-scenes.mjs .
 
 将 `<remotion-factory>` 替换为当前 skill 安装路径。该脚本只做静态扫描，不能替代 Studio 预览和成片播放检查。
 
-### Phase 4 渲染后 → 成品质质检
+### Phase 4 渲染后 → 成品质检
 
 **Agent 1：同步质检**
 - 读取 `<project>/subtitle-timings.json` 和 `<project>/audio-segments.json`
@@ -1880,7 +1880,7 @@ node <remotion-factory>/scripts/lint-remotion-scenes.mjs .
 - **FAIL 标准**：存在字幕重叠；间隙 > 1 秒；对齐误差 > 5 帧；动画-口播误差 > 10 帧
 - 输出：PASS / FAIL + 同步问题列表（含帧号和期望值）
 
-**Agent 2：成品质质检**
+**Agent 2：成品质检**
 - 读取渲染输出文件大小（应 > 10MB，小于 10MB 通常意味着渲染不完整）
 - 检查 FullVideo.tsx 的总帧数是否覆盖所有章节（各 Chapter 帧数之和 = FullVideo 总帧数）
 - 检查 Root.tsx 中 FullVideo 的 durationInFrames 是否正确
