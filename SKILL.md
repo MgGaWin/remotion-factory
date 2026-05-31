@@ -1,9 +1,9 @@
 ---
 name: remotion-factory
 description: |
-  把一篇文章或口播稿，用 Remotion 做成可直接渲染 MP4 的视频。
-  流程：原始文章 → 口播稿 → 音频合成 → Remotion 开发 → 渲染 MP4。
-  适用场景：B 站 / YouTube / 视频号教程、产品演示、数据可视化视频、动态 PPT。
+  把文章、口播稿、简略提纲、信息科普内容或代码项目，用 Remotion 做成可直接渲染 MP4 的视频。
+  流程：原始材料 → 费曼扩写/口播稿 → 音频合成 → Remotion 开发 → 渲染 MP4。
+  适用场景：B 站 / YouTube / 视频号教程、科普解释、代码项目讲解、产品演示、数据可视化视频、动态 PPT。
   默认设计风格：Anthropic 暖调赤陶色人文极简。用户可自定义。
 ---
 
@@ -13,6 +13,8 @@ description: |
 
 ## 版本记录
 
+- 2.0.0: 全面整改——TTS 文本清理规则完善（markdown/编程符号）、Chrome 渲染指引明确（本地优先）、质检流程强化（具体检查项+通过标准）、明暗节奏用户可选、导演审美系统
+- 1.14.0: 信息/科普解释模式——新增 EXPLAINER-SCRIPTING.md，支持费曼扩写、简略文章+代码项目/资料库转口播稿；Phase 1 增加 feynman-notes.md 中间产物和证据追踪
 - 1.13.0: Agent Teams 自动质检——每个 Phase 完成后自动并行派出两个独立 Agent 质检，含详细 prompt 模板、PASS/FAIL 闸门、失败重试循环
 - 1.12.0: 工程化补强——新增 scripts/lint-remotion-scenes.mjs 静态质检脚本、STYLE-ADAPTATION.md 风格迁移指南；主文档参考索引瘦身，Phase 3 增加 lint 闸门
 - 1.11.0: 创作判断层补全——新增 CREATIVE-GAP-PLAYBOOK.md/creative-gap-playbook.html，补齐简洁帧选择、视觉重音、观众留存、色彩用量、好坏对比审稿；Phase 3 增加场景规划闸门和观众任务标注
@@ -77,6 +79,7 @@ Phase 4   渲染 MP4 + 故障排查
 ```
 my-video/
 ├── article.md              # 用户原文
+├── feynman-notes.md        # 信息/科普解释模式的费曼扩写笔记（可选但推荐）
 ├── script.md               # 口播稿
 ├── outline.md              # 开发计划
 ├── audio-segments.json     # 场景 → 音频映射 + 口播文本
@@ -133,6 +136,7 @@ my-video/
 - 可选目录，不需要时可以不创建
 
 **Skill 内置参考路由**：
+- 信息/科普/代码项目扩写：`references/EXPLAINER-SCRIPTING.md`
 - 音频合成/帧数：`references/audio.md`
 - 场景开发/动效/构图：`references/CHAPTER-CRAFT.md`
 - 创作判断/留存/重音：`references/CREATIVE-GAP-PLAYBOOK.md`，可视化页 `references/creative-gap-playbook.html`
@@ -588,6 +592,97 @@ my-video/
 | 信息密集型章节没有 Oat 卡 | 缺少节奏缓冲 | 每章至少 1 个 Oat 卡 |
 | 卡片内硬编码颜色 | 应该用 tokens.css 变量 | 用 `var(--c-card-*)` 系列 |
 
+### 全屏组件规范
+
+全屏组件占据整个 1920x1080 画面，用于特殊的视觉呈现场景。与普通卡片/场景不同，全屏组件有独立的布局和交互规则。
+
+#### CodeComparison（左右分屏代码对比）
+
+适用场景：Before/After 代码对比、重构展示、优化前后对比
+
+**结构**：
+- 左侧 45%："Before" 代码
+- 中间 10%：分隔线或箭头（可用 `var(--c-divider)` 或 accent 色箭头）
+- 右侧 45%："After" 代码
+
+**规范**：
+- 代码字体 20px，行高 1.7，使用 `var(--font-mono)`
+- 当前行高亮（背景 `var(--c-terminal-highlight)`）
+- 其他行默认色（`var(--c-terminal-text)`）
+- 左侧标签 "BEFORE"，右侧标签 "AFTER"（标签用 `var(--c-text-muted)` 或 accent 色）
+- 用 `Sequence` 实现左右代码依次出现（左侧先出现，右侧延迟 12-18 帧）
+- 代码区域背景使用 `var(--c-card-terminal-bg)`，圆角 16px
+- 代码区域 padding 24px
+
+**示例结构**：
+```tsx
+<div style={{ display: 'flex', width: '100%', height: '100%', gap: 40, padding: 100 }}>
+  {/* 左侧 Before */}
+  <div style={{ width: '45%', background: 'var(--c-card-terminal-bg)', borderRadius: 16, padding: 24 }}>
+    <div style={{ color: 'var(--c-text-muted)', fontSize: 20, marginBottom: 16 }}>BEFORE</div>
+    {/* 代码行 */}
+  </div>
+  {/* 中间分隔 */}
+  <div style={{ width: '10%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ width: 2, height: '60%', background: 'var(--c-divider)' }} />
+  </div>
+  {/* 右侧 After */}
+  <div style={{ width: '45%', background: 'var(--c-card-terminal-bg)', borderRadius: 16, padding: 24 }}>
+    <div style={{ color: 'var(--c-accent)', fontSize: 20, marginBottom: 16 }}>AFTER</div>
+    {/* 代码行 */}
+  </div>
+</div>
+```
+
+#### TerminalSequence（终端序列）
+
+适用场景：命令行操作演示、安装流程、配置步骤
+
+**结构**：
+- 800px 宽，居中
+- 背景 `var(--c-card-terminal-bg)`
+- 圆角 24px
+- 三色圆点标题栏（红 #F38BA8 / 黄 #F9E2AF / 绿 #A6E3A1，各 12px 圆点）
+
+**规范**：
+- 每条命令依次出现（逐项延迟 12 帧）
+- 输出紧跟命令（延迟 3-5 帧）
+- 命令文字用 `var(--c-terminal-text)`
+- 输出文字用 `var(--c-text-muted)`
+- 当前命令高亮（背景 `var(--c-terminal-highlight)`）
+- 命令前缀 `$` 用 `var(--c-accent)`
+- 终端区域 padding 32px，内部行间距 8px
+- 字体使用 `var(--font-mono)`，20px
+
+**示例结构**：
+```tsx
+<div style={{
+  width: 800, margin: '0 auto', background: 'var(--c-card-terminal-bg)',
+  borderRadius: 24, overflow: 'hidden',
+}}>
+  {/* 标题栏 */}
+  <div style={{ display: 'flex', gap: 8, padding: '16px 24px' }}>
+    <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#F38BA8' }} />
+    <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#F9E2AF' }} />
+    <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#A6E3A1' }} />
+  </div>
+  {/* 命令区域 */}
+  <div style={{ padding: '0 32px 32px', fontFamily: 'var(--font-mono)', fontSize: 20 }}>
+    {/* 命令行依次出现 */}
+  </div>
+</div>
+```
+
+#### 全屏组件使用规则
+
+| 规则 | 说明 |
+|------|------|
+| 前后必须有非全屏场景 | 避免连续全屏组件，前后各至少 1 个普通场景（SceneLight / SceneDark） |
+| 不计入简洁帧/密集帧统计 | 全屏组件是独立类型，不参与帧型比例计算 |
+| 每章最多 1-2 个 | 全屏组件是特殊展示，过多会打断节奏 |
+| 与暗色场景的关系 | 全屏组件自带深色背景（终端类），不额外加 dark-theme className |
+| 字幕安全 | 代码/终端内容 y < 930，底部留 160px |
+
 ### 节奏驱动决策规则（替代内容驱动）
 
 **旧规则（已弃用）**：内容类型 → 固定主题（代码=暗、图表=亮…）
@@ -613,6 +708,11 @@ my-video/
 连续亮色场景：最多 4 个（含 LightWithDarkCard，体感不同）
 暗色场景比例：20%~35%
 ```
+
+**章节标题与暗场景的关系**：
+- 带章节标题时：章节标题场景计入暗场景配额（20-35%）
+- 不带章节标题时：暗场景配额不变，由普通场景承担暗色节奏
+- 连续章节标题冲突：当两个章节标题场景连续出现时，第二个改用亮色方案（深色文字 + 浅色背景），避免连续暗色
 
 **示例 A**：有章节（6 个场景的章节）
 ```
@@ -683,6 +783,26 @@ const y = interpolate(frame, [delay, delay + FAST], [24, 0], {
 ```
 
 **仅在单场景内需要局部切换时**才用 `interpolateColor`（18 帧 easeInOut），多数情况直接换场景组件。
+
+### 信息密度曲线
+
+全片信息密度应呈波浪形态，而非一成不变：
+
+| 阶段 | 密度 | 原因 |
+|------|------|------|
+| 开场（前 30 秒） | 高 | Hook 观众，展示核心价值 |
+| 第一章展开 | 中高 | 观众已投入，展开核心内容 |
+| 章节间过渡 | 低 | 喘息，给观众校准时间 |
+| 关键论点 | 最高 | 全片最重要的信息 |
+| 证据/案例 | 中 | 用细节支撑论点 |
+| 章节结尾 | 中低 | 总结，准备进入下一章 |
+| 全片结尾 | 中 | 留下印象，不要过载 |
+
+规则：
+- 开场 30 秒内必须抛出核心价值（观众决定是否继续看）
+- 每 60-90 秒有一次密度变化（升高或降低）
+- 连续高密度不超过 2 分钟（观众会疲劳）
+- 章节首场景密度略降（给观众 3-5 秒校准）
 
 ### 实现方式
 
@@ -804,6 +924,7 @@ Chapter 编排中无需额外处理，主题已在场景组件内部决定：
 |---|---|
 | 原始文章 | 一次产出 script.md + outline.md |
 | 直接口播稿 | 落盘成 script.md，产出 outline.md |
+| 简略文章 + 代码项目/资料库 | 启用信息/科普解释模式，先产出 feynman-notes.md，再产出 script.md + outline.md |
 | 啥都没有 | 反问：先给素材或大纲 |
 
 **边界条件处理**：
@@ -814,6 +935,23 @@ Chapter 编排中无需额外处理，主题已在场景组件内部决定：
 ### 1.2 内容类型判断
 
 拿到原文后，先判断内容类型，决定口播稿的处理策略。
+
+### 判断决策树
+
+读完用户输入后，按以下顺序判断：
+
+1. **用户提供了学术论文/研究报告？** → 论文/学术类（忠实还原，不扩展）
+2. **内容是个人经历/情感表达/散文故事？** → 抒情/散文类（口语化，保持情感基调）
+3. **内容涉及商业推广/产品介绍/营销？** → 商业/产品类（突出卖点，结构化整理）
+4. **内容是讲故事/案例叙述/叙事结构？** → 故事/叙事类（保持叙事节奏）
+5. **内容包含代码/技术文档/API？**
+   - 有操作步骤（怎么做）→ 教程类（讲清步骤，可费曼扩写）
+   - 有原理解释（为什么）→ 代码项目讲解（讲清设计思想，费曼扩写）
+6. **内容是数据/报告/统计分析？** → 数据/报告解读（突出关键数据，可视化）
+7. **内容是观点/分析/评论？** → 观点/分析类（理清逻辑链）
+8. **以上都不是，是知识/概念/科普？** → 信息类/科普类（费曼扩写，核心策略）
+
+判断不确定时，问用户："这个内容你希望我怎么处理？忠实还原原文，还是用费曼学习法扩写？"
 
 **忠实类（不擅自扩展）**
 
@@ -833,14 +971,18 @@ Chapter 编排中无需额外处理，主题已在场景组件内部决定：
 **扩展类（主动增强）**
 
 信息类/科普类：
+- 默认启用 `references/EXPLAINER-SCRIPTING.md` 的信息/科普解释模式
 - 原文的核心信息保留，但要判断信息是否完整
 - 如果原文只说了"是什么"，补充"为什么"和"怎么做"
 - 如果原文有观点但没有数据支撑，补充相关数据或案例
 - 如果原文概念之间缺少联系，建立逻辑链条
 - 如果原文停留在理论，补充实际应用场景
 - 扩展的内容要和原文风格一致，不要突兀
+- 先写 `feynman-notes.md` 暴露解释缺口和证据来源，再写 `script.md`
+- 每个重要结论必须能追溯到 article、代码路径、资料来源或明确标注的推理
 
 教程类：
+- 如果有代码项目或操作材料，也启用信息/科普解释模式
 - 原文的步骤保留，但要检查是否每个步骤都足够清晰
 - 如果某个步骤只说了"做X"但没说"怎么做X"，补充具体操作方法
 - 如果原文没有说明"为什么要做这一步"，补充原因（观众需要理解意图）
@@ -865,6 +1007,12 @@ Chapter 编排中无需额外处理，主题已在场景组件内部决定：
 
 ### 1.3 产出 script.md + outline.md
 
+启用信息/科普解释模式时，先产出 `feynman-notes.md`：
+- 目标观众、核心问题、结束收益
+- 每个概念的：大白话解释 / 为什么需要 / 证据来源 / 常见误解 / 边界条件 / Payoff 句
+- 如果有代码项目，记录关键代码路径和主流程
+- 无法从材料补齐的内容标记"需要用户确认"，不要编造
+
 script.md: B 站 / YouTube 风格口播稿，口语化、有节奏感。
 
 **内容保真原则（重要）**：
@@ -877,6 +1025,7 @@ script.md: B 站 / YouTube 风格口播稿，口语化、有节奏感。
 outline.md: 章节切分 + 每步内容 + 信息池。
 
 outline 必须写：章节切分 / 每章 scene 数 / 估时 / 每步屏幕内容 / 章节级信息池 / **每张卡片的形态标注（标准卡① / Oat卡② / Feature暗卡③ / 终端卡④）**
+启用信息/科普解释模式时，outline 每个场景还必须写：解释单元 / 观众问题 / 证据来源 / Payoff 句 / 帧型 / 视觉重音
 outline 不要写：具体动画类型 / CSS 实现细节 / 时长数值
 
 **检查 references/ 目录**：如果存在设计参考图，识别图片内容，在 outline 中注明参考了哪些视觉元素。
@@ -899,6 +1048,10 @@ script.md + outline.md 写完后必须停下来，一次对齐 5 件事：
       - 共享资源：tokens.css / components/ / global.css 由主 Agent 预先创建，子 Agent 只读引用
       - 合并规则：子 Agent 完成后由主 Agent 合并到 ChapterX.tsx，检查命名冲突
       - 限制：同一章的多个场景必须由同一个 Agent 完成（保证卡片节奏一致性）
+6. 章节标题偏好
+   - 带章节标题（章节标题场景算入暗场景配额）
+   - 不带章节标题（暗场景配额不变，由普通场景承担）
+   - 由 AI 根据内容长度决定
 
 ---
 
@@ -916,9 +1069,31 @@ script.md + outline.md 写完后必须停下来，一次对齐 5 件事：
 - 对照 article.md 检查完整性
 
 **文本清理规则（TTS 友好）**：
-- -（连字符）→ 空格（max-retries → max retries）
+
+基础替换：
 - _（下划线）→ 空格（init_chat_model → init chat model）
-- 保留中文标点
+- -（连字符）→ 空格（max-retries → max retries）
+
+Markdown 清理：
+- **粗体** → 删除 ** 标记，保留文字
+- *斜体* → 删除 * 标记，保留文字
+- # 标题 → 删除 # 标记，保留标题文字
+- 代码反引号 → 删除反引号，保留内容
+- [链接文本](URL) → 只保留"链接文本"，删除 URL
+- ![图片描述](URL) → 删除整行
+- > 引用块 → 删除 > 符号，保留引用文字
+- - 列表标记 / 1. 有序列表 → 删除标记符，保留内容
+- --- 分割线 → 删除
+
+编程符号清理：
+- () → 保留内容，删除括号
+- {} → 删除
+- [] → 保留内容，删除括号
+- | → 替换为空格
+- \ ~ ^ → 删除
+- => → 读作"变成"或删除
+
+保留：中文标点（。！？，、；：）、英文标点（.,!?）
 
 ### 2.2 合成音频
 
@@ -954,7 +1129,7 @@ API 配置：
   node scripts/synthesize-audio.mjs           # 合成全部（跳过已存在）
   node scripts/synthesize-audio.mjs --force   # 强制重新合成全部
 
-**synthesize-audio.mjs 脚本来源**：由 Claude 根据上方 API 配置编写，首次合成时自动创建。如已有脚本，核对 API 配置是否匹配。
+**synthesize-audio.mjs 脚本来源**：由 Claude 根据上方 API 配置和下方自动重试机制编写，首次合成时自动创建。如已有脚本，核对 API 配置和重试逻辑是否匹配。脚本必须包含：(1) 完整的文本清理逻辑（见上方清理规则）；(2) 自动重试机制（见下方重试配置）；(3) WAV 文件输出；(4) 失败记录和汇总报告。
 
 **错误处理**：
 - API 返回 401/403 → 检查 api-key 是否正确、是否过期
@@ -963,6 +1138,19 @@ API 配置：
 - 单个片段质量差 → 修改 audio-segments.json 的 text 字段后单独重新生成（只重新生成单个文件，步骤见下方）
 - WAV 文件异常（0 字节） → 检查 API 返回格式，重新运行合成脚本
 - TTS 服务完全不可用 → 用户可选择 (a) 等待服务恢复，(b) 跳过音频进入纯视觉模式
+
+### 自动重试机制
+
+synthesize-audio.mjs 内置自动重试逻辑，无需手动干预：
+
+| 配置项 | 值 | 说明 |
+|--------|-----|------|
+| 最大重试次数 | 3 次 | 单个片段最多重试 3 次 |
+| 退避策略 | 指数退避 | 500ms → 1000ms → 2000ms |
+| 429 响应 | 自动翻倍间隔 | 遇到限流自动将请求间隔翻倍后重试 |
+| 超时 | 30 秒 | 单次请求 30 秒超时，超时后重试 |
+| 失败处理 | 记录并继续 | 单个片段失败不中断整体，记录失败文件继续处理下一个 |
+| 完成后 | 汇总报告 | 全部完成后输出成功/失败统计 |
 
 **只重新生成单个文件**（不要用 --force 全部重新生成）：
   1. 临时把 audio-segments.json 只保留要重新生成的条目
@@ -1223,8 +1411,9 @@ export const FullVideo: React.FC = () => (
 --browser-executable="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 # Linux
 --browser-executable="/usr/bin/google-chrome"
-# 或使用 Remotion 自动下载 Chromium（推荐，无需手动指定）
-npx remotion browser ensure
+# 国内环境优先使用本地 Chrome，不推荐自动下载（网络可能不通）
+# Windows 备选：Microsoft Edge
+--browser-executable="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 ```
 
 **选项 A：仅渲染各章节**
@@ -1268,7 +1457,7 @@ npx remotion render src/index.ts FullVideo out/full-video.mp4
 
 | 问题 | 原因 | 解决方案 |
 |------|------|---------|
-| Chrome 路径错误 | 路径不匹配或未安装 | 运行 `npx remotion browser ensure` 自动下载 Chromium |
+| Chrome 路径错误 | 路径不匹配或未安装 | 检查本地 Chrome 路径是否正确，或改用 Edge |
 | 内存不足（OOM） | 长视频渲染占用大量内存 | 分段渲染各章节，再用 FFmpeg 合并 |
 | TypeScript 编译失败 | 组件有语法错误 | 在 Studio 预览中定位错误，先修复再渲染 |
 | 音频文件缺失 | public/audio/ 下文件不全 | 检查 audio-segments.json 与实际文件是否匹配 |
@@ -1384,6 +1573,38 @@ import subtitleTimings from '../../subtitle-timings.json';
   - **D4 左解释+右代码**：左 42% 描述+参数表+陷阱提示 / 右 58% 15行完整代码。适合 API 演示
   - **D5 网格卡片**：3×2 六卡片网格，一张 Oat 标记推荐。适合方案对比、工具选型
   - **D6 问题-改进对比**：左右各 5 个痛点/改进 + 进度条对比。适合痛点分析、前后对比
+
+### 布局 ID 系统
+
+所有场景必须标注布局 ID，用于规划和审稿时快速识别构图类型：
+
+| 布局 ID | 名称 | 子类型 | 适用场景 |
+|---------|------|--------|----------|
+| S1 | 大字独白 | 简洁帧 | 核心观点、开场、结尾 |
+| S2 | 标题+副标题 | 简洁帧 | 章节转场、概念引入 |
+| S3 | 引用卡 | 简洁帧 | 名言、核心结论 |
+| S4 | 数据高亮 | 简洁帧 | 关键数字、统计 |
+| D1 | 卡片网格 | 密集帧 | 列表、分类、对比 |
+| D2 | 左右对比 | 密集帧 | Before/After、对比 |
+| D3 | 时间线 | 密集帧 | 流程、步骤、历史 |
+| D4 | 终端窗口 | 密集帧 | 代码、命令行 |
+| D5 | 代码对比 | 密集帧 | 代码比较 |
+| D6 | 有序列表 | 密集帧 | 要点罗列 |
+| F | Feature 暗卡 | 特殊帧 | 全章最重要的结论（每章最多 2 个） |
+| T | Terminal | 特殊帧 | 终端/代码展示 |
+| CC | CodeComparison | 全屏组件 | 左右代码对比 |
+| TS | TerminalSequence | 全屏组件 | 终端操作序列 |
+
+**布局 ID 使用规则**：
+- 连续场景不能使用同一布局 ID
+- 每章至少使用 2-3 种不同布局类型
+- 全屏组件（CC / TS）前后必须有非全屏场景
+
+**每章视觉形式要求**：
+- 每章至少使用 2-3 种不同布局类型
+- 至少包含 1 种简洁帧 + 1 种密集帧
+- 避免单章全部使用同一种布局
+- 建议组合：开场简洁帧 → 展开密集帧 → 喘息简洁帧 → 深入密集帧 → 总结简洁帧
 
 ### 帧型选择决策器
 
@@ -1533,37 +1754,54 @@ Agent 2: description="质检 Phase N - 角色B", prompt="...", subagent_type="re
 ### Phase 1 完成后 → Checkpoint Plan 质检
 
 **Agent 1：内容质检**
-- 读取 `<project>/article.md` 和 `<project>/script.md`
+- 读取 `<project>/article.md` 和 `<project>/script.md`；如存在 `<project>/feynman-notes.md` 也必须读取
 - 逐节对比：文章的每个知识点是否在口播稿中有覆盖
 - 检查口播稿是否有文章中不存在的错误知识
 - 检查口播语句是否自然（非书面语、无过长句子）
-- 输出：PASS / FAIL + 缺失知识点列表
+- 检查 script.md 中不含模糊写法（如"等等"、"诸如此类"、"就不展开了"、"大家可以自行了解"——这些是偷懒信号）
+- 检查每个场景/段落是否有 Payoff 句（可复述的结论句），不能只是信息罗列而无收束
+- 信息/科普解释模式：检查每个重要结论是否有证据来源或明确标注为推理
+- 信息/科普解释模式：检查术语第一次出现是否有大白话解释
+- **PASS 标准**：article.md 的每个核心知识点在 script.md 中均有对应覆盖；无模糊偷懒写法；每个段落有 Payoff 收束句
+- **FAIL 标准**：存在未覆盖的知识点；有模糊写法超过 2 处；任意段落缺少 Payoff 句
+- 输出：PASS / FAIL + 缺失知识点列表 + 模糊写法位置
 
 **Agent 2：结构质检**
-- 读取 `<project>/script.md` 和 `<project>/outline.md`
+- 读取 `<project>/script.md` 和 `<project>/outline.md`；如存在 `<project>/feynman-notes.md` 也必须读取
 - 检查场景数与口播段落数是否匹配
 - 检查帧类型比例（简洁帧 30-45%，密集帧 55-70%）
 - 检查暗色场景比例（20-35%）
 - 检查连续简洁帧不超过 2 个
+- 检查连续场景布局不重复（相邻场景不能使用相同构图模板，如连续两个居中大字独白）
 - 检查每章是否有章节标题场景
+- 信息/科普解释模式：检查每个场景是否有解释单元、观众问题、证据来源、Payoff 句
+- **PASS 标准**：场景数与段落数一致；暗色比例 20-35%；无连续同布局；每章有标题场景
+- **FAIL 标准**：场景数与段落数不匹配；暗色比例超出范围；连续 2 个以上场景使用相同布局；章节缺标题场景
 - 输出：PASS / FAIL + 结构问题列表
 
 ### Phase 2 完成后 → Checkpoint Audio 质检
 
 **Agent 1：音频质检**
 - 读取 `<project>/audio-segments.json`
-- 检查每个 segment 的 text 字段是否与 script.md 对应段落一致
-- 检查 text 中是否有 TTS 不友好的字符（下划线、连字符、特殊符号）
-- 检查 audio 文件名是否按 chapter-scene 规则命名
-- 输出：PASS / FAIL + 文本不一致列表
+- 检查每个 segment 的 text 字段是否与 script.md 对应段落一致（逐字对比，不允许精简或改写）
+- 检查 text 中是否有 TTS 不友好的字符（下划线 `_`、连字符 `-`、反引号 `` ` ``、`**`、`#`、`[]`、`()`、`{}`、`|`、`~`、`^`）
+- 检查 audio 文件名是否按 chapter-scene 规则命名（如 ch1-0.wav）
+- 检查每个 WAV 文件是否存在且大小 > 0 字节（0 字节 = TTS 合成失败）
+- 尝试用 `node -e` 读取 WAV header 验证文件可解析（byteRate > 0, dataSize > 0）
+- **PASS 标准**：所有 text 与 script.md 一致；无 TTS 不友好字符；所有 WAV 文件存在且可解析
+- **FAIL 标准**：text 有不一致；存在未清理的符号；WAV 文件缺失或 0 字节
+- 输出：PASS / FAIL + 文本不一致列表 + 异常文件列表
 
 **Agent 2：帧数质检**
 - 读取 `<project>/public/audio/` 下所有 WAV 文件
-- 读取 WAV 头部计算时长，转换为帧数（×30fps + 15 帧缓冲）
-- 与 ChapterX.tsx 中的 durationInFrames 常量对比
+- 从 WAV header 读取 byteRate 和 dataSize，计算秒数 = dataSize / byteRate
+- 帧数计算公式：`Math.ceil(seconds * 30)`（向上取整，不加缓冲）
+- 与 ChapterX.tsx 中的帧数常量对比，误差必须 <= 2 帧
 - 与 FullVideo.tsx 中的总帧数对比
 - 检查各 Chapter 帧数之和是否等于 FullVideo 总帧数
-- 输出：PASS / FAIL + 帧数不匹配列表
+- **PASS 标准**：所有 WAV 帧数与 ChapterX.tsx 常量误差 <= 2 帧；各 Chapter 帧数之和 = FullVideo 总帧数
+- **FAIL 标准**：任意 WAV 帧数误差 > 2 帧；帧数之和不等于总帧数
+- 输出：PASS / FAIL + 帧数不匹配列表（含文件名、期望值、实际值、误差）
 
 ### Phase 3 完成后 → Checkpoint Render 质检
 
@@ -1574,15 +1812,18 @@ Agent 2: description="质检 Phase N - 角色B", prompt="...", subagent_type="re
 - 运行静态质检脚本（如存在）：`node <skill>/scripts/lint-remotion-scenes.mjs <project>`
 - 检查清单：
   - [ ] 已运行 `node <skill>/scripts/lint-remotion-scenes.mjs <project>`（或项目内同名脚本），无 error
-  - [ ] 所有 interpolate 有 extrapolateLeft/Right: clamp
-  - [ ] 无 Date.now / Math.random
+  - [ ] 所有 interpolate 有 extrapolateLeft/Right: clamp（漏一个即 FAIL）
+  - [ ] 无 Date.now / Math.random（非确定性 API，渲染会不一致）
   - [ ] 暗色场景用 AbsoluteFill className="dark-theme"（不要 div 包裹 Sequence）
   - [ ] 暗色场景的 AbsoluteFill style 中必须显式设置 `background: 'var(--c-bg)'`（否则父级亮色背景会透出，因为 CSS 变量作用域问题）
   - [ ] interpolateColor 用 3 参数形式
-  - [ ] 字体 >= 24px（grep 所有 fontSize < 24）
+  - [ ] 字体 >= 24px（grep 所有 fontSize < 24，发现即 FAIL）
+  - [ ] 所有颜色引用 tokens.css 变量（`var(--c-*)`），无硬编码 hex/rgba（grep `#[0-9a-fA-F]{3,8}` 和 `rgba\(` 排除 global.css/tokens.css 本身）
   - [ ] 无 emoji 当图标
   - [ ] 动画时长 >= 18 帧（FAST 常量 + 内联范围）
   - [ ] 无 `var(--c-surface)` 或 `var(--c-card-featured-*)` 残留
+- **PASS 标准**：lint 脚本 0 error；所有 interpolate 有 clamp；无非确定性 API；无硬编码颜色；无 fontSize < 24
+- **FAIL 标准**：lint 有 error；任意 interpolate 缺 clamp；使用 Date.now/Math.random；硬编码颜色超过 0 处；fontSize < 24 存在
 - 输出：PASS / FAIL + 代码问题列表（含文件名和行号）
 
 **Agent 2：视觉质检**
@@ -1596,7 +1837,8 @@ Agent 2: description="质检 Phase N - 角色B", prompt="...", subagent_type="re
   - [ ] accent 色克制使用：每场景最多 1-2 处 accent（装饰线、关键词高亮），副标题/标签等次要元素不要用 accent
   - [ ] 简洁帧的入场动画核心元素用 SLOW(24)，装饰元素用 FAST(18)，多元素需有 stagger 先后顺序
   - [ ] Feature 暗卡标题字号 >= 52px（建议 56px），确保视觉冲击力
-  - [ ] 暗色场景比例 20-35%
+  - [ ] 暗色场景比例 20-35%（统计所有场景的 className，超出范围即 FAIL）
+  - [ ] 连续暗色场景不超过 1 个；连续亮色场景不超过 4 个
   - [ ] 所有内容 y < 930
   - [ ] 标准卡有 `border: 0.5px solid var(--c-card-border)`
   - [ ] Oat 卡无 border、无 boxShadow（纯靠 #E3DACC 背景区分）
@@ -1613,7 +1855,10 @@ Agent 2: description="质检 Phase N - 角色B", prompt="...", subagent_type="re
   - [ ] 音频和画面严格同步
   - [ ] 颜色来自 tokens.css（无硬编码 hex/rgba）
   - [ ] 明暗节奏合理（20-35% 暗色）
+  - [ ] 无 AI 味视觉特征：无紫色粉红渐变、无高饱和霓虹、无 emoji 当图标、无 3D 渲染、无夸张弹跳动画（检查 easing 函数不含 Bounce/Elastic）
   - [ ] Studio 预览无报错
+- **PASS 标准**：暗色比例 20-35%；无连续同布局；所有内容 y < 930；无 AI 味特征；Studio 无报错
+- **FAIL 标准**：暗色比例超出范围；连续 3 个以上场景同布局；内容超出安全区；存在 AI 味特征；Studio 报错
 - 输出：PASS / FAIL + 视觉问题列表（含场景名）
 
 **静态质检命令**：
@@ -1627,20 +1872,25 @@ node <remotion-factory>/scripts/lint-remotion-scenes.mjs .
 
 **Agent 1：同步质检**
 - 读取 `<project>/subtitle-timings.json` 和 `<project>/audio-segments.json`
-- 检查字幕时间戳是否与音频时长匹配
-- 检查字幕是否有重叠或间隙
-- 字幕与音频是否对齐
-- 动画切换是否在音频提到内容时发生
-- 输出：PASS / FAIL + 同步问题列表
+- 检查字幕时间戳是否与音频时长匹配（每句 start/end 在对应音频帧范围内）
+- 检查字幕是否有重叠（前一句 end > 后一句 start）或间隙（相邻句间隔 > 30 帧 / 1 秒）
+- 字幕与音频是否对齐：字幕出现时间与口播节奏一致（误差 <= 5 帧）
+- 动画切换是否在音频提到内容时发生（关键元素入场帧与口播关键词帧误差 <= 10 帧）
+- **PASS 标准**：无字幕重叠；无 > 1 秒间隙；字幕-音频对齐误差 <= 5 帧；动画-口播误差 <= 10 帧
+- **FAIL 标准**：存在字幕重叠；间隙 > 1 秒；对齐误差 > 5 帧；动画-口播误差 > 10 帧
+- 输出：PASS / FAIL + 同步问题列表（含帧号和期望值）
 
 **Agent 2：成品质质检**
-- 读取渲染输出文件大小（应 > 10MB）
-- 检查 FullVideo.tsx 的总帧数是否覆盖所有章节
+- 读取渲染输出文件大小（应 > 10MB，小于 10MB 通常意味着渲染不完整）
+- 检查 FullVideo.tsx 的总帧数是否覆盖所有章节（各 Chapter 帧数之和 = FullVideo 总帧数）
 - 检查 Root.tsx 中 FullVideo 的 durationInFrames 是否正确
-- 完整播放无报错
-- 暗色场景视觉效果正确
-- 字幕不遮挡主内容
-- 输出：PASS / FAIL + 成品问题列表
+- 检查输出视频时长是否与帧数一致（总帧数 / 30fps = 预期秒数，误差 < 1 秒）
+- 完整播放无报错（无黑屏、无卡顿、无音频缺失）
+- 暗色场景视觉效果正确（暗色场景背景为深色而非白色）
+- 字幕不遮挡主内容（字幕 y 坐标在安全区内，不覆盖卡片/文字）
+- **PASS 标准**：文件 > 10MB；帧数一致；时长匹配；播放无异常；字幕不遮挡
+- **FAIL 标准**：文件 < 10MB；帧数不一致；时长误差 >= 1 秒；播放有异常；字幕遮挡内容
+- 输出：PASS / FAIL + 成品问题列表（含文件大小、时长、异常描述）
 
 ### 失败处理
 

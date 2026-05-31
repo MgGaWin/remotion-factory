@@ -18,6 +18,7 @@ git clone https://github.com/MgGaWin/remotion-factory.git ~/.claude/skills/remot
 - 使用 MiMo TTS（苏打音色）合成音频并嵌入时间轴
 - 直接渲染 MP4，不用录屏
 - 内容保真：口播文本保持原文信息密度
+- 信息/科普扩写：简略文章 + 代码项目/资料库可先生成 feynman-notes.md，再生成口播稿
 - 参考图支持：操作员可放草图，Claude 识别后参考创作
 
 ## 工作流（音频先行）
@@ -32,6 +33,7 @@ git clone https://github.com/MgGaWin/remotion-factory.git ~/.claude/skills/remot
 
 - 音频先行：先合成音频再开发，避免帧号错位
 - 内容保真：audio-segments.json 忠实于 script.md
+- 费曼扩写：信息类/科普类/代码项目讲解先补齐解释链条，再生成 script.md
 - TTS 友好：自动将 _ 和 - 替换为空格
 - 默认风格：Anthropic 暖调赤陶色（可通过 tokens.css 自定义）
 - 风格迁移：通过 STYLE-ADAPTATION.md 在不破坏工作流的前提下替换视觉气质
@@ -69,6 +71,7 @@ remotion-factory/                   # 技能目录（~/.claude/skills/）
 │   └── lint-remotion-scenes.mjs     # Remotion 场景静态质检脚本
 └── references/                     # 技能内置文档（随技能分发）
     ├── CHAPTER-CRAFT.md            # 场景开发指南 + 动画模式库
+    ├── EXPLAINER-SCRIPTING.md      # 信息/科普/代码项目的费曼扩写指南
     ├── CREATIVE-GAP-PLAYBOOK.md    # 创作判断指南（帧型/重音/留存/色彩/好坏对比）
     ├── STYLE-ADAPTATION.md         # 风格迁移与 token 映射指南
     ├── audio.md                    # 音频合成 + 帧对齐
@@ -80,6 +83,7 @@ remotion-factory/                   # 技能目录（~/.claude/skills/）
 
 my-video/                           # 用户项目目录（独立于技能）
 ├── article.md                      # 用户原文
+├── feynman-notes.md                # 信息/科普解释模式中间产物（可选）
 ├── script.md                       # 口播稿
 ├── references/                     # 用户的设计参考图（可选）
 │   └── sketch-01.png               # 操作员放的草图/截图

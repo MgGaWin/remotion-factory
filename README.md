@@ -19,6 +19,7 @@ Or download the [ZIP](https://github.com/MgGaWin/remotion-factory/archive/refs/h
 - Audio embedded directly in the timeline via MiMo TTS
 - Renders to MP4 - no screen recording needed
 - Content-faithful narration: preserves article depth, no over-summarization
+- Explainer expansion: brief notes plus code/docs can produce feynman-notes.md before the narration script
 - Reference images: operators can drop design sketches for Claude to reference
 
 ## Workflow (Audio-First)
@@ -33,6 +34,7 @@ Or download the [ZIP](https://github.com/MgGaWin/remotion-factory/archive/refs/h
 
 - **Audio-first**: synthesize audio before developing scenes to avoid frame misalignment
 - Content fidelity: audio-segments.json text matches script.md faithfully
+- Feynman-style expansion: informational, science, and code-project videos get a clearer explanation chain before script.md
 - TTS-safe text: automatically replaces _ and - with spaces
 - Default style: Anthropic warm terracotta (customizable via tokens.css)
 - Style adaptation: use STYLE-ADAPTATION.md to change visual tone without breaking the workflow
@@ -70,6 +72,7 @@ remotion-factory/                   # Skill directory (~/.claude/skills/)
 │   └── lint-remotion-scenes.mjs     # Static Remotion scene quality checker
 └── references/                     # Skill built-in docs (ships with skill)
     ├── CHAPTER-CRAFT.md            # Scene development guide + animation patterns
+    ├── EXPLAINER-SCRIPTING.md      # Feynman-style scripting for informational/science/code videos
     ├── CREATIVE-GAP-PLAYBOOK.md    # Creative planning guide (frames/accent/retention/color/review)
     ├── STYLE-ADAPTATION.md         # Style adaptation and token mapping guide
     ├── audio.md                    # Audio synthesis + frame alignment
@@ -81,6 +84,7 @@ remotion-factory/                   # Skill directory (~/.claude/skills/)
 
 my-video/                           # User project directory (separate)
 ├── article.md                      # User's original article
+├── feynman-notes.md                # Optional intermediate notes for explainer mode
 ├── script.md                       # Narration script
 ├── references/                     # User's design reference images (optional)
 │   └── sketch-01.png               # Operator drops sketches here
