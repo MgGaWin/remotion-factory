@@ -1,6 +1,7 @@
 ---
 
 name: remotion-factory
+version: 3.0.0
 description: |
   把文章、口播稿、简略提纲、信息科普内容或代码项目，用 Remotion 做成可直接渲染 MP4 的视频。
   流程：原始材料 -> 费曼扩写/口播稿 -> 音频合成 -> Remotion 开发 -> 渲染 MP4。
@@ -29,7 +30,7 @@ Skill 自动执行四阶段流水线：**内容编写 -> 音频合成 -> Remotio
 
 ## 版本记录
 
-- 3.0.0: 架构重组 -- SKILL.md 瘦身至 ~800 行，设计系统和质检规范独立为 DESIGN-SYSTEM.md / QUALITY-CHECKS.md；补齐 synthesize-audio.mjs 和 gen-subtitle-timings.mjs 脚本；新增快速开始章节
+- 3.0.0: 架构重组 -- SKILL.md 瘦身至 ~470 行，设计系统和质检规范独立为 DESIGN-SYSTEM.md / QUALITY-CHECKS.md；补齐 synthesize-audio.mjs 和 gen-subtitle-timings.mjs 脚本；新增快速开始章节；默认开启配音和字幕
 - 2.0.0: 全面整改 -- TTS 文本清理规则完善、Chrome 渲染指引明确、质检流程强化、明暗节奏用户可选、导演审美系统
 - 1.14.0: 信息/科普解释模式 -- 费曼扩写、简略文章+代码项目转口播稿
 - 1.13.0: Agent Teams 自动质检 -- 每 Phase 双 Agent 并行质检、PASS/FAIL 闸门

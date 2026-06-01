@@ -1,69 +1,67 @@
-﻿# Design System — Remotion Factory
+# 设计系统 — Remotion Factory
 
-Extracted from SKILL.md. Covers the full visual design language, token system,
-card patterns, rhythm rules, and layout IDs. Read this alongside the HTML demos
-in `color-preview.html`, `surface-demo.html`, and `layout-gallery.html`.
+从 SKILL.md 提取。涵盖完整的视觉设计语言、Token 系统、卡片模式、节奏规则和布局 ID。配合 `color-preview.html`、`surface-demo.html`、`layout-gallery.html` 使用。
 
 ---
 
-## 1. Default Style: Anthropic "Intellectual Warmth"
+## 1. 默认风格：Anthropic "Intellectual Warmth"
 
-Core philosophy: academic journal texture + humanist warmth + restrained intellectual elegance.
-Explicitly rejects "aggressive" tech aesthetics (high-saturation deep blue, neon gradients, cold futuristic feel).
+核心理念：学术期刊质感 + 人文温度 + 克制的知识分子风。
+明确拒绝"侵略性"科技美学（高饱和深蓝、霓虹渐变、冷酷未来感）。
 
-### Color Tokens (Light Theme)
+### 颜色 Token（亮色主题）
 
 ```css
 :root {
-  /* Backgrounds */
-  --c-bg: #FAF9F5;              /* Parchment white */
-  --c-bg-warm: #F3F1EC;          /* Warm gray, card zones */
-  --c-surface: #FFFFFF;          /* Modal/dialog surfaces only (NOT card bg) */
+  /* 底色 */
+  --c-bg: #FAF9F5;              /* 羊皮纸白 */
+  --c-bg-warm: #F3F1EC;          /* 暖灰，卡片分区 */
+  --c-surface: #FFFFFF;          /* 仅用于模态框/弹出层（不是卡片背景） */
 
-  /* Text */
-  --c-text: #141413;             /* Deep ink black (never pure #000) */
-  --c-text-secondary: #7A7870;   /* Secondary text */
-  --c-text-muted: #9E9C94;       /* Muted / dividers */
-  --c-divider: #B0AEA5;          /* Fine divider lines */
+  /* 文字 */
+  --c-text: #141413;             /* 深油墨黑（不用纯黑 #000） */
+  --c-text-secondary: #7A7870;   /* 次文字 */
+  --c-text-muted: #9E9C94;       /* 弱文字 / 分割线 */
+  --c-divider: #B0AEA5;          /* 细分割线 */
 
-  /* Brand accent */
-  --c-accent: #D97757;           /* Warm terracotta */
-  --c-accent-deep: #C2522D;      /* Deep terracotta, hover/emphasis */
+  /* 品牌色 */
+  --c-accent: #D97757;           /* 暖赤陶 */
+  --c-accent-deep: #C2522D;      /* 深赤陶，hover/强调 */
 
-  /* Chart auxiliary colors */
-  --c-chart-blue: #6A9BCC;       /* Morandi blue, low saturation */
-  --c-chart-green: #788C5D;      /* Sage green, low saturation */
-  --c-chart-gray: #E8E6DC;       /* Light gray chart background */
+  /* 辅助色（图表） */
+  --c-chart-blue: #6A9BCC;       /* 莫兰迪青蓝 */
+  --c-chart-green: #788C5D;      /* 鼠尾草绿 */
+  --c-chart-gray: #E8E6DC;       /* 浅灰底色 */
 
-  /* 10-step neutral scale (Anthropic official) */
-  --c-slate-medium: #3D3D3A;     /* Borders / focus rings */
-  --c-slate-light: #5E5D59;      /* Tertiary text */
-  --c-cloud-dark: #87867F;       /* Secondary / timestamps */
-  --c-cloud-light: #D1CFC5;      /* Card fine borders / dividers */
-  --c-oat: #E3DACC;              /* Warm fill card background */
-  --c-ivory-medium: #F0EEE6;     /* Secondary surface / nav background */
+  /* 10 档中性色阶 */
+  --c-slate-medium: #3D3D3A;     /* 边框 / focus 环 */
+  --c-slate-light: #5E5D59;      /* 三级文字 */
+  --c-cloud-dark: #87867F;       /* 次要文字 / 时间戳 */
+  --c-cloud-light: #D1CFC5;      /* 卡片细边框 */
+  --c-oat: #E3DACC;              /* 暖填充卡底色 */
+  --c-ivory-medium: #F0EEE6;     /* 二级面 / 导航背景 */
 
-  /* Terminal (code display) */
+  /* 终端（代码展示） */
   --c-terminal-bg: #1E1E2E;
   --c-terminal-text: #CDD6F4;
   --c-terminal-red: #F38BA8;
 }
 ```
 
-### Color Tokens (Dark Theme)
+### 颜色 Token（暗色主题）
 
 ```css
 .dark-theme {
-  --c-bg: #191917;              /* Deep charcoal with warmth */
+  --c-bg: #191917;              /* 深炭墨，带暖意 */
   --c-bg-warm: #242422;
   --c-surface: #2D2C2A;
 
-  --c-text: #EBEAE4;             /* Warm off-white (never pure white) */
+  --c-text: #EBEAE4;             /* 暖奶白（不用纯白） */
   --c-text-secondary: #9E9C94;
   --c-text-muted: #666560;
   --c-divider: rgba(158, 156, 148, 0.15);
 
-  --c-accent: #EE6B3E;           /* Brighter terracotta for dark bg */
+  --c-accent: #EE6B3E;           /* 亮赤陶，暗底提亮 */
   --c-accent-deep: #E58565;
 
   --c-chart-blue: #81A9D4;
@@ -72,243 +70,243 @@ Explicitly rejects "aggressive" tech aesthetics (high-saturation deep blue, neon
 }
 ```
 
-### Color Usage: Three-Layer Model
+### 颜色使用：三层模型
 
-| Layer | Rule | Example |
-|-------|------|---------|
-| **Graphic layer** - free | Chart lines, SVG doodles, flow connectors | Three colors simultaneously OK |
-| **Tag layer** - restrained | Small tag backgrounds, dots, numbered circles, left borders, accent text | Max 3 colors, total area < 5% of screen |
-| **Container layer** - forbidden | Full card backgrounds, surface fills | Never fill containers with auxiliary colors |
+| 层级 | 规则 | 示例 |
+|------|------|------|
+| **图形层** — 放开用 | 数据图线条、SVG 涂鸦、流程图连接线 | 三色同时出现没问题 |
+| **标签层** — 克制用 | 小标签底色、色点、编号圆、左边框、accent 文字 | 同屏最多 3 种，面积总和 < 屏幕 5% |
+| **容器层** — 禁止用 | 大面积卡片背景、Surface 容器填充 | 不管面积多小，整块填充都破坏暖调基调 |
 
-**Accent (terracotta `#D97757`) use rules:**
-- Allowed: text color (CTA/highlights), tag background (white text on accent), left border (3px solid), graphic strokes
-- Forbidden: large container backgrounds
-- Max 1-2 accent elements per section
+**accent 赤陶色（`#D97757`）用法**：
+- 允许：文字色（CTA/关键词高亮）、标签底色（白字）、左边框（3px solid）、图形描边
+- 禁止：大面积容器背景填充
+- 每个版块最多 1-2 处 accent 元素
 
-**Tint callout containers** (pure light background + 3px left border):
-- `--c-tint-blue: #EBF2F8` + `--c-tint-blue-border: #6A9BCC` — info/tips
-- `--c-tint-green: #ECF0E6` + `--c-tint-green-border: #788C5D` — best practice
-- `--c-tint-orange: #FAEDE6` + `--c-tint-orange-border: #D97757` — warning/caution
-
----
-
-## 2. Card System
-
-### Four Card Types
-
-| Type | Background | Border | Radius | Semantic |
-|------|-----------|--------|--------|----------|
-| 1. Standard | `#FAF9F5` (same as page) | `0.5px solid #D1CFC5` | 8px | Information display, equal treatment |
-| 2. Oat warm fill | `#E3DACC` | None | 8px | Important but not climax; a "pause" beat |
-| 3. Feature dark | `#141413` | None | 24px | Chapter''s most important takeaway |
-| 4. Terminal | `#1E1E2E` | None | 24px | Code / technical content |
-
-### Card Decision Tree
-
-For each card, answer three questions:
-
-**Q1: If removed, what core insight would the audience miss?**
-- "Not much" -> Standard 1
-- "A key point" -> Oat 2
-- "The soul of the section" -> Feature dark 3
-
-**Q2: Has a dark card already been used in this chapter?**
-- "Not yet" -> OK to use Feature dark if it''s core takeaway
-- "Used one" -> OK for a second if truly the most important
-- "Used two" -> Force downgrade to Oat. Max 2 Feature dark cards per chapter.
-
-**Q3: Is this content "one thing" or "multiple parallel items"?**
-- "Multiple, need comparison" -> Force Standard 1 (dark cards cannot hold lists)
-- "One sentence / one idea" -> Consider dark or Oat
-
-### Card Hard Constraints
-
-| Constraint | Detail |
-|------------|--------|
-| Feature dark: need-based | Only if missing this content means losing key info |
-| Max 2 Feature dark per chapter | More loses "most important" meaning |
-| No lists in dark cards | Dark cards hold single-sentence conclusions only |
-| No consecutive Oat cards | Must follow Oat with Standard (rhythm drops off) |
-| Info-dense chapters: >= 1 Oat | Narrative chapters may skip |
-| Max 1 non-standard card type per scene | Rest must be Standard |
-| Standard cards must have border | `border: 0.5px solid var(--c-card-border)` |
-| Oat cards: no border, no boxShadow | Distinguished purely by `#E3DACC` background |
-| Dark card text: no green/blue/red | Use `var(--c-card-feature-text)` / `var(--c-card-feature-secondary)` |
-| Oat card text: neutral only | Use `var(--c-card-oat-text)` or `var(--c-accent)` text color |
+**Tint 提示容器**（纯色浅底 + 左边框）：
+- `--c-tint-blue: #EBF2F8` + `--c-tint-blue-border: #6A9BCC` — 提示/信息
+- `--c-tint-green: #ECF0E6` + `--c-tint-green-border: #788C5D` — 最佳实践
+- `--c-tint-orange: #FAEDE6` + `--c-tint-orange-border: #D97757` — 注意/警告
 
 ---
 
-## 3. Typography
+## 2. 卡片系统
 
-| Level | Size | Weight | Font | Use |
-|-------|------|--------|------|-----|
-| Hero | 80-100px | 700 | `var(--font-display)` | Chapter opening, core quote |
-| Large heading | 48-60px | 700 | `var(--font-display)` | Scene theme |
-| Subheading | 32-36px | 600 | `var(--font-sans)` | Card titles |
-| Body | 24-28px | 400 | `var(--font-sans)` | Explanatory text |
-| Label | 20-22px | 400 | `var(--font-sans)` | Data source, timestamps |
-| Big number | 80-120px | 700 | `var(--font-display)` | Data focal point |
-| Code | 22-24px | 400 | `var(--font-mono)` | Terminal/code blocks |
+### 四种卡片形态
+
+| 形态 | 背景 | 边框 | 圆角 | 语义 |
+|------|------|------|------|------|
+| ① 标准卡 | `#FAF9F5`（与页面同色） | `0.5px solid #D1CFC5` | 8px | 信息陈列，平等对待 |
+| ② Oat 暖填充卡 | `#E3DACC` | 无 | 8px | 有分量但不是高潮 |
+| ③ Feature 暗卡 | `#141413` | 无 | 24px | 全章最重要的结论 |
+| ④ 终端卡 | `#1E1E2E` | 无 | 24px | 代码/技术内容 |
+
+### 卡片决策树
+
+每个卡片回答三个问题：
+
+**Q1：去掉这块内容，观众会错过什么？**
+- 「去掉也没大碍」→ 标准卡 ①
+- 「少一个关键点」→ Oat 卡 ②
+- 「整段的灵魂」→ Feature 暗卡 ③
+
+**Q2：这章已经用过暗卡了吗？**
+- 「没用过」→ 可以用
+- 「用过一个」→ 确实是最核心结论才用第二个
+- 「用过两个」→ 强制降级为 Oat
+
+**Q3：是「一条」还是「多条并列」？**
+- 「多条并列」→ 强制标准卡 ①（暗卡不能放列表）
+- 「一句话/一个观点」→ 可考虑暗卡或 Oat
+
+### 卡片硬约束
+
+| 约束 | 说明 |
+|------|------|
+| Feature 暗卡按需使用 | 错过会损失关键信息才用 |
+| 每章最多 2 个 Feature 暗卡 | 超过就失去"最重要"含义 |
+| 列表/多条内容不进暗卡 | 暗卡只放单句核心结论 |
+| 连续两个 Oat 卡禁止 | Oat 后必须接标准卡 |
+| 信息密集型章节至少 1 个 Oat | 叙事型章节可不用 |
+| 同一场景内非标准卡最多 1 种 | 其余全用标准卡 |
+| 标准卡必须有边框 | `border: 0.5px solid var(--c-card-border)` |
+| Oat 卡无边框无阴影 | 纯靠 `#E3DACC` 背景区分 |
+| 暗卡文字不用绿/蓝/红 | 用 `var(--c-card-feature-text)` / `var(--c-card-feature-secondary)` |
+
+---
+
+## 3. 排版系统
+
+| 层级 | 字号 | 字重 | 字体 | 用途 |
+|------|------|------|------|------|
+| 超大标题 | 80-100px | 700 | `var(--font-display)` | 章节开场、核心金句 |
+| 大标题 | 48-60px | 700 | `var(--font-display)` | 场景主题 |
+| 小标题 | 32-36px | 600 | `var(--font-sans)` | 卡片标题 |
+| 正文 | 24-28px | 400 | `var(--font-sans)` | 说明文字 |
+| 标注 | 20-22px | 400 | `var(--font-sans)` | 数据来源、时间戳 |
+| 大数字 | 80-120px | 700 | `var(--font-display)` | 数据焦点 |
+| 代码 | 22-24px | 400 | `var(--font-mono)` | 终端/代码块 |
 
 ```css
---font-display: 'Lora', Georgia, serif;      /* Authority, tension */
---font-sans: 'Poppins', Arial, sans-serif;    /* Modern humanist */
---font-mono: 'JetBrains Mono', monospace;     /* Code */
+--font-display: 'Lora', Georgia, serif;          /* 衬线体，权威感 */
+--font-sans: 'Poppins', Arial, sans-serif;       /* 无衬线体，现代人文 */
+--font-mono: 'JetBrains Mono', monospace;        /* 等宽字体 */
 ```
 
-For Chinese content, add `'Noto Sans SC'` as first fallback after Poppins.
+中文内容在 Poppins 后加 `'Noto Sans SC'` 作为 fallback。
 
 ---
 
-## 4. Scene Rhythm System
+## 4. 场景节奏系统
 
-### Rhythm-Driven (NOT Content-Driven)
+### 节奏驱动（不是内容驱动）
 
-Dark scenes are "accent beats" inserted by frequency, not by content type:
-1. Scene 0 must be dark (opening impact)
-2. After every 3-4 consecutive light scenes, insert 1 dark scene
-3. If chapters exist, chapter opening scenes are natural dark positions (not forced)
-4. Last scene may be dark (closing impact, optional)
+暗色是"重音拍"，按频率插入：
+1. 全片第 0 场景必须暗色（开场重音）
+2. 此后每出现 3-4 个连续亮色场景，插入 1 个暗色场景
+3. 有章节时，章节首场景天然适合作为暗色位置（不强制）
+4. 全片最后一个场景可以暗色（收尾重音，可选）
 
-**Constraints:**
-- Max 1 consecutive dark scene
-- Max 4 consecutive light scenes (including LightWithDarkCard)
-- Dark scene ratio: 20-35%
+**约束**：
+- 连续暗色场景：最多 1 个
+- 连续亮色场景：最多 4 个
+- 暗色场景比例：20-35%
 
-### Scene Modes
+### 场景模式
 
-| Mode | Background | Use |
-|------|-----------|-----|
-| `SceneLight` | `var(--c-bg)` parchment white | Body text, charts, flow steps |
-| `SceneDark` | `#191917` deep charcoal | Opening title, core conclusions (accent beat) |
-| `SceneLightWithDarkCard` | `var(--c-bg)` parchment white | Light scene with embedded dark card (code/terminal) |
-
----
-
-## 5. Layout ID System
-
-### Simple Frames (40%)
-
-| ID | Name | Use |
-|----|------|-----|
-| S1 | Large text monologue | Core idea, opening, closing |
-| S2 | Title + subtitle | Chapter transition, concept intro |
-| S3 | Quote card | Quote, core takeaway |
-| S4 | Data highlight | Key number, statistic |
-
-### Dense Frames (60%)
-
-| ID | Name | Structure |
-|----|------|-----------|
-| D1 | Data table | 6-8 row table + header + highlight row + footer |
-| D2 | Left text + right data | L 55%: text+tags / R 45%: data cards |
-| D3 | Numbered list | 6 steps with numbered circles + descriptions |
-| D4 | Left explain + right code | L 42%: description / R 58%: code |
-| D5 | Grid cards | 3x2 grid, one Oat marked as recommended |
-| D6 | Problem-improvement compare | L/R: 5 pain points / improvements |
-
-### Special Frames
-
-| ID | Name | Use |
-|----|------|-----|
-| F | Feature dark card | Chapter''s most important takeaway (max 2/chapter) |
-| T | Terminal | Code / tech content |
-| CC | CodeComparison | Left/right code diff (full-screen component) |
-| TS | TerminalSequence | Terminal operation sequence (full-screen component) |
-
-**Rules:**
-- Consecutive scenes cannot use the same layout ID
-- At least 2-3 different layout types per chapter
-- Full-screen components (CC/TS) must have non-full-screen scenes before and after
-- Recommended arc: opening simple frame -> expand dense frame -> breathing simple frame -> deep dive dense frame -> summary simple frame
+| 模式 | 背景 | 用途 |
+|------|------|------|
+| `SceneLight` | `var(--c-bg)` 羊皮纸白 | 正文、图表、流程步骤 |
+| `SceneDark` | `#191917` 深炭墨 | 开场标题、核心结论（重音拍） |
+| `SceneLightWithDarkCard` | `var(--c-bg)` 羊皮纸白 | 亮色场景中嵌入暗色卡片（代码终端） |
 
 ---
 
-## 6. Visual Accent System (Levels 1-5)
+## 5. 布局 ID 系统
 
-One primary accent per frame. Accent strength must match voiceover intensity.
+### 简洁帧（40%）
 
-| Level | Scope | Tools |
-|-------|-------|-------|
-| 1 Word | Keywords, parameter names, terms | Accent text, underline, colored dot |
-| 2 Item | Current list item / code line being discussed | Left border, numbered dot, row highlight |
-| 3 Block | One region more important than others | Oat card, light tint, fine border |
-| 4 Frame | Core takeaway, chapter turn | Simple frame, dark theme, Feature dark card |
-| 5 Rhythm | Mood shift, paragraph gear change | Light/dark switch, whitespace, brief pause |
+| ID | 名称 | 用途 |
+|----|------|------|
+| S1 | 大字独白 | 核心观点、开场、结尾 |
+| S2 | 标题+副标题 | 章节转场、概念引入 |
+| S3 | 引用卡 | 名言、核心结论 |
+| S4 | 数据高亮 | 关键数字、统计 |
+
+### 密集帧（60%）
+
+| ID | 名称 | 结构 |
+|----|------|------|
+| D1 | 数据表格 | 6-8 行数据表 + 表头 + 高亮行 + 底部结论条 |
+| D2 | 左文右数据 | 左 55% 文字+标签 / 右 45% 数据卡 |
+| D3 | 编号列表 | 6 步编号列表，编号圆+标题+说明 |
+| D4 | 左解释+右代码 | 左 42% 描述 / 右 58% 代码 |
+| D5 | 网格卡片 | 3×2 六卡片网格，一张 Oat 标记推荐 |
+| D6 | 问题-改进对比 | 左右各 5 个痛点/改进 + 进度条对比 |
+
+### 特殊帧
+
+| ID | 名称 | 用途 |
+|----|------|------|
+| F | Feature 暗卡 | 全章最重要的结论（每章最多 2 个） |
+| T | Terminal | 终端/代码展示 |
+| CC | CodeComparison | 左右代码对比（全屏组件） |
+| TS | TerminalSequence | 终端操作序列（全屏组件） |
+
+**规则**：
+- 连续场景不能使用同一布局 ID
+- 每章至少使用 2-3 种不同布局类型
+- 全屏组件（CC/TS）前后必须有非全屏场景
+- 推荐弧线：开场简洁帧 → 展开密集帧 → 喘息简洁帧 → 深挖密集帧 → 总结简洁帧
 
 ---
 
-## 7. Audience Retention Beats
+## 6. 视觉重音体系（Level 1-5）
 
-Every scene labels at least one beat:
-- **Hook**: Enter with question, contrast, cost, or result
-- **Map**: Tell audience how many parts (without laying out all details)
-- **Reveal**: Deliver information item by item, synced with voiceover
-- **Contrast**: Create judgment via before/after, good/bad, left/right, old/new
-- **Payoff**: Compress explanation into a repeatable takeaway sentence
+同一帧最多一个主重音。重音强度要匹配口播强度。
 
-**Timing rules:**
-- First 8 seconds: direct question, contrast, or promise (no background preamble)
-- Every 20-35 seconds: at least one light turn (simple frame, dark frame, contrast, code result, conclusion bar)
-- Every 60-90 seconds: one structural recap (what was solved, why next part matters)
-- Last 12 seconds: compressed answer; last frame should look screenshot-worthy
+| Level | 范围 | 工具 |
+|-------|------|------|
+| 1 词级 | 关键词、参数名、术语 | accent 文本、下划线、色点 |
+| 2 项级 | 当前正在讲的列表项/代码行 | 左边框、编号圆点、当前行高亮 |
+| 3 区块级 | 一个区域比其他区域重要 | Oat 卡、浅 tint 提示、细边框 |
+| 4 帧级 | 核心结论、章节转折 | 简洁帧、暗色主题、Feature 暗卡 |
+| 5 节奏级 | 情绪变化、段落换挡 | 明暗切换、留白、短暂停顿 |
 
 ---
 
-## 8. Animation Rules
+## 7. 观众留存节拍
 
-### Core Principles
-- `useCurrentFrame()` is the sole time source
-- Deterministic: same frame = same output
-- All `interpolate()` must have `extrapolateLeft: 'clamp', extrapolateRight: 'clamp'`
-- "Appear and stay": elements remain visible once animated in (`exitOp = 1`)
+每个场景至少标注一个节拍：
 
-### Animation Pace
+- **Hook**：用问题、反差、代价或结果让观众进入
+- **Map**：告诉观众这段有几个部分，但不提前铺满细节
+- **Reveal**：逐项交付信息，口播说到哪里，画面出现到哪里
+- **Contrast**：用前后、好坏、左右、旧新制造判断感
+- **Payoff**：把解释压成一句可复述的结论
+
+**时间规则**：
+- 前 8 秒：直接给问题、反差或承诺，不先铺背景
+- 每 20-35 秒：至少一次轻转折
+- 每 60-90 秒：一句结构回收
+- 最后 12 秒：压缩版答案，最后一帧应像"可截图的结论"
+
+---
+
+## 8. 动画规则
+
+### 核心原则
+- `useCurrentFrame()` 是唯一时间源
+- 确定性：同一帧数永远产生同一画面
+- 所有 `interpolate` 必须有 `extrapolateLeft/Right: 'clamp'`
+- "出现就留下"：元素出现后保持可见（`exitOp = 1`）
+
+### 动画节奏
 ```tsx
-const FAST = 18;  // Normal elements (0.6s)
-const SLOW = 24;  // Important elements (0.8s)
+const FAST = 18;  // 普通元素（0.6s）
+const SLOW = 24;  // 重要元素（0.8s）
 ```
 
-### Scene Transitions
-Hard cuts between scenes. No `interpolateColor` between scene components.
-Anthropic official style: zero gradient, zero shadow softening, hard-edge transitions.
+### 场景切换
+硬切（直接换组件，无过渡动画）。Anthropic 官方风格：零渐变、零阴影柔化、硬边切换。
 
-### Forbidden
-- Bounce / Elastic easing
-- Fast blinking / large deformations
-- CSS transitions (not deterministic)
-
----
-
-## 9. Spacing System (1920x1080)
-
-| Layout | Padding | Notes |
-|--------|---------|-------|
-| Large text monologue | TB 160px, LR 200px | Maximum breathing room |
-| Title + content | T 80px, B 160px, LR 100px | Standard flow |
-| Two-column compare | TB 80px, LR 100px | Information dense |
-| Data table | T 60px, B 160px, LR 80px | Maximize content area |
-| Deep dive frame | T 60px, B 160px, LR 80px | Maximize content area |
-
-### Subtitle Safety
-- All content `y < 930`
-- Bottom padding >= 160px (subtitle reservation, even when subtitles disabled)
-- Subtitle component: `bottom: 40px`, semi-transparent dark bg `rgba(20,20,19,0.85)`, white text `#EBEAE4`, 28px
+### 禁止
+- Bounce / Elastic 缓动
+- 快速闪烁 / 大幅度变形
+- CSS transition（不确定性强）
 
 ---
 
-## 10. Negative Checklist
+## 9. 间距系统（1920×1080）
 
-Things to NEVER do:
-- High-saturation blue, neon gradients
-- Purple-pink gradients
-- Emoji as icons
-- SVG-drawn people
-- 3D rendering, fluid gradients, aurora effects
-- Exaggerated bounce animations
-- High-energy electronic BGM
-- Auxiliary colors as full container backgrounds
-- Scale font size with viewport width
-- Hard-coded hex/rgba in scene files (use tokens)
-- `var(--c-surface)` as card background
-- Chinese text smaller than 24px
+| 布局 | padding | 说明 |
+|------|---------|------|
+| 大字独白 | 上下 160px 左右 200px | 极简呼吸感 |
+| 标题+内容 | 上 80px 下 160px 左右 100px | 标准流程 |
+| 双栏对比 | 上下 80px 左右 100px | 信息密集 |
+| 数据表格 | 上 60px 下 160px 左右 80px | 最大化内容区 |
+| 深挖帧 | 上 60px 下 160px 左右 80px | 最大化内容区 |
+
+### 字幕安全区
+- 所有内容 `y < 930`
+- 底部 padding >= 160px（字幕预留，即使不加字幕也要留）
+- 字幕样式：`bottom: 40px`，半透明深色背景 `rgba(20,20,19,0.85)`，白色文字 `#EBEAE4`，28px
+
+---
+
+## 10. 否定清单
+
+绝对不要做的事：
+
+- 高饱和度蓝色、霓虹渐变
+- 紫色粉红渐变
+- emoji 当图标
+- SVG 画人
+- 3D 渲染、流体渐变、极光特效
+- 夸张弹跳动画
+- 高燃电子乐 BGM
+- 辅助色做整块容器背景
+- 字号随视口宽度缩放
+- 场景文件里硬编码 hex/rgba（用 token）
+- `var(--c-surface)` 做卡片背景
+- 中文文字小于 24px

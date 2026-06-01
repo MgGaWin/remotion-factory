@@ -15,7 +15,7 @@ import path from "node:path";
 // ── Config ──────────────────────────────────────────────
 const API_URL = "https://token-plan-cn.xiaomimimo.com/v1/chat/completions";
 const API_KEY = process.env.MIMO_API_KEY;
-const VOICE = "\u82cf\u6253"; // \u82cf\u6253
+const VOICE = "\u82cf\u6253";
 const MODEL = "mimo-v2.5-tts";
 const REQUEST_INTERVAL_MS = 500;
 const MAX_RETRIES = 3;

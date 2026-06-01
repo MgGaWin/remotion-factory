@@ -63,9 +63,8 @@ function splitSentences(text) {
   // Merge adjacent short sentences (< 12 chars)
   const merged = [];
   for (const s of result) {
-    if (merged.length > 0 && merged[merged.length - 1].length < 12) {
-      merged[merged.length - 1] += s;
-    } else if (merged.length > 0 && s.length < 12) {
+    if (merged.length > 0 && s.length < 12) {
+      // Current sentence too short, merge into previous
       merged[merged.length - 1] += s;
     } else {
       merged.push(s);
