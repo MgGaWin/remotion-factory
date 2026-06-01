@@ -16,6 +16,7 @@ git clone https://github.com/MgGaWin/remotion-factory.git ~/.claude/skills/remot
 - 输入文章或口播稿 -> 输出 Remotion 项目
 - 帧级动画控制（useCurrentFrame + interpolate）
 - 使用 MiMo TTS（苏打音色）合成音频并嵌入时间轴
+- **默认开启配音和字幕**（用户说「不加配音/字幕」时才跳过）
 - 直接渲染 MP4，不用录屏
 - 内容保真：口播文本保持原文信息密度
 - 信息/科普扩写：简略文章 + 代码项目/资料库可先生成 feynman-notes.md，再生成口播稿
@@ -35,6 +36,7 @@ git clone https://github.com/MgGaWin/remotion-factory.git ~/.claude/skills/remot
 - 内容保真：audio-segments.json 忠实于 script.md
 - 费曼扩写：信息类/科普类/代码项目讲解先补齐解释链条，再生成 script.md
 - TTS 友好：自动将 _ 和 - 替换为空格
+- TTS 容错：MiMo TTS 不可用时自动降级到 Edge TTS
 - 默认风格：Anthropic 暖调赤陶色（可通过 tokens.css 自定义）
 - 风格迁移：通过 STYLE-ADAPTATION.md 在不破坏工作流的前提下替换视觉气质
 - **配色体系**：辅助色三层模型（图形层/标签层/容器层）+ tint 提示容器
@@ -65,28 +67,38 @@ git clone https://github.com/MgGaWin/remotion-factory.git ~/.claude/skills/remot
 
 ```
 remotion-factory/                   # 技能目录（~/.claude/skills/）
-├── SKILL.md                        # 主文件
+├── SKILL.md                        # 主文件（工作流路由）
 ├── manifest.json                   # 技能元数据
 ├── scripts/
-│   └── lint-remotion-scenes.mjs     # Remotion 场景静态质检脚本
+│   ├── lint-remotion-scenes.mjs     # Remotion 场景静态质检脚本
+│   ├── synthesize-audio.mjs         # MiMo TTS 音频合成脚本
+│   └── gen-subtitle-timings.mjs     # 字幕时间戳生成脚本
 └── references/                     # 技能内置文档（随技能分发）
-    ├── CHAPTER-CRAFT.md            # 场景开发指南 + 动画模式库
-    ├── EXPLAINER-SCRIPTING.md      # 信息/科普/代码项目的费曼扩写指南
-    ├── CREATIVE-GAP-PLAYBOOK.md    # 创作判断指南（帧型/重音/留存/色彩/好坏对比）
-    ├── STYLE-ADAPTATION.md         # 风格迁移与 token 映射指南
-    ├── audio.md                    # 音频合成 + 帧对齐
-    ├── SKETCH-SVG.md               # 手绘涂鸦 SVG 指南
-    ├── sketch-demo.html            # 涂鸦交互式演示（88 个动画元素）
-    ├── color-preview.html          # 配色全景预览（全部 token 可视化）
-    ├── surface-demo.html           # 辅助色应用体系演示（三层模型）
-    └── creative-gap-playbook.html  # 创作缺口补全可视化参考
+    ├── DESIGN-SYSTEM.md             # 完整设计系统（颜色、卡片、排版、节奏）
+    ├── QUALITY-CHECKS.md            # 各阶段质检详细标准
+    ├── CHAPTER-CRAFT.md             # 场景开发指南 + 动画模式库
+    ├── EXPLAINER-SCRIPTING.md       # 信息/科普/代码项目的费曼扩写指南
+    ├── CREATIVE-GAP-PLAYBOOK.md     # 创作判断指南（帧型/重音/留存/色彩/好坏对比）
+    ├── STYLE-ADAPTATION.md          # 风格迁移与 token 映射指南
+    ├── audio.md                     # 音频合成 + 帧对齐 + TTS 容错
+    ├── SKETCH-SVG.md                # 手绘涂鸦 SVG 指南
+    ├── sketch-demo.html             # 涂鸦交互式演示（88 个动画元素）
+    ├── color-preview.html           # 配色全景预览（全部 token 可视化）
+    ├── surface-demo.html            # 辅助色应用体系演示（三层模型）
+    ├── creative-gap-playbook.html   # 创作缺口补全可视化参考
+    └── layout-gallery.html          # 布局模板库
 
 my-video/                           # 用户项目目录（独立于技能）
 ├── article.md                      # 用户原文
 ├── feynman-notes.md                # 信息/科普解释模式中间产物（可选）
 ├── script.md                       # 口播稿
+├── outline.md                      # 开发计划 + 卡片形态标注
+├── audio-segments.json             # 场景 -> 音频映射 + 口播文本
+├── subtitle-timings.json           # 字幕时间戳
 ├── references/                     # 用户的设计参考图（可选）
 │   └── sketch-01.png               # 操作员放的草图/截图
+├── public/audio/                   # WAV 音频文件
+├── scripts/                        # 项目脚本（自动生成）
 └── src/                            # Remotion 源码
 ```
 
@@ -104,3 +116,14 @@ my-video/                           # 用户项目目录（独立于技能）
 | `surface-demo.html` | 辅助色三层模型、正确做法、tint 提示容器 |
 | `sketch-demo.html` | 88 个涂鸦元素 + AI 提示词一键复制 |
 | `creative-gap-playbook.html` | 帧型选择、重音、留存、色彩、好坏对比的可视化工作台 |
+| `layout-gallery.html` | 布局模板库（简洁帧 + 密集帧） |
+
+## 版本
+
+当前版本：v3.0.0
+
+更新日志：
+- v3.0.0: 架构重组 — SKILL.md 瘦身，设计系统和质检规范独立文档；新增 TTS 合成和字幕生成脚本；新增 TTS 容错策略
+- v2.0.0: 全面整改 — TTS 文本清理规则完善、Chrome 渲染指引明确、质检流程强化
+- v1.14.0: 信息/科普解释模式 — 费曼扩写、简略文章+代码项目转口播稿
+- v1.13.0: Agent Teams 自动质检 — 每 Phase 双 Agent 并行质检

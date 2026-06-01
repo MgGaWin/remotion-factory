@@ -164,6 +164,47 @@ const TOTAL_FRAMES = S1_START + SCENE1_AUDIO;
 
 ---
 
+## TTS 回退策略
+
+MiMo TTS 是首选方案，但作为单点依赖存在服务不可用的风险。当 MiMo 完全不可用时（API 持续返回错误、服务宕机），可降级到 Edge TTS 作为备用方案。
+
+### 回退触发条件
+
+满足以下任一条件时启用回退：
+- MiMo API 连续 5 次请求均失败（含重试）
+- API 返回 502/503 且持续超过 10 分钟
+- 用户明确要求使用免费 TTS
+
+### Edge TTS 备用方案
+
+Edge TTS 是 Microsoft Edge 浏览器内置的 TTS 引擎，免费、无需 API key、支持中文。缺点是音色选择较少、语速控制不如 MiMo 精细。
+
+```bash
+# 安装
+npm install edge-tts
+
+# 合成单个文本
+npx edge-tts --voice zh-CN-XiaoxiaoNeural --text "你的文本" --write-media output.wav
+
+# 批量合成（用 Python 脚本包装）
+```
+
+**回退注意事项**：
+- Edge TTS 不支持 MiMo 的 WAV 直接输出格式，需要额外转换步骤
+- 音色与 MiMo「苏打」不同，全片音色会不一致——如已合成部分 MiMo 音频，建议全部改用 Edge TTS 重新合成以保持一致
+- 回退模式下仍需遵守文本清理规则（下划线转空格、Markdown 清除等）
+
+### 回退后流程
+
+1. 修改 `synthesize-audio.mjs` 或创建 `synthesize-audio-edge.mjs` 替换 API 调用
+2. 重新合成全部音频
+3. 重新测量帧数（WAV 格式相同，测量流程不变）
+4. 在 Checkpoint Audio 阶段告知用户已使用备用 TTS，确认音色可接受
+
+> 回退方案仅作为应急备用，不替代主流程。正常情况始终使用 MiMo TTS。
+
+---
+
 ## 错误处理与故障排除
 
 ### 自动重试机制

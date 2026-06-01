@@ -1,8 +1,12 @@
 ﻿{
   "name": "remotion-factory",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "category": "Video / Presentation",
-  "description": "Turn articles, scripts, brief notes, science explainers, informational content, or code projects into MP4 videos using Remotion. Includes content type detection, Feynman-style script expansion for long-form narration, director aesthetics with cinematic scene composition, audio-first workflow, creative scene planning, style adaptation, static scene linting, reference images support, and Agent Teams quality checks.",
+  "description": "Turn articles, scripts, brief notes, science explainers, informational content, or code projects into MP4 videos using Remotion. Includes content type detection, Feynman-style script expansion for long-form narration, director aesthetics with cinematic scene composition, audio-first workflow, creative scene planning, style adaptation, static scene linting, reference images support, Agent Teams quality checks, and comprehensive design system with light/dark rhythm.",
   "homepage": "https://github.com/MgGaWin/remotion-factory",
-  "compat": ["claude-code", "claude-ai", "cursor"]
+  "compat": ["claude-code", "claude-ai", "cursor"],
+  "notes": {
+    "core": "All workflow phases, TTS synthesis, scene development, rendering pipeline are platform-independent.",
+    "claude-code-only": "Dual-agent parallel quality checks and Agent Teams parallel chapter development require Claude Code's agent tooling."
+  }
 }
