@@ -45,6 +45,15 @@
   --c-terminal-bg: #1E1E2E;
   --c-terminal-text: #CDD6F4;
   --c-terminal-red: #F38BA8;
+
+  /* 语法高亮（One Dark 主题，用于代码块内） */
+  --c-code-keyword: #C678DD;     /* class, def, return, import */
+  --c-code-type: #61AFEF;        /* 类名、函数名 */
+  --c-code-string: #98C379;      /* 字符串 */
+  --c-code-number: #D19A66;      /* 数字 */
+  --c-code-variable: #E5C07B;    /* 类型注解、变量 */
+  --c-code-comment: #ABB2BF;     /* 注释、普通代码 */
+  --c-code-error: #E06C75;       /* 错误、警告标记 */
 }
 ```
 
