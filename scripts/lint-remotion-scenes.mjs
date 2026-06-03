@@ -21,6 +21,7 @@ Checks:
   - risky y positions and small bottom subtitle space
   - Oat card with border/boxShadow
   - Feature dark card overuse in a single file
+  - code block with terminal background missing color property
 `;
 
 const args = process.argv.slice(2);
@@ -280,6 +281,46 @@ function checkCardPatterns(file, text, lines) {
   }
 }
 
+function checkCodeBlockColor(file, text, lines) {
+  // Code content blocks (with font-mono + terminal-bg) must have a color property
+  // Skip outer wrapper divs (they only have background + borderRadius, no fontFamily)
+  const terminalBgPattern = /c-terminal-bg/g;
+  for (const match of text.matchAll(terminalBgPattern)) {
+    const line = lineOf(text, match.index);
+    // Find the style block containing this match
+    let styleStart = line;
+    let styleEnd = line;
+    for (let i = line; i >= 0; i--) {
+      if (lines[i] && lines[i].includes('{')) { styleStart = i; break; }
+    }
+    for (let i = line; i < lines.length; i++) {
+      if (lines[i] && lines[i].includes('}')) { styleEnd = i; break; }
+    }
+    // Only check blocks that have fontFamily (code content areas, not outer wrappers)
+    let hasFontFamily = false;
+    for (let i = styleStart; i <= styleEnd; i++) {
+      if (lines[i] && /fontFamily/.test(lines[i])) {
+        hasFontFamily = true;
+        break;
+      }
+    }
+    if (!hasFontFamily) continue; // Skip outer wrapper
+    // Check if any line in this style block has a color property
+    let hasColor = false;
+    for (let i = styleStart; i <= styleEnd; i++) {
+      if (lines[i] && /color\s*:/.test(lines[i])) {
+        hasColor = true;
+        break;
+      }
+    }
+    if (!hasColor) {
+      add('error', file, line, 'code-block-color',
+        'Code block with terminal background is missing a color property. Non-highlighted text will be invisible.',
+        lineText(lines, line));
+    }
+  }
+}
+
 function checkText(text, file) {
   const clean = stripComments(text);
   const lines = text.split(/\r?\n/);
@@ -291,6 +332,7 @@ function checkText(text, file) {
   checkEmoji(file, clean, lines);
   checkPositionSafety(file, clean, lines);
   checkCardPatterns(file, clean, lines);
+  checkCodeBlockColor(file, clean, lines);
 }
 
 const files = candidateFiles(projectRoot);
